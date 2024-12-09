@@ -18,7 +18,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     UNUSED(hPrevInstance);
     UNUSED(nCmdShow);
     UNUSED(pCmdLine);
-    Engine<Game>::Initialize("Abrams 2022 2D Template"s);
+    Engine<Game>::Initialize("Missile"s);
     Engine<Game>::Run();
     Engine<Game>::Shutdown();
 }
