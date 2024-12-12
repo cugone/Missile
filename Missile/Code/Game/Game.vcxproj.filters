@@ -52,4 +52,9 @@
       <Filter>General</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Run_x64\Data\Materials\crosshair.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+  </ItemGroup>
 </Project>

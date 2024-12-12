@@ -1,0 +1,6 @@
+<material name="crosshair" >
+  <shader src="__2D" />
+  <textures>
+    <diffuse src="Data/Images/crosshair.png" />
+  </textures>
+</material>

@@ -162,6 +162,9 @@
       <Project>{acbda225-83de-4fba-a746-0135429fb391}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Run_x64\Data\Materials\crosshair.material" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

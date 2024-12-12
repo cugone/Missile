@@ -24,37 +24,39 @@ void Game::Initialize() noexcept {
 
     _cameraController = OrthographicCameraController();
     _cameraController.SetPosition(Vector2::Zero);
+    _cameraController.SetZoomLevelRange(Vector2{8.0f, 450.0f});
+    _cameraController.SetZoomLevel(450.0f);
+    g_theInputSystem->SetCursorToWindowCenter();
+    _mouse_delta = Vector2::Zero;
+    _mouse_pos = g_theInputSystem->GetMouseCoords();
+    g_theInputSystem->HideMouseCursor();
 }
 
 void Game::BeginFrame() noexcept {
-    /* DO NOTHING */
+    _missile_fired = false;
 }
 
 void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     g_theRenderer->UpdateGameTime(deltaSeconds);
-
+    HandleDebugInput(deltaSeconds);
     HandlePlayerInput(deltaSeconds);
 
     _ui_camera2D.Update(deltaSeconds);
     _cameraController.Update(deltaSeconds);
+    _mouse_world_pos = g_theRenderer->ConvertScreenToWorldCoords(_cameraController.GetCamera(), _mouse_pos);
 }
 
 void Game::Render() const noexcept {
+
     g_theRenderer->BeginRenderToBackbuffer();
 
 
-    //World View
-    g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("__2D"));
-    {
-        const auto S = Matrix4::CreateScaleMatrix(Vector2::One);
-        const auto R = Matrix4::I;
-        const auto T = Matrix4::I;
-        const auto M = Matrix4::MakeSRT(S, R, T);
-        g_theRenderer->DrawQuad2D(M, Rgba::ForestGreen);
-    }
+    //3D World View
 
-    // HUD View
+
+    //2D World / HUD View
     {
+
         const auto ui_view_height = static_cast<float>(GetSettings().GetWindowHeight());
         const auto ui_view_width = ui_view_height * _ui_camera2D.GetAspectRatio();
         const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
@@ -62,24 +64,15 @@ void Game::Render() const noexcept {
         const auto ui_cam_pos = Vector2::Zero;
         g_theRenderer->BeginHUDRender(_ui_camera2D, ui_cam_pos, ui_view_height);
 
-        {
-            const auto S = Matrix4::CreateScaleMatrix(Vector2::One * (1.0f + MathUtils::SineWaveDegrees(g_theRenderer->GetGameTime().count())));
-            static float r = 0.0f;
-            const std::string text = "Abrams 2022 Template";
-            const auto* font = g_theRenderer->GetFont("System32");
-            const auto T = Matrix4::I;
-            const auto nT = Matrix4::CreateTranslationMatrix(-Vector2{font->CalculateTextWidth(text), font->CalculateTextHeight(text)} * 0.5f);
-            const auto R = Matrix4::Create2DRotationDegreesMatrix(r);
-            static const float w = 90.0f;
-            r += g_theRenderer->GetGameFrameTime().count() * w;
-            const auto M = Matrix4::MakeRT(nT, Matrix4::MakeSRT(S, R, T));
-            g_theRenderer->DrawTextLine(M, font, text);
-        }
+        RenderCrosshairAt(_mouse_world_pos);
+
     }
 }
 
 void Game::EndFrame() noexcept {
-    /* DO NOTHING */
+    _mouse_pos += _mouse_delta;
+    g_theInputSystem->SetCursorToWindowCenter();
+    _mouse_delta = Vector2::Zero;
 }
 
 const GameSettings& Game::GetSettings() const noexcept {
@@ -109,7 +102,28 @@ void Game::HandleControllerInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
 }
 
 void Game::HandleMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
+    if(g_theInputSystem->WasMouseMoved()) {
+        _mouse_delta = g_theInputSystem->GetMouseDeltaFromWindowCenter();
+    }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::LButton)) {
+        _missile_fired = true;
+    }
+}
 
+void Game::RenderCrosshair() const noexcept {
+    RenderCrosshairAt(_mouse_pos);
+}
+
+void Game::RenderCrosshairAt(Vector2 pos) const noexcept {
+    g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("crosshair"));
+    const auto scale = Vector2::One * 10.0f;
+    {
+        const auto S = Matrix4::CreateScaleMatrix(scale);
+        const auto R = Matrix4::I;
+        const auto T = Matrix4::CreateTranslationMatrix(pos);
+        const auto M = Matrix4::MakeSRT(S, R, T);
+        g_theRenderer->DrawQuad2D(M);
+    }
 }
 
 void Game::HandleDebugInput(TimeUtils::FPSeconds deltaSeconds) {
@@ -120,6 +134,9 @@ void Game::HandleDebugInput(TimeUtils::FPSeconds deltaSeconds) {
 void Game::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
     if(g_theUISystem->WantsInputKeyboardCapture()) {
         return;
+    }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::F1)) {
+        _debug_render = !_debug_render;
     }
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::F4)) {
         g_theUISystem->ToggleImguiDemoWindow();

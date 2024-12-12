@@ -26,6 +26,8 @@ public:
     GameSettings& GetSettings() noexcept override;
 protected:
 private:
+    void RenderCrosshair() const noexcept;
+    void RenderCrosshairAt(Vector2 pos) const noexcept;
 
     void HandleDebugInput(TimeUtils::FPSeconds deltaSeconds);
     void HandleDebugKeyboardInput(TimeUtils::FPSeconds deltaSeconds);
@@ -38,6 +40,10 @@ private:
 
     mutable Camera2D _ui_camera2D{};
     OrthographicCameraController _cameraController{};
-    bool _debug_render = false;
+    Vector2 _mouse_pos{};
+    Vector2 _mouse_world_pos{};
+    Vector2 _mouse_delta{};
+    bool _missile_fired{false};
+    bool _debug_render{false};
 };
 
