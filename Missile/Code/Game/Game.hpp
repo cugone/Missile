@@ -33,6 +33,7 @@ private:
     void RenderCrosshair() const noexcept;
     void RenderCrosshairAt(Vector2 pos) const noexcept;
     void RenderGround() const noexcept;
+    void RenderBase() const noexcept;
 
     void HandleDebugInput(TimeUtils::FPSeconds deltaSeconds);
     void HandleDebugKeyboardInput(TimeUtils::FPSeconds deltaSeconds);

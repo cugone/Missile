@@ -6,6 +6,7 @@
 #include "Engine/Input/InputSystem.hpp"
 
 #include "Engine/Math/Disc2.hpp"
+#include "Engine/Math/Polygon2.hpp"
 
 #include "Engine/Renderer/Renderer.hpp"
 #include "Engine/Renderer/Material.hpp"
@@ -78,6 +79,7 @@ void Game::Render() const noexcept {
         g_theRenderer->BeginHUDRender(_ui_camera2D, ui_cam_pos, ui_view_height);
 
         RenderGround();
+        RenderBase();
         RenderCrosshairAt(_mouse_world_pos);
 
     }
@@ -134,6 +136,19 @@ void Game::RenderGround() const noexcept {
     g_theRenderer->DrawQuad2D(M, Rgba::Red);
 }
 
+void Game::RenderBase() const noexcept {
+    g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("__2D"));
+    const auto S = Matrix4::CreateScaleMatrix(320.0f);
+    const auto R = Matrix4::Create2DRotationDegreesMatrix(135.0f);
+    const auto height = _cameraController.CalcViewBounds().mins.y;
+    const auto p = Polygon2(6);
+    const auto p_height = p.GetHalfExtents().y;
+    const auto T = Matrix4::CreateTranslationMatrix(Vector2::Y_Axis * (-height - p_height));
+    const auto M = Matrix4::MakeSRT(S, R, T);
+    g_theRenderer->SetModelMatrix(M);
+    
+    g_theRenderer->DrawFilledPolygon2D(p, Rgba::Red);
+}
 
 void Game::RenderCrosshair() const noexcept {
     RenderCrosshairAt(_mouse_pos);
