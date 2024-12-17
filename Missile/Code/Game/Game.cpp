@@ -45,6 +45,7 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     _cameraController.Update(deltaSeconds);
 
     CalcCrosshairPositionFromRawMousePosition();
+    ClampCrosshairToView();
 
 }
 
@@ -52,7 +53,9 @@ void Game::CalcCrosshairPositionFromRawMousePosition() noexcept {
     _mouse_world_pos = g_theRenderer->ConvertScreenToWorldCoords(_cameraController.GetCamera(), _mouse_pos);
 }
 
-    _mouse_world_pos = g_theRenderer->ConvertScreenToWorldCoords(_cameraController.GetCamera(), _mouse_pos);
+void Game::ClampCrosshairToView() noexcept {
+    AABB2 view = _cameraController.CalcViewBounds();
+    _mouse_world_pos = MathUtils::CalcClosestPoint(_mouse_world_pos, view);
 }
 
 void Game::Render() const noexcept {
