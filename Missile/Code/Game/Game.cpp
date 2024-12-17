@@ -64,6 +64,7 @@ void Game::Render() const noexcept {
         const auto ui_cam_pos = Vector2::Zero;
         g_theRenderer->BeginHUDRender(_ui_camera2D, ui_cam_pos, ui_view_height);
 
+        RenderGround();
         RenderCrosshairAt(_mouse_world_pos);
 
     }
@@ -109,6 +110,17 @@ void Game::HandleMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
         _missile_fired = true;
     }
 }
+
+void Game::RenderGround() const noexcept {
+    g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("__2D"));
+    const auto S = Matrix4::CreateScaleMatrix(Vector2::One * Vector2{1600.0f, 40.0f});
+    const auto R = Matrix4::I;
+    const auto T = Matrix4::CreateTranslationMatrix(Vector2::Y_Axis * 450.0f);
+    const auto M = Matrix4::MakeSRT(S, R, T);
+
+    g_theRenderer->DrawQuad2D(M, Rgba::Red);
+}
+
 
 void Game::RenderCrosshair() const noexcept {
     RenderCrosshairAt(_mouse_pos);
