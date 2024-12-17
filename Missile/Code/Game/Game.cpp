@@ -43,6 +43,15 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
     _ui_camera2D.Update(deltaSeconds);
     _cameraController.Update(deltaSeconds);
+
+    CalcCrosshairPositionFromRawMousePosition();
+
+}
+
+void Game::CalcCrosshairPositionFromRawMousePosition() noexcept {
+    _mouse_world_pos = g_theRenderer->ConvertScreenToWorldCoords(_cameraController.GetCamera(), _mouse_pos);
+}
+
     _mouse_world_pos = g_theRenderer->ConvertScreenToWorldCoords(_cameraController.GetCamera(), _mouse_pos);
 }
 
