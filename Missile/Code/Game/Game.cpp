@@ -56,6 +56,7 @@ void Game::CalcCrosshairPositionFromRawMousePosition() noexcept {
 void Game::ClampCrosshairToView() noexcept {
     AABB2 view = _cameraController.CalcViewBounds();
     _mouse_world_pos = MathUtils::CalcClosestPoint(_mouse_world_pos, view);
+    _mouse_pos = g_theRenderer->ConvertWorldToScreenCoords(_cameraController.GetCamera(), _mouse_world_pos);
 }
 
 void Game::Render() const noexcept {
