@@ -30,6 +30,8 @@ private:
     void CalcCrosshairPositionFromRawMousePosition() noexcept;
     void ClampCrosshairToView() noexcept;
 
+    Vector2 BaseLocation() const noexcept;
+
     void RenderCrosshair() const noexcept;
     void RenderCrosshairAt(Vector2 pos) const noexcept;
     void RenderGround() const noexcept;

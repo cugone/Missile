@@ -52,6 +52,11 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
 void Game::CalcCrosshairPositionFromRawMousePosition() noexcept {
     _mouse_world_pos = g_theRenderer->ConvertScreenToWorldCoords(_cameraController.GetCamera(), _mouse_pos);
+
+Vector2 Game::BaseLocation() const noexcept {
+    return Vector2::Y_Axis * _cameraController.CalcViewBounds().maxs.y;
+}
+
 }
 
 void Game::ClampCrosshairToView() noexcept {
@@ -140,10 +145,8 @@ void Game::RenderBase() const noexcept {
     g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("__2D"));
     const auto S = Matrix4::CreateScaleMatrix(320.0f);
     const auto R = Matrix4::Create2DRotationDegreesMatrix(135.0f);
-    const auto height = _cameraController.CalcViewBounds().mins.y;
     const auto p = Polygon2(6);
-    const auto p_height = p.GetHalfExtents().y;
-    const auto T = Matrix4::CreateTranslationMatrix(Vector2::Y_Axis * (-height - p_height));
+    const auto T = Matrix4::CreateTranslationMatrix(BaseLocation());
     const auto M = Matrix4::MakeSRT(S, R, T);
     g_theRenderer->SetModelMatrix(M);
     
