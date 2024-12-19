@@ -47,11 +47,16 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
     CalculateCrosshairLocation();
 
+    if (_missile_fired) {
+        _missile_targets.push_back(std::make_pair(BaseLocation(), CalculateMissileTarget()));
+        _missile_fired = false;
+    }
 
 }
 
-void Game::CalcCrosshairPositionFromRawMousePosition() noexcept {
-    _mouse_world_pos = g_theRenderer->ConvertScreenToWorldCoords(_cameraController.GetCamera(), _mouse_pos);
+Vector2 Game::CalculateMissileTarget() noexcept {
+    return CalcCrosshairPositionFromRawMousePosition();
+}
 
 Vector2 Game::BaseLocation() const noexcept {
     return Vector2::Y_Axis * _cameraController.CalcViewBounds().maxs.y;
@@ -90,9 +95,14 @@ void Game::Render() const noexcept {
         const auto ui_cam_pos = Vector2::Zero;
         g_theRenderer->BeginHUDRender(_ui_camera2D, ui_cam_pos, ui_view_height);
 
+        RenderMissileTracks();
         RenderGround();
         RenderBase();
         RenderCrosshairAt(_mouse_world_pos);
+
+        const auto t = std::format("Mouse: {}", _mouse_world_pos);
+        g_theRenderer->SetModelMatrix();
+        g_theRenderer->DrawTextLine(g_theRenderer->GetFont("System32"), t);
 
     }
 }
@@ -135,6 +145,14 @@ void Game::HandleMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
     }
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::LButton)) {
         _missile_fired = true;
+    }
+}
+
+void Game::RenderMissileTracks() const noexcept {
+    g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("__2D"));
+    g_theRenderer->SetModelMatrix();
+    for(const auto& t : _missile_targets) {
+        g_theRenderer->DrawLine2D(t.first, t.second, Rgba::Red);
     }
 }
 

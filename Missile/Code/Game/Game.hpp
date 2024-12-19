@@ -31,8 +31,10 @@ private:
     Vector2 CalcCrosshairPositionFromRawMousePosition() noexcept;
     void ClampCrosshairToView() noexcept;
 
+    Vector2 CalculateMissileTarget() noexcept;
     Vector2 BaseLocation() const noexcept;
 
+    void RenderMissileTracks() const noexcept;
     void RenderCrosshair() const noexcept;
     void RenderCrosshairAt(Vector2 pos) const noexcept;
     void RenderGround() const noexcept;
@@ -52,6 +54,8 @@ private:
     Vector2 _mouse_pos{};
     Vector2 _mouse_world_pos{};
     Vector2 _mouse_delta{};
+    std::vector<std::pair<Vector2, Vector2>> _missile_targets{};
+
     bool _missile_fired{false};
     bool _debug_render{false};
 };
