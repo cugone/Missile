@@ -3,6 +3,8 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/KerningFont.hpp"
 
+#include "Engine/Audio/AudioSystem.hpp"
+
 #include "Engine/Input/InputSystem.hpp"
 
 #include "Engine/Math/Disc2.hpp"
@@ -13,6 +15,7 @@
 
 #include "Engine/Services/ServiceLocator.hpp"
 #include "Engine/Services/IAppService.hpp"
+#include "Engine/Services/IAudioService.hpp"
 
 #include "Engine/UI/UISystem.hpp"
 
@@ -152,6 +155,9 @@ void Game::HandleMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
     }
     if(g_theInputSystem->WasKeyJustPressed(KeyCode::LButton)) {
         _missile_fired = true;
+        static int i = 0;
+        g_theAudioSystem->Play(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameData) / std::filesystem::path{ "Audio" } / std::filesystem::path{ std::format("LaunchMissile{}.wav", i) }, AudioSystem::SoundDesc{});
+        i = (i + 1) % max_launch_sounds;
     }
 }
 
