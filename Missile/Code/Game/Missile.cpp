@@ -54,6 +54,10 @@ void Missile::SetTarget(Vector2 newTarget) noexcept {
     m_target = newTarget;
 }
 
+Vector2 Missile::GetTarget() const noexcept {
+    return m_target;
+}
+
 bool Missile::ReachedTarget() const noexcept {
     return MathUtils::IsEquivalentToZero((m_target - m_position).CalcLengthSquared());
 }

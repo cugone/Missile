@@ -22,6 +22,7 @@ public:
     void EndFrame() noexcept;
 
     void SetTarget(Vector2 newTarget) noexcept;
+    Vector2 GetTarget() const noexcept;
     bool ReachedTarget() const noexcept;
 
 protected:
