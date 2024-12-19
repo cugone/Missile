@@ -40,6 +40,9 @@
     <ClCompile Include="GameConfig.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="Missile.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -50,6 +53,9 @@
     </ClInclude>
     <ClInclude Include="GameConfig.hpp">
       <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="Missile.hpp">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
