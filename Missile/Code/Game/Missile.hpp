@@ -2,6 +2,8 @@
 
 #include "Engine/Core/TimeUtils.hpp"
 
+#include "Engine/Math/Vector2.hpp"
+
 class Missile {
 public:
     Missile() = default;
@@ -11,11 +13,21 @@ public:
     Missile& operator=(Missile&& other) = default;
     ~Missile() = default;
 
+    Missile(Vector2 startPosition, Vector2 target) noexcept;
+    Missile(Vector2 startPosition, Vector2 target, TimeUtils::FPSeconds timeToTarget) noexcept;
+
     void BeginFrame() noexcept;
     void Update(TimeUtils::FPSeconds deltaTime) noexcept;
     void Render() const;
     void EndFrame() noexcept;
 
+    void SetTarget(Vector2 newTarget) noexcept;
+    bool ReachedTarget() const noexcept;
+
 protected:
 private:
+    Vector2 m_position{};
+    Vector2 m_target{};
+    Vector2 m_startPosition{};
+    TimeUtils::FPSeconds m_timeToTarget{ TimeUtils::FPFrames{1.0f} };
 };

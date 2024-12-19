@@ -7,6 +7,8 @@
 
 #include "Engine/Renderer/Camera2D.hpp"
 
+#include "Game/Missile.hpp"
+
 class Game : public GameBase {
 public:
     Game() = default;
@@ -33,6 +35,7 @@ private:
 
     Vector2 CalculateMissileTarget() noexcept;
     Vector2 BaseLocation() const noexcept;
+    void UpdateMissilePositions(TimeUtils::FPSeconds deltaSeconds) noexcept;
 
     void RenderMissileTracks() const noexcept;
     void RenderCrosshair() const noexcept;
@@ -54,7 +57,7 @@ private:
     Vector2 _mouse_pos{};
     Vector2 _mouse_world_pos{};
     Vector2 _mouse_delta{};
-    std::vector<std::pair<Vector2, Vector2>> _missile_targets{};
+    std::vector<Missile> _missiles{};
 
     bool _missile_fired{false};
     bool _debug_render{false};

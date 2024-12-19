@@ -34,7 +34,10 @@ void Game::Initialize() noexcept {
 }
 
 void Game::BeginFrame() noexcept {
-    _missile_fired = false;
+    if (_missile_fired) {
+        _missile_fired = false;
+        _missiles.push_back(Missile{ BaseLocation(), CalculateMissileTarget(), TimeUtils::FPSeconds{0.5f} });
+    }
 }
 
 void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -46,11 +49,7 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     _cameraController.Update(deltaSeconds);
 
     CalculateCrosshairLocation();
-
-    if (_missile_fired) {
-        _missile_targets.push_back(std::make_pair(BaseLocation(), CalculateMissileTarget()));
-        _missile_fired = false;
-    }
+    UpdateMissilePositions(deltaSeconds);
 
 }
 
@@ -111,6 +110,14 @@ void Game::EndFrame() noexcept {
     _mouse_pos += _mouse_delta;
     g_theInputSystem->SetCursorToWindowCenter();
     _mouse_delta = Vector2::Zero;
+
+    for (auto iter = std::begin(_missiles); iter != std::end(_missiles); ++iter) {
+        if((*iter).ReachedTarget()) {
+            std::iter_swap(std::end(_missiles) - 1, iter);
+            _missiles.pop_back();
+            break;
+        }
+    }
 }
 
 const GameSettings& Game::GetSettings() const noexcept {
@@ -148,11 +155,15 @@ void Game::HandleMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
     }
 }
 
+void Game::UpdateMissilePositions(TimeUtils::FPSeconds deltaSeconds) noexcept {
+    for(auto& m : _missiles) {
+        m.Update(deltaSeconds);
+    }
+}
+
 void Game::RenderMissileTracks() const noexcept {
-    g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("__2D"));
-    g_theRenderer->SetModelMatrix();
-    for(const auto& t : _missile_targets) {
-        g_theRenderer->DrawLine2D(t.first, t.second, Rgba::Red);
+    for(const auto& m : _missiles) {
+        m.Render();
     }
 }
 
