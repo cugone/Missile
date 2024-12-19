@@ -45,8 +45,8 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     _ui_camera2D.Update(deltaSeconds);
     _cameraController.Update(deltaSeconds);
 
-    CalcCrosshairPositionFromRawMousePosition();
-    ClampCrosshairToView();
+    CalculateCrosshairLocation();
+
 
 }
 
@@ -57,12 +57,19 @@ Vector2 Game::BaseLocation() const noexcept {
     return Vector2::Y_Axis * _cameraController.CalcViewBounds().maxs.y;
 }
 
+Vector2 Game::CalcCrosshairPositionFromRawMousePosition() noexcept {
+    return g_theRenderer->ConvertScreenToWorldCoords(_cameraController.GetCamera(), _mouse_pos);
 }
 
 void Game::ClampCrosshairToView() noexcept {
     AABB2 view = _cameraController.CalcViewBounds();
     _mouse_world_pos = MathUtils::CalcClosestPoint(_mouse_world_pos, view);
     _mouse_pos = g_theRenderer->ConvertWorldToScreenCoords(_cameraController.GetCamera(), _mouse_world_pos);
+}
+
+void Game::CalculateCrosshairLocation() noexcept {
+    _mouse_world_pos = CalcCrosshairPositionFromRawMousePosition();
+    ClampCrosshairToView();
 }
 
 void Game::Render() const noexcept {

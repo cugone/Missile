@@ -27,7 +27,8 @@ public:
 protected:
 private:
 
-    void CalcCrosshairPositionFromRawMousePosition() noexcept;
+    void CalculateCrosshairLocation() noexcept;
+    Vector2 CalcCrosshairPositionFromRawMousePosition() noexcept;
     void ClampCrosshairToView() noexcept;
 
     Vector2 BaseLocation() const noexcept;
