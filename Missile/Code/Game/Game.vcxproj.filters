@@ -26,6 +26,9 @@
     <Filter Include="Data\Shaders">
       <UniqueIdentifier>{38c32011-edaf-4083-bb77-be03e4e3d720}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\Audio">
+      <UniqueIdentifier>{743a0ba7-e9a0-4f5f-abfc-5d50f84175ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Win32.cpp">
@@ -68,5 +71,28 @@
     <None Include="..\..\Run_x64\Data\Materials\crosshair.material">
       <Filter>Data\Materials</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion0.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion1.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion2.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion3.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion4.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\LaunchMissile0.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\LaunchMissile1.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
   </ItemGroup>
 </Project>

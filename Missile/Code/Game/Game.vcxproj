@@ -169,6 +169,15 @@
   <ItemGroup>
     <None Include="..\..\Run_x64\Data\Materials\crosshair.material" />
   </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion0.wav" />
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion1.wav" />
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion2.wav" />
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion3.wav" />
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion4.wav" />
+    <Media Include="..\..\Run_x64\Data\Audio\LaunchMissile0.wav" />
+    <Media Include="..\..\Run_x64\Data\Audio\LaunchMissile1.wav" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
