@@ -25,10 +25,13 @@ public:
     Vector2 GetTarget() const noexcept;
     bool ReachedTarget() const noexcept;
 
+    void SetColor(Rgba newColor) noexcept;
+
 protected:
 private:
     Vector2 m_position{};
     Vector2 m_target{};
     Vector2 m_startPosition{};
+    Rgba m_color{Rgba::Red};
     TimeUtils::FPSeconds m_timeToTarget{ TimeUtils::FPFrames{1.0f} };
 };

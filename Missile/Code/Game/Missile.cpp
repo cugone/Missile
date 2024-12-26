@@ -62,3 +62,7 @@ bool Missile::ReachedTarget() const noexcept {
     return MathUtils::IsEquivalentToZero((m_target - m_position).CalcLengthSquared());
 }
 
+void Missile::SetColor(Rgba newColor) noexcept {
+    m_color = newColor;
+}
+
