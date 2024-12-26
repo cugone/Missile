@@ -4,6 +4,8 @@
 
 #include "Engine/Math/Vector2.hpp"
 
+#include "Engine/Renderer/Mesh.hpp"
+
 class Missile {
 public:
     Missile() = default;
@@ -18,7 +20,7 @@ public:
 
     void BeginFrame() noexcept;
     void Update(TimeUtils::FPSeconds deltaTime) noexcept;
-    void Render() const;
+    void AppendToMesh(Mesh::Builder& builder) noexcept;
     void EndFrame() noexcept;
 
     void SetTarget(Vector2 newTarget) noexcept;
