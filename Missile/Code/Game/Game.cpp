@@ -22,7 +22,10 @@
 #include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
 
+#include <algorithm>
+
 void Game::Initialize() noexcept {
+    g_theRenderer->SetVSync(true);
     g_theRenderer->RegisterMaterialsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameMaterials));
     g_theRenderer->RegisterFontsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameFonts));
 
@@ -41,6 +44,14 @@ void Game::BeginFrame() noexcept {
         _missile_fired = false;
         _missiles.push_back(Missile{ BaseLocation(), CalculateMissileTarget(), TimeUtils::FPSeconds{0.5f} });
     }
+    for (auto& e : _explosions) {
+        e.BeginFrame();
+    }
+    for (auto& m : _missiles) {
+        m.BeginFrame();
+    }
+    m_builder.Clear();
+
 }
 
 void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -52,8 +63,9 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     _cameraController.Update(deltaSeconds);
 
     CalculateCrosshairLocation();
-    UpdateMissilePositions(deltaSeconds);
 
+    UpdateMissiles(deltaSeconds);
+    UpdateExplosions(deltaSeconds);
 }
 
 Vector2 Game::CalculateMissileTarget() noexcept {
@@ -79,6 +91,74 @@ void Game::CalculateCrosshairLocation() noexcept {
     ClampCrosshairToView();
 }
 
+void Game::HandlePlayerInput(TimeUtils::FPSeconds deltaSeconds) {
+    HandleKeyboardInput(deltaSeconds);
+    HandleControllerInput(deltaSeconds);
+    HandleMouseInput(deltaSeconds);
+}
+
+void Game::HandleKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
+    if (g_theInputSystem->WasKeyJustPressed(KeyCode::Esc)) {
+        auto* app = ServiceLocator::get<IAppService>();
+        app->SetIsQuitting(true);
+        return;
+    }
+}
+
+void Game::HandleControllerInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
+
+}
+
+void Game::HandleMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
+    if (g_theInputSystem->WasMouseMoved()) {
+        _mouse_delta = g_theInputSystem->GetMouseDeltaFromWindowCenter();
+    }
+    if (g_theInputSystem->WasKeyJustPressed(KeyCode::LButton)) {
+        _missile_fired = true;
+    }
+}
+
+void Game::HandleDebugInput(TimeUtils::FPSeconds deltaSeconds) {
+    HandleDebugKeyboardInput(deltaSeconds);
+    HandleDebugMouseInput(deltaSeconds);
+}
+
+void Game::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
+    if (g_theUISystem->WantsInputKeyboardCapture()) {
+        return;
+    }
+    if (g_theInputSystem->WasKeyJustPressed(KeyCode::F1)) {
+        _debug_render = !_debug_render;
+    }
+    if (g_theInputSystem->WasKeyJustPressed(KeyCode::F4)) {
+        g_theUISystem->ToggleImguiDemoWindow();
+    }
+}
+
+void Game::HandleDebugMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
+    if (g_theUISystem->WantsInputMouseCapture()) {
+        return;
+    }
+}
+
+void Game::CreateExplosionAt(Vector2 position) noexcept {
+    _explosions.push_back(Explosion{ position, 40.0f, TimeUtils::FPSeconds{3.0f} });
+}
+
+void Game::UpdateExplosions(TimeUtils::FPSeconds deltaSeconds) noexcept {
+    for (auto& e : _explosions) {
+        e.Update(deltaSeconds);
+        e.AppendToMesh(m_builder);
+    }
+}
+
+void Game::UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept {
+    for (auto& m : _missiles) {
+        m.Update(deltaSeconds);
+        m.AppendToMesh(m_builder);
+    }
+}
+
 void Game::Render() const noexcept {
 
     g_theRenderer->BeginRenderToBackbuffer();
@@ -97,7 +177,7 @@ void Game::Render() const noexcept {
         const auto ui_cam_pos = Vector2::Zero;
         g_theRenderer->BeginHUDRender(_ui_camera2D, ui_cam_pos, ui_view_height);
 
-        RenderMissileTracks();
+        RenderObjects();
         RenderGround();
         RenderBase();
         RenderCrosshairAt(_mouse_world_pos);
@@ -109,73 +189,14 @@ void Game::Render() const noexcept {
     }
 }
 
-void Game::EndFrame() noexcept {
-    _mouse_pos += _mouse_delta;
-    g_theInputSystem->SetCursorToWindowCenter();
-    _mouse_delta = Vector2::Zero;
-
-    for (auto iter = std::begin(_missiles); iter != std::end(_missiles); ++iter) {
-        if((*iter).ReachedTarget()) {
-            std::iter_swap(std::end(_missiles) - 1, iter);
-            _missiles.pop_back();
-            break;
-        }
-    }
-}
-
-const GameSettings& Game::GetSettings() const noexcept {
-    return GameBase::GetSettings();
-}
-
-GameSettings& Game::GetSettings() noexcept {
-    return GameBase::GetSettings();
-}
-
-void Game::HandlePlayerInput(TimeUtils::FPSeconds deltaSeconds) {
-    HandleKeyboardInput(deltaSeconds);
-    HandleControllerInput(deltaSeconds);
-    HandleMouseInput(deltaSeconds);
-}
-
-void Game::HandleKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::Esc)) {
-        auto* app = ServiceLocator::get<IAppService>();
-        app->SetIsQuitting(true);
-        return;
-    }
-}
-
-void Game::HandleControllerInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
-
-}
-
-void Game::HandleMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
-    if(g_theInputSystem->WasMouseMoved()) {
-        _mouse_delta = g_theInputSystem->GetMouseDeltaFromWindowCenter();
-    }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::LButton)) {
-        _missile_fired = true;
-        static int i = 0;
-        g_theAudioSystem->Play(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameData) / std::filesystem::path{ "Audio" } / std::filesystem::path{ std::format("LaunchMissile{}.wav", i) }, AudioSystem::SoundDesc{});
-        i = (i + 1) % max_launch_sounds;
-    }
-}
-
-void Game::UpdateMissilePositions(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    for(auto& m : _missiles) {
-        m.Update(deltaSeconds);
-    }
-}
-
-void Game::RenderMissileTracks() const noexcept {
-    for(const auto& m : _missiles) {
-        m.Render();
-    }
+void Game::RenderObjects() const noexcept {
+    g_theRenderer->SetModelMatrix();
+    Mesh::Render(m_builder);
 }
 
 void Game::RenderGround() const noexcept {
     g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("__2D"));
-    const auto S = Matrix4::CreateScaleMatrix(Vector2::One * Vector2{1600.0f, 40.0f});
+    const auto S = Matrix4::CreateScaleMatrix(Vector2::One * Vector2{ 1600.0f, 40.0f });
     const auto R = Matrix4::I;
     const auto T = Matrix4::CreateTranslationMatrix(Vector2::Y_Axis * 450.0f);
     const auto M = Matrix4::MakeSRT(S, R, T);
@@ -191,7 +212,7 @@ void Game::RenderBase() const noexcept {
     const auto T = Matrix4::CreateTranslationMatrix(BaseLocation());
     const auto M = Matrix4::MakeSRT(S, R, T);
     g_theRenderer->SetModelMatrix(M);
-    
+
     g_theRenderer->DrawFilledPolygon2D(p, Rgba::Red);
 }
 
@@ -211,25 +232,38 @@ void Game::RenderCrosshairAt(Vector2 pos) const noexcept {
     }
 }
 
-void Game::HandleDebugInput(TimeUtils::FPSeconds deltaSeconds) {
-    HandleDebugKeyboardInput(deltaSeconds);
-    HandleDebugMouseInput(deltaSeconds);
+void Game::EndFrame() noexcept {
+    _mouse_pos += _mouse_delta;
+    g_theInputSystem->SetCursorToWindowCenter();
+    _mouse_delta = Vector2::Zero;
+
+    for (auto& m : _missiles) {
+        m.EndFrame();
+    }
+    for (auto iter = std::begin(_missiles); iter != std::end(_missiles); iter++) {
+        if(iter->ReachedTarget()) {
+            CreateExplosionAt(iter->GetTarget());
+            std::iter_swap(std::rbegin(_missiles), iter);
+            _missiles.pop_back();
+            break;
+        }
+    }
+    for(auto& e : _explosions) {
+        e.EndFrame();
+    }
+    for (auto iter = std::begin(_explosions); iter != std::end(_explosions); ++iter) {
+        if(iter->IsDead()) {
+            std::iter_swap(std::end(_explosions) - 1, iter);
+            _explosions.pop_back();
+            break;
+        }
+    }
 }
 
-void Game::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
-    if(g_theUISystem->WantsInputKeyboardCapture()) {
-        return;
-    }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::F1)) {
-        _debug_render = !_debug_render;
-    }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::F4)) {
-        g_theUISystem->ToggleImguiDemoWindow();
-    }
+const GameSettings& Game::GetSettings() const noexcept {
+    return GameBase::GetSettings();
 }
 
-void Game::HandleDebugMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
-    if(g_theUISystem->WantsInputMouseCapture()) {
-        return;
-    }
+GameSettings& Game::GetSettings() noexcept {
+    return GameBase::GetSettings();
 }
