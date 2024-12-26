@@ -34,4 +34,6 @@ private:
     Vector2 m_startPosition{};
     Rgba m_color{Rgba::Red};
     TimeUtils::FPSeconds m_timeToTarget{ TimeUtils::FPFrames{1.0f} };
+    static inline int idx{0};
+
 };

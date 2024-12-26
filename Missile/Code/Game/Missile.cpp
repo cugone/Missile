@@ -6,6 +6,9 @@
 #include "Engine/Renderer/Material.hpp"
 
 #include "Engine/Services/ServiceLocator.hpp"
+#include "Engine/Audio/AudioSystem.hpp"
+
+#include "Game/GameCommon.hpp"
 
 Missile::Missile(Vector2 startPosition, Vector2 target) noexcept
     : Missile{ startPosition, target, TimeUtils::Frames{1} }
@@ -19,7 +22,8 @@ Missile::Missile(Vector2 startPosition, Vector2 target, TimeUtils::FPSeconds tim
     , m_startPosition{ startPosition }
     , m_timeToTarget{timeToTarget}
 {
-    /* DO NOTHING */
+    g_theAudioSystem->Play(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameData) / std::filesystem::path{ "Audio" } / std::filesystem::path{ std::format("LaunchMissile{}.wav", idx) }, AudioSystem::SoundDesc{});
+    idx = (idx + 1) % max_launch_sounds;
 }
 
 void Missile::BeginFrame() noexcept {
