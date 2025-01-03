@@ -27,11 +27,13 @@ public:
 
 protected:
 private:
+
+    void DoSizeEaseOut(TimeUtils::FPSeconds deltaTime) noexcept;
+
     Vector2 _position{};
     float _max_radius{};
     float _current_radius{};
     TimeUtils::FPSeconds _ttl{1.0f};
     static inline int idx{0};
     Rgba _color{};
-    static inline Mesh::Builder _builder{};
 };

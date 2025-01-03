@@ -7,6 +7,7 @@
 
 #include "Engine/Math/Disc2.hpp"
 
+#include "Engine/Math/MathUtils.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 
 #include "Game/GameCommon.hpp"
@@ -28,7 +29,9 @@ void Explosion::BeginFrame() noexcept {
 }
 
 void Explosion::Update([[maybe_unused]] TimeUtils::FPSeconds deltaTime) noexcept {
-    _current_radius = _max_radius * MathUtils::SineWave(TimeUtils::FPSeconds{TimeUtils::GetCurrentTimeElapsed()} / _ttl);
+    if (!IsDead()) {
+        DoSizeEaseOut(deltaTime);
+    }
 }
 
 void Explosion::AppendToMesh(Mesh::Builder& builder) noexcept {
@@ -45,10 +48,10 @@ void Explosion::AppendToMesh(Mesh::Builder& builder) noexcept {
         builder.AddVertex(Vector2{pX, pY});
     }
 
-
-    builder.indicies = std::vector<unsigned int>((num_sides - 1) * 3);
+    auto index_start = builder.indicies.size();
+    builder.indicies.insert(std::end(builder.indicies), static_cast<unsigned int>(num_sides) - 1u * 3u, 0u);
     unsigned int j = 1u;
-    for (std::size_t i = 1; i < builder.indicies.size() - 1; i += 3) {
+    for (std::size_t i = index_start; i < builder.indicies.size() - 1; i += 3) {
         builder.indicies[i] = (j++) % num_sides;
         builder.indicies[i + 1] = (j == num_sides ? 1 : j) % num_sides;
     }
@@ -56,9 +59,28 @@ void Explosion::AppendToMesh(Mesh::Builder& builder) noexcept {
 }
 
 void Explosion::EndFrame() noexcept {
-    /* DO NOTHING */
+    if(_ttl <= TimeUtils::FPSeconds::zero()) {
+        _ttl = TimeUtils::FPSeconds::zero();
+    }
 }
 
 bool Explosion::IsDead() const noexcept {
     return _ttl == TimeUtils::FPSeconds::zero();
+}
+
+void Explosion::DoSizeEaseOut(TimeUtils::FPSeconds deltaTime) noexcept {
+    static TimeUtils::FPSeconds t;
+    if (t < _ttl) {
+        _current_radius = MathUtils::Interpolate(_max_radius, 0.0f, MathUtils::EasingFunctions::SmoothStop<5>(t.count() / _ttl.count()));
+        t += deltaTime;
+    } else {
+        _current_radius = _max_radius;
+        _ttl = TimeUtils::FPSeconds::zero();
+        t = TimeUtils::FPSeconds::zero();
+    }
+    if (MathUtils::IsEquivalent(_current_radius, _max_radius)) {
+        _current_radius = _max_radius;
+        _ttl = TimeUtils::FPSeconds::zero();
+        t = TimeUtils::FPSeconds::zero();
+    }
 }
