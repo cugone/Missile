@@ -101,4 +101,9 @@
       <Filter>Data\Audio</Filter>
     </Media>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\Run_x64\Data\Images\Crosshair.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
