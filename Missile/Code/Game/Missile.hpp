@@ -28,14 +28,18 @@ public:
     bool ReachedTarget() const noexcept;
 
     void SetColor(Rgba newColor) noexcept;
+    void Kill() noexcept;
+    bool IsDead() const noexcept;
 
 protected:
 private:
+
     Vector2 m_position{};
     Vector2 m_target{};
     Vector2 m_startPosition{};
     Rgba m_color{Rgba::Red};
     TimeUtils::FPSeconds m_timeToTarget{ TimeUtils::FPFrames{1.0f} };
+    int m_health{1};
     static inline int idx{0};
 
 };

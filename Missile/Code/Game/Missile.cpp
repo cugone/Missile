@@ -9,6 +9,7 @@
 #include "Engine/Audio/AudioSystem.hpp"
 
 #include "Game/GameCommon.hpp"
+#include "Game/Game.hpp"
 
 Missile::Missile(Vector2 startPosition, Vector2 target) noexcept
     : Missile{ startPosition, target, TimeUtils::Frames{1} }
@@ -42,6 +43,9 @@ void Missile::Update([[maybe_unused]] TimeUtils::FPSeconds deltaTime) noexcept {
             m_position = m_target;
         }
     }
+    if(ReachedTarget()) {
+        Kill();
+    }
 }
 
 void Missile::AppendToMesh(Mesh::Builder& builder) noexcept {
@@ -56,7 +60,9 @@ void Missile::AppendToMesh(Mesh::Builder& builder) noexcept {
 }
 
 void Missile::EndFrame() noexcept {
-    /* DO NOTHING */
+    if(IsDead()) {
+        GetGameAs<Game>()->CreateExplosionAt(m_position);
+    }
 }
 
 void Missile::SetTarget(Vector2 newTarget) noexcept {
@@ -75,3 +81,10 @@ void Missile::SetColor(Rgba newColor) noexcept {
     m_color = newColor;
 }
 
+bool Missile::IsDead() const noexcept {
+    return m_health <= 0;
+}
+
+void Missile::Kill() noexcept {
+    m_health = 0;
+}
