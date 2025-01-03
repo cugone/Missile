@@ -2,6 +2,7 @@
 
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/KerningFont.hpp"
+#include "Engine/Core/Utilities.hpp"
 
 #include "Engine/Audio/AudioSystem.hpp"
 
@@ -42,16 +43,13 @@ void Game::Initialize() noexcept {
 void Game::BeginFrame() noexcept {
     if (_missile_fired) {
         _missile_fired = false;
-        _missiles.push_back(Missile{ BaseLocation(), CalculateMissileTarget(), TimeUtils::FPSeconds{0.5f} });
+        _missiles.push_back(Missile{ BaseLocation(), CalculatePlayerMissileTarget(), TimeUtils::FPSeconds{0.5f} });
     }
-    for (auto& e : _explosions) {
-        e.BeginFrame();
-    }
+    _explosionManager.BeginFrame();
     for (auto& m : _missiles) {
         m.BeginFrame();
     }
     m_builder.Clear();
-
 }
 
 void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -65,10 +63,10 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     CalculateCrosshairLocation();
 
     UpdateMissiles(deltaSeconds);
-    UpdateExplosions(deltaSeconds);
+    _explosionManager.Update(deltaSeconds);
 }
 
-Vector2 Game::CalculateMissileTarget() noexcept {
+Vector2 Game::CalculatePlayerMissileTarget() noexcept {
     return CalcCrosshairPositionFromRawMousePosition();
 }
 
@@ -133,6 +131,9 @@ void Game::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::F4)) {
         g_theUISystem->ToggleImguiDemoWindow();
     }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::M)) {
+        Utils::FlipFlop([]() {g_theAudioSystem->SuspendAudio(); }, []() {g_theAudioSystem->ResumeAudio(); });
+    }
 }
 
 void Game::HandleDebugMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
@@ -142,19 +143,14 @@ void Game::HandleDebugMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
 }
 
 void Game::CreateExplosionAt(Vector2 position) noexcept {
-    _explosions.push_back(Explosion{ position, 40.0f, TimeUtils::FPSeconds{3.0f} });
-}
-
-void Game::UpdateExplosions(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    for (auto& e : _explosions) {
-        e.Update(deltaSeconds);
-        e.AppendToMesh(m_builder);
-    }
+    _explosionManager.CreateExplosionAt(position, 40.0f, TimeUtils::FPSeconds{3.0f});
 }
 
 void Game::UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept {
     for (auto& m : _missiles) {
         m.Update(deltaSeconds);
+    }
+    for (auto& m : _missiles) {
         m.AppendToMesh(m_builder);
     }
 }
@@ -190,6 +186,7 @@ void Game::Render() const noexcept {
 }
 
 void Game::RenderObjects() const noexcept {
+    _explosionManager.Render();
     g_theRenderer->SetModelMatrix();
     Mesh::Render(m_builder);
 }
@@ -237,27 +234,11 @@ void Game::EndFrame() noexcept {
     g_theInputSystem->SetCursorToWindowCenter();
     _mouse_delta = Vector2::Zero;
 
-    for (auto& m : _missiles) {
+    for(auto& m : _missiles) {
         m.EndFrame();
     }
-    for (auto iter = std::begin(_missiles); iter != std::end(_missiles); iter++) {
-        if(iter->ReachedTarget()) {
-            CreateExplosionAt(iter->GetTarget());
-            std::iter_swap(std::rbegin(_missiles), iter);
-            _missiles.pop_back();
-            break;
-        }
-    }
-    for(auto& e : _explosions) {
-        e.EndFrame();
-    }
-    for (auto iter = std::begin(_explosions); iter != std::end(_explosions); ++iter) {
-        if(iter->IsDead()) {
-            std::iter_swap(std::end(_explosions) - 1, iter);
-            _explosions.pop_back();
-            break;
-        }
-    }
+    _missiles.erase(std::remove_if(std::begin(_missiles), std::end(_missiles), [](Missile& m) { return m.IsDead(); }), std::end(_missiles));
+    _explosionManager.EndFrame();
 }
 
 const GameSettings& Game::GetSettings() const noexcept {

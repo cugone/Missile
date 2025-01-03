@@ -8,7 +8,7 @@
 #include "Engine/Renderer/Camera2D.hpp"
 
 #include "Game/Missile.hpp"
-#include "Game/Explosion.hpp"
+#include "Game/ExplosionManager.hpp"
 
 #include <vector>
 
@@ -29,18 +29,20 @@ public:
 
     const GameSettings& GetSettings() const noexcept override;
     GameSettings& GetSettings() noexcept override;
+
+    void CreateExplosionAt(Vector2 position) noexcept;
+
 protected:
 private:
-    void CreateExplosionAt(Vector2 position) noexcept;
+
 
     void CalculateCrosshairLocation() noexcept;
     Vector2 CalcCrosshairPositionFromRawMousePosition() noexcept;
     void ClampCrosshairToView() noexcept;
 
-    Vector2 CalculateMissileTarget() noexcept;
+    Vector2 CalculatePlayerMissileTarget() noexcept;
     Vector2 BaseLocation() const noexcept;
     void UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept;
-    void UpdateExplosions(TimeUtils::FPSeconds deltaSeconds) noexcept;
 
     void RenderObjects() const noexcept;
     void RenderCrosshair() const noexcept;
@@ -63,7 +65,7 @@ private:
     Vector2 _mouse_world_pos{};
     Vector2 _mouse_delta{};
     std::vector<Missile> _missiles{};
-    std::vector<Explosion> _explosions{};
+    ExplosionManager _explosionManager{};
     mutable Mesh::Builder m_builder{};
     bool _missile_fired{false};
     bool _debug_render{false};
