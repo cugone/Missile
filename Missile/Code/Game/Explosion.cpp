@@ -37,6 +37,7 @@ void Explosion::AppendToMesh(Mesh::Builder& builder) noexcept {
     builder.Begin(PrimitiveType::Triangles);
     builder.SetColor(_color);
 
+    const auto index_start = builder.verticies.size();
     builder.AddVertex(_position);
     const auto num_sides = 64;
     constexpr const auto anglePerVertex = 360.0f / num_sides;
@@ -47,12 +48,11 @@ void Explosion::AppendToMesh(Mesh::Builder& builder) noexcept {
         builder.AddVertex(Vector2{pX, pY});
     }
 
-    auto index_start = builder.indicies.size();
-    builder.indicies.insert(std::end(builder.indicies), static_cast<unsigned int>(num_sides) - 1u * 3u, 0u);
-    unsigned int j = 1u;
-    for (std::size_t i = index_start; i < builder.indicies.size() - 1; i += 3) {
+    builder.indicies.insert(std::end(builder.indicies), static_cast<unsigned int>(num_sides - 1u) * 3u, static_cast<unsigned int>(index_start));
+    unsigned int j = static_cast<unsigned int>(index_start) + 1;
+    for (std::size_t i = j; i < builder.indicies.size() - 1; i += 3) {
         builder.indicies[i] = (j++) % num_sides;
-        builder.indicies[i + 1] = (j == num_sides ? 1 : j) % num_sides;
+        builder.indicies[i + 1] = (j == num_sides ? index_start + 1 : j) % num_sides;
     }
     builder.End(g_theRenderer->GetMaterial("__2D"));
 }
