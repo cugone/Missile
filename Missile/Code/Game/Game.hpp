@@ -8,6 +8,7 @@
 #include "Engine/Renderer/Camera2D.hpp"
 
 #include "Game/Missile.hpp"
+#include "Game/MissileManager.hpp"
 #include "Game/ExplosionManager.hpp"
 
 #include <vector>
@@ -63,10 +64,8 @@ private:
     Vector2 _mouse_pos{};
     Vector2 _mouse_world_pos{};
     Vector2 _mouse_delta{};
-    std::vector<Missile> _missiles{};
+    MissileManager m_missileManager{};
     ExplosionManager _explosionManager{};
-    mutable Mesh::Builder m_builder{};
-    bool _missile_fired{false};
     bool _debug_render{false};
 };
 

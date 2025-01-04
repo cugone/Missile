@@ -41,15 +41,8 @@ void Game::Initialize() noexcept {
 }
 
 void Game::BeginFrame() noexcept {
-    if (_missile_fired) {
-        _missile_fired = false;
-        _missiles.push_back(Missile{ BaseLocation(), CalculatePlayerMissileTarget(), TimeUtils::FPSeconds{0.5f} });
-    }
     _explosionManager.BeginFrame();
-    for (auto& m : _missiles) {
-        m.BeginFrame();
-    }
-    m_builder.Clear();
+    m_missileManager.BeginFrame();
 }
 
 void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -61,8 +54,8 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     _cameraController.Update(deltaSeconds);
 
     CalculateCrosshairLocation();
-
-    UpdateMissiles(deltaSeconds);
+    m_missileManager.LaunchMissile(BaseLocation(), MissileManager::Target{ CalculatePlayerMissileTarget() }, TimeUtils::FPSeconds{1.0f});
+    m_missileManager.Update(deltaSeconds);
     _explosionManager.Update(deltaSeconds);
 }
 
@@ -112,7 +105,7 @@ void Game::HandleMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
         _mouse_delta = g_theInputSystem->GetMouseDeltaFromWindowCenter();
     }
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::LButton)) {
-        _missile_fired = true;
+        m_missileManager.FireMissile();
     }
 }
 
@@ -177,9 +170,8 @@ void Game::Render() const noexcept {
 }
 
 void Game::RenderObjects() const noexcept {
+    m_missileManager.Render();
     _explosionManager.Render();
-    g_theRenderer->SetModelMatrix();
-    Mesh::Render(m_builder);
 }
 
 void Game::RenderGround() const noexcept {
@@ -224,11 +216,7 @@ void Game::EndFrame() noexcept {
     _mouse_pos += _mouse_delta;
     g_theInputSystem->SetCursorToWindowCenter();
     _mouse_delta = Vector2::Zero;
-
-    for(auto& m : _missiles) {
-        m.EndFrame();
-    }
-    _missiles.erase(std::remove_if(std::begin(_missiles), std::end(_missiles), [](Missile& m) { return m.IsDead(); }), std::end(_missiles));
+    m_missileManager.EndFrame();
     _explosionManager.EndFrame();
 }
 
