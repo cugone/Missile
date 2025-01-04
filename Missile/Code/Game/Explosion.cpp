@@ -29,9 +29,7 @@ void Explosion::BeginFrame() noexcept {
 }
 
 void Explosion::Update([[maybe_unused]] TimeUtils::FPSeconds deltaTime) noexcept {
-    if (!IsDead()) {
-        DoSizeEaseOut(deltaTime);
-    }
+    DoSizeEaseOut(deltaTime);
 }
 
 void Explosion::AppendToMesh(Mesh::Builder& builder) noexcept {
