@@ -17,14 +17,13 @@ void ExplosionManager::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     for (auto& e : m_explosions) {
         e.Update(deltaSeconds);
     }
-    for (auto& e : m_explosions) {
-        e.AppendToMesh(m_builder);
-    }
 }
 
 void ExplosionManager::Render() const noexcept {
     g_theRenderer->SetModelMatrix();
-    Mesh::Render(m_builder);
+    for (const auto& e : m_explosions) {
+        g_theRenderer->DrawFilledCircle2D(e.GetCollisionMesh().center, e.GetCollisionMesh().radius, e.GetColor());
+    }
 }
 
 void ExplosionManager::EndFrame() noexcept {
