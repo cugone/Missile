@@ -201,6 +201,10 @@ void Game::RenderCrosshair() const noexcept {
 }
 
 void Game::RenderCrosshairAt(Vector2 pos) const noexcept {
+    RenderCrosshairAt(pos, Rgba::White);
+}
+
+void Game::RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept {
     g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("crosshair"));
     const auto scale = Vector2::One * 10.0f;
     {
@@ -208,8 +212,11 @@ void Game::RenderCrosshairAt(Vector2 pos) const noexcept {
         const auto R = Matrix4::I;
         const auto T = Matrix4::CreateTranslationMatrix(pos);
         const auto M = Matrix4::MakeSRT(S, R, T);
-        g_theRenderer->DrawQuad2D(M);
+        g_theRenderer->DrawQuad2D(M, color);
     }
+    g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("__2D"));
+    g_theRenderer->SetModelMatrix();
+    g_theRenderer->DrawFilledCircle2D(Disc2{pos, 40.0f}, color);
 }
 
 void Game::EndFrame() noexcept {
