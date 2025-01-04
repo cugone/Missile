@@ -21,7 +21,7 @@ Explosion::Explosion(Vector2 position, float maxRadius, TimeUtils::FPSeconds lif
     , _ttl{lifetime}
     , _color{ Rgba::Random() }
 {
-    g_theAudioSystem->Play(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameData) / "Audio" / std::format("Explosion{}.wav", idx), AudioSystem::SoundDesc{});
+    //g_theAudioSystem->Play(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameData) / "Audio" / std::format("Explosion{}.wav", idx), AudioSystem::SoundDesc{});
     idx = (idx + 1) % max_explosion_sounds;
 }
 
