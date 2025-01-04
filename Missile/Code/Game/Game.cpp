@@ -193,7 +193,7 @@ void Game::RenderBase() const noexcept {
     const auto M = Matrix4::MakeSRT(S, R, T);
     g_theRenderer->SetModelMatrix(M);
 
-    g_theRenderer->DrawFilledPolygon2D(p, Rgba::Red);
+    //g_theRenderer->DrawFilledPolygon2D(p, Rgba::Red);
 }
 
 void Game::RenderCrosshair() const noexcept {
