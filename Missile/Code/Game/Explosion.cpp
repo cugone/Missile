@@ -67,18 +67,13 @@ bool Explosion::IsDead() const noexcept {
 }
 
 void Explosion::DoSizeEaseOut(TimeUtils::FPSeconds deltaTime) noexcept {
-    static TimeUtils::FPSeconds t;
-    if (t < _ttl) {
-        _current_radius = MathUtils::Interpolate(_max_radius, 0.0f, MathUtils::EasingFunctions::SmoothStop<5>(t.count() / _ttl.count()));
-        t += deltaTime;
-    } else {
-        _current_radius = _max_radius;
-        _ttl = TimeUtils::FPSeconds::zero();
-        t = TimeUtils::FPSeconds::zero();
+    if (_t < TimeUtils::FPSeconds::zero()) {
+        _t = TimeUtils::FPSeconds::zero();
     }
-    if (MathUtils::IsEquivalent(_current_radius, _max_radius)) {
-        _current_radius = _max_radius;
-        _ttl = TimeUtils::FPSeconds::zero();
-        t = TimeUtils::FPSeconds::zero();
+    if (_t > _ttl) {
+        _t = _ttl;
     }
+    const auto delta = _t / _ttl;
+    _current_radius = _max_radius * (MathUtils::EasingFunctions::SmoothStart<5>(delta) + MathUtils::EasingFunctions::SmoothStart<5>(delta));
+    _t += deltaTime;
 }
