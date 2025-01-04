@@ -3,6 +3,7 @@
 #include "Engine/Core/Rgba.hpp"
 #include "Engine/Core/TimeUtils.hpp"
 
+#include "Engine/Math/Disc2.hpp"
 #include "Engine/Math/Vector2.hpp"
 
 #include "Engine/Renderer/Mesh.hpp"
@@ -24,6 +25,7 @@ public:
     void EndFrame() noexcept;
 
     bool IsDead() const noexcept;
+    Disc2 GetCollisionMesh() const noexcept;
 
 protected:
 private:

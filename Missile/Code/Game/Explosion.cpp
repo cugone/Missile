@@ -64,6 +64,10 @@ bool Explosion::IsDead() const noexcept {
     return _ttl <= _t;
 }
 
+Disc2 Explosion::GetCollisionMesh() const noexcept {
+    return Disc2{_position, _current_radius};
+}
+
 }
 
 void Explosion::DoSizeEaseOut(TimeUtils::FPSeconds deltaTime) noexcept {
