@@ -57,13 +57,13 @@ void Explosion::AppendToMesh(Mesh::Builder& builder) noexcept {
 }
 
 void Explosion::EndFrame() noexcept {
-    if(_ttl <= TimeUtils::FPSeconds::zero()) {
-        _ttl = TimeUtils::FPSeconds::zero();
-    }
+    /* DO NOTHING */
 }
 
 bool Explosion::IsDead() const noexcept {
-    return _ttl == TimeUtils::FPSeconds::zero();
+    return _ttl <= _t;
+}
+
 }
 
 void Explosion::DoSizeEaseOut(TimeUtils::FPSeconds deltaTime) noexcept {
