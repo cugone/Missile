@@ -51,12 +51,18 @@ void Missile::Update([[maybe_unused]] TimeUtils::FPSeconds deltaTime) noexcept {
 void Missile::AppendToMesh(Mesh::Builder& builder) noexcept {
     builder.Begin(PrimitiveType::Lines);
     builder.SetColor(m_color);
-
     builder.AddVertex(m_startPosition);
     builder.AddVertex(m_position);
     builder.AddIndicies(Mesh::Builder::Primitive::Line);
-
     builder.End(g_theRenderer->GetMaterial("__2D"));
+
+    builder.Begin(PrimitiveType::Points);
+    builder.SetColor(Rgba::White);
+    builder.AddVertex(m_position);
+    builder.AddIndicies(Mesh::Builder::Primitive::Point);
+    builder.End(g_theRenderer->GetMaterial("__2D"));
+
+
 }
 
 void Missile::EndFrame() noexcept {
