@@ -33,6 +33,7 @@ private:
     Vector2 _position{};
     float _max_radius{};
     float _current_radius{};
+    TimeUtils::FPSeconds _t{TimeUtils::FPSeconds::zero()};
     TimeUtils::FPSeconds _ttl{1.0f};
     static inline int idx{0};
     Rgba _color{};
