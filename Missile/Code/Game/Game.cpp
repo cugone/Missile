@@ -146,15 +146,6 @@ void Game::CreateExplosionAt(Vector2 position) noexcept {
     _explosionManager.CreateExplosionAt(position, 40.0f, TimeUtils::FPSeconds{3.0f});
 }
 
-void Game::UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    for (auto& m : _missiles) {
-        m.Update(deltaSeconds);
-    }
-    for (auto& m : _missiles) {
-        m.AppendToMesh(m_builder);
-    }
-}
-
 void Game::Render() const noexcept {
 
     g_theRenderer->BeginRenderToBackbuffer();

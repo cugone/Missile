@@ -31,6 +31,9 @@ public:
     GameSettings& GetSettings() noexcept override;
 
     void CreateExplosionAt(Vector2 position) noexcept;
+    Vector2 CalculatePlayerMissileTarget() noexcept;
+    Vector2 BaseLocation() const noexcept;
+    void RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept;
 
 protected:
 private:
@@ -39,10 +42,6 @@ private:
     void CalculateCrosshairLocation() noexcept;
     Vector2 CalcCrosshairPositionFromRawMousePosition() noexcept;
     void ClampCrosshairToView() noexcept;
-
-    Vector2 CalculatePlayerMissileTarget() noexcept;
-    Vector2 BaseLocation() const noexcept;
-    void UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept;
 
     void RenderObjects() const noexcept;
     void RenderCrosshair() const noexcept;
