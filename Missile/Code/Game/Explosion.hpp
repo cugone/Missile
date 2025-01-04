@@ -26,6 +26,7 @@ public:
 
     bool IsDead() const noexcept;
     Disc2 GetCollisionMesh() const noexcept;
+    Rgba GetColor() const noexcept;
 
 protected:
 private:

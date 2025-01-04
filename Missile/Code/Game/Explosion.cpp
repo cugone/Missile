@@ -68,6 +68,8 @@ Disc2 Explosion::GetCollisionMesh() const noexcept {
     return Disc2{_position, _current_radius};
 }
 
+Rgba Explosion::GetColor() const noexcept {
+    return _color;
 }
 
 void Explosion::DoSizeEaseOut(TimeUtils::FPSeconds deltaTime) noexcept {
