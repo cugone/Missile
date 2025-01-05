@@ -41,7 +41,7 @@ void Game::Initialize() noexcept {
 }
 
 void Game::BeginFrame() noexcept {
-    _explosionManager.BeginFrame();
+    m_explosionManager.BeginFrame();
     m_missileManager.BeginFrame();
 }
 
@@ -56,7 +56,7 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     CalculateCrosshairLocation();
     m_missileManager.LaunchMissile(BaseLocation(), MissileManager::Target{ CalculatePlayerMissileTarget() }, TimeUtils::FPSeconds{1.0f});
     m_missileManager.Update(deltaSeconds);
-    _explosionManager.Update(deltaSeconds);
+    m_explosionManager.Update(deltaSeconds);
 }
 
 Vector2 Game::CalculatePlayerMissileTarget() noexcept {
@@ -136,7 +136,7 @@ void Game::HandleDebugMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
 }
 
 void Game::CreateExplosionAt(Vector2 position) noexcept {
-    _explosionManager.CreateExplosionAt(position, 40.0f, TimeUtils::FPSeconds{3.0f});
+    m_explosionManager.CreateExplosionAt(position, 40.0f, TimeUtils::FPSeconds{3.0f});
 }
 
 void Game::Render() const noexcept {
@@ -171,7 +171,7 @@ void Game::Render() const noexcept {
 
 void Game::RenderObjects() const noexcept {
     m_missileManager.Render();
-    _explosionManager.Render();
+    m_explosionManager.Render();
 }
 
 void Game::RenderGround() const noexcept {
@@ -224,7 +224,7 @@ void Game::EndFrame() noexcept {
     g_theInputSystem->SetCursorToWindowCenter();
     _mouse_delta = Vector2::Zero;
     m_missileManager.EndFrame();
-    _explosionManager.EndFrame();
+    m_explosionManager.EndFrame();
 }
 
 const GameSettings& Game::GetSettings() const noexcept {

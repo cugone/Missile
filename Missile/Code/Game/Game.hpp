@@ -65,7 +65,7 @@ private:
     Vector2 _mouse_world_pos{};
     Vector2 _mouse_delta{};
     MissileManager m_missileManager{};
-    ExplosionManager _explosionManager{};
+    ExplosionManager m_explosionManager{};
     bool _debug_render{false};
 };
 
