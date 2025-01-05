@@ -55,6 +55,9 @@
     <ClCompile Include="MissileManager.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="MissileBase.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -76,6 +79,9 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="MissileManager.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="MissileBase.hpp">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

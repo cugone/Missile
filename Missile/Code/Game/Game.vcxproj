@@ -154,6 +154,7 @@
     <ClCompile Include="GameConfig.cpp" />
     <ClCompile Include="Main_Win32.cpp" />
     <ClCompile Include="Missile.cpp" />
+    <ClCompile Include="MissileBase.cpp" />
     <ClCompile Include="MissileManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -163,6 +164,7 @@
     <ClInclude Include="GameCommon.hpp" />
     <ClInclude Include="GameConfig.hpp" />
     <ClInclude Include="Missile.hpp" />
+    <ClInclude Include="MissileBase.hpp" />
     <ClInclude Include="MissileManager.hpp" />
   </ItemGroup>
   <ItemGroup>
