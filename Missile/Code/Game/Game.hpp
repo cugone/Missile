@@ -59,13 +59,13 @@ private:
     void HandleControllerInput(TimeUtils::FPSeconds deltaSeconds);
     void HandleMouseInput(TimeUtils::FPSeconds deltaSeconds);
 
-    mutable Camera2D _ui_camera2D{};
-    OrthographicCameraController _cameraController{};
-    Vector2 _mouse_pos{};
-    Vector2 _mouse_world_pos{};
-    Vector2 _mouse_delta{};
+    mutable Camera2D m_ui_camera2D{};
+    OrthographicCameraController m_cameraController{};
+    Vector2 m_mouse_pos{};
+    Vector2 m_mouse_world_pos{};
+    Vector2 m_mouse_delta{};
     MissileManager m_missileManager{};
     ExplosionManager m_explosionManager{};
-    bool _debug_render{false};
+    bool m_debug_render{false};
 };
 

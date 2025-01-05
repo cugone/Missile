@@ -30,13 +30,13 @@ void Game::Initialize() noexcept {
     g_theRenderer->RegisterMaterialsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameMaterials));
     g_theRenderer->RegisterFontsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameFonts));
 
-    _cameraController = OrthographicCameraController();
-    _cameraController.SetPosition(Vector2::Zero);
-    _cameraController.SetZoomLevelRange(Vector2{8.0f, 450.0f});
-    _cameraController.SetZoomLevel(450.0f);
+    m_cameraController = OrthographicCameraController();
+    m_cameraController.SetPosition(Vector2::Zero);
+    m_cameraController.SetZoomLevelRange(Vector2{8.0f, 450.0f});
+    m_cameraController.SetZoomLevel(450.0f);
     g_theInputSystem->SetCursorToWindowCenter();
-    _mouse_delta = Vector2::Zero;
-    _mouse_pos = g_theInputSystem->GetMouseCoords();
+    m_mouse_delta = Vector2::Zero;
+    m_mouse_pos = g_theInputSystem->GetMouseCoords();
     g_theInputSystem->HideMouseCursor();
 }
 
@@ -50,8 +50,8 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     HandleDebugInput(deltaSeconds);
     HandlePlayerInput(deltaSeconds);
 
-    _ui_camera2D.Update(deltaSeconds);
-    _cameraController.Update(deltaSeconds);
+    m_ui_camera2D.Update(deltaSeconds);
+    m_cameraController.Update(deltaSeconds);
 
     CalculateCrosshairLocation();
     m_missileManager.LaunchMissile(BaseLocation(), MissileManager::Target{ CalculatePlayerMissileTarget() }, TimeUtils::FPSeconds{1.0f});
@@ -64,21 +64,21 @@ Vector2 Game::CalculatePlayerMissileTarget() noexcept {
 }
 
 Vector2 Game::BaseLocation() const noexcept {
-    return Vector2::Y_Axis * _cameraController.CalcViewBounds().maxs.y;
+    return Vector2::Y_Axis * m_cameraController.CalcViewBounds().maxs.y;
 }
 
 Vector2 Game::CalcCrosshairPositionFromRawMousePosition() noexcept {
-    return g_theRenderer->ConvertScreenToWorldCoords(_cameraController.GetCamera(), _mouse_pos);
+    return g_theRenderer->ConvertScreenToWorldCoords(m_cameraController.GetCamera(), m_mouse_pos);
 }
 
 void Game::ClampCrosshairToView() noexcept {
-    AABB2 view = _cameraController.CalcViewBounds();
-    _mouse_world_pos = MathUtils::CalcClosestPoint(_mouse_world_pos, view);
-    _mouse_pos = g_theRenderer->ConvertWorldToScreenCoords(_cameraController.GetCamera(), _mouse_world_pos);
+    AABB2 view = m_cameraController.CalcViewBounds();
+    m_mouse_world_pos = MathUtils::CalcClosestPoint(m_mouse_world_pos, view);
+    m_mouse_pos = g_theRenderer->ConvertWorldToScreenCoords(m_cameraController.GetCamera(), m_mouse_world_pos);
 }
 
 void Game::CalculateCrosshairLocation() noexcept {
-    _mouse_world_pos = CalcCrosshairPositionFromRawMousePosition();
+    m_mouse_world_pos = CalcCrosshairPositionFromRawMousePosition();
     ClampCrosshairToView();
 }
 
@@ -102,7 +102,7 @@ void Game::HandleControllerInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
 
 void Game::HandleMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
     if (g_theInputSystem->WasMouseMoved()) {
-        _mouse_delta = g_theInputSystem->GetMouseDeltaFromWindowCenter();
+        m_mouse_delta = g_theInputSystem->GetMouseDeltaFromWindowCenter();
     }
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::LButton)) {
         m_missileManager.FireMissile();
@@ -119,7 +119,7 @@ void Game::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
         return;
     }
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::F1)) {
-        _debug_render = !_debug_render;
+        m_debug_render = !m_debug_render;
     }
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::F4)) {
         g_theUISystem->ToggleImguiDemoWindow();
@@ -151,18 +151,18 @@ void Game::Render() const noexcept {
     {
 
         const auto ui_view_height = static_cast<float>(GetSettings().GetWindowHeight());
-        const auto ui_view_width = ui_view_height * _ui_camera2D.GetAspectRatio();
+        const auto ui_view_width = ui_view_height * m_ui_camera2D.GetAspectRatio();
         const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
         const auto ui_view_half_extents = ui_view_extents * 0.5f;
         const auto ui_cam_pos = Vector2::Zero;
-        g_theRenderer->BeginHUDRender(_ui_camera2D, ui_cam_pos, ui_view_height);
+        g_theRenderer->BeginHUDRender(m_ui_camera2D, ui_cam_pos, ui_view_height);
 
         RenderObjects();
         RenderGround();
         RenderBase();
-        RenderCrosshairAt(_mouse_world_pos);
+        RenderCrosshairAt(m_mouse_world_pos);
 
-        const auto t = std::format("Mouse: {}", _mouse_world_pos);
+        const auto t = std::format("Mouse: {}", m_mouse_world_pos);
         g_theRenderer->SetModelMatrix();
         g_theRenderer->DrawTextLine(g_theRenderer->GetFont("System32"), t);
 
@@ -197,7 +197,7 @@ void Game::RenderBase() const noexcept {
 }
 
 void Game::RenderCrosshair() const noexcept {
-    RenderCrosshairAt(_mouse_pos);
+    RenderCrosshairAt(m_mouse_pos);
 }
 
 void Game::RenderCrosshairAt(Vector2 pos) const noexcept {
@@ -220,9 +220,9 @@ void Game::RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept {
 }
 
 void Game::EndFrame() noexcept {
-    _mouse_pos += _mouse_delta;
+    m_mouse_pos += m_mouse_delta;
     g_theInputSystem->SetCursorToWindowCenter();
-    _mouse_delta = Vector2::Zero;
+    m_mouse_delta = Vector2::Zero;
     m_missileManager.EndFrame();
     m_explosionManager.EndFrame();
 }
