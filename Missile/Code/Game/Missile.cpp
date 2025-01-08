@@ -12,7 +12,7 @@
 #include "Game/Game.hpp"
 
 Missile::Missile(Vector2 startPosition, Vector2 target) noexcept
-    : Missile{ startPosition, target, TimeUtils::Frames{1} }
+    : Missile{ startPosition, target, TimeUtils::FPSeconds{1.0f} }
 {
     /* DO NOTHING */
 }
