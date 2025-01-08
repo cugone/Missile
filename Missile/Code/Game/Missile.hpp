@@ -39,6 +39,7 @@ private:
     Vector2 m_startPosition{};
     Rgba m_color{Rgba::Red};
     TimeUtils::FPSeconds m_timeToTarget{ TimeUtils::FPSeconds{1.0f} };
+    float m_speed{};
     int m_health{1};
     static inline int idx{0};
 
