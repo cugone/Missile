@@ -13,6 +13,20 @@
 
 #include <vector>
 
+class MySettings : public GameSettings {
+public:
+    void SaveToConfig(Config& config) noexcept override;
+    void SetToDefault() noexcept override;
+
+    virtual float GetUiScale() const noexcept;
+    virtual void SetUiScale(float newScale) noexcept;
+    virtual float DefaultUiScale() const noexcept;
+
+protected:
+    float m_UiScale{};
+    float m_defaultUiScale{1.0f};
+};
+
 class Game : public GameBase {
 public:
     Game() = default;
@@ -28,8 +42,8 @@ public:
     void Render() const noexcept override;
     void EndFrame() noexcept override;
 
-    const GameSettings& GetSettings() const noexcept override;
-    GameSettings& GetSettings() noexcept override;
+    const GameSettings* GetSettings() const noexcept override;
+    GameSettings* GetSettings() noexcept override;
 
     void CreateExplosionAt(Vector2 position) noexcept;
     Vector2 CalculatePlayerMissileTarget() noexcept;
@@ -66,6 +80,7 @@ private:
     Vector2 m_mouse_delta{};
     MissileManager m_missileManager{};
     ExplosionManager m_explosionManager{};
+    MySettings m_mySettings{};
     bool m_debug_render{false};
 };
 

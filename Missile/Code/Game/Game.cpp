@@ -1,6 +1,7 @@
 #include "Game/Game.hpp"
 
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Core/FileUtils.hpp"
 #include "Engine/Core/KerningFont.hpp"
 #include "Engine/Core/Utilities.hpp"
 
@@ -25,7 +26,40 @@
 
 #include <algorithm>
 
+void MySettings::SaveToConfig(Config& config) noexcept {
+    GameSettings::SaveToConfig(config);
+    config.SetValue("uiScale", m_UiScale);
+}
+
+void MySettings::SetToDefault() noexcept {
+    GameSettings::SetToDefault();
+    m_UiScale = m_defaultUiScale;
+}
+
+float MySettings::GetUiScale() const noexcept {
+    return m_UiScale;
+}
+
+void MySettings::SetUiScale(float newScale) noexcept {
+    m_UiScale = newScale;
+}
+
+float MySettings::DefaultUiScale() const noexcept {
+    return m_defaultUiScale;
+}
+
 void Game::Initialize() noexcept {
+    (void)g_theConfig->AppendFromFile(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameConfig) / "game.config");
+    if(g_theConfig->HasKey("uiScale")) {
+        float value = m_mySettings.GetUiScale();
+        g_theConfig->GetValueOr("uiScale", value, m_mySettings.DefaultUiScale());
+        m_mySettings.SetUiScale(value);
+    } else {
+        g_theConfig->SetValue("uiScale", 1.0f);
+    }
+    if(!g_theConfig->SaveToFile(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameConfig) / "game.config")) {
+        g_theFileLogger->LogWarnLine("Could not save game config.");
+    }
     g_theRenderer->SetVSync(true);
     g_theRenderer->RegisterMaterialsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameMaterials));
     g_theRenderer->RegisterFontsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameFonts));
@@ -150,7 +184,7 @@ void Game::Render() const noexcept {
     //2D World / HUD View
     {
 
-        const auto ui_view_height = static_cast<float>(GetSettings().GetWindowHeight());
+        const auto ui_view_height = static_cast<float>(GetSettings()->GetWindowHeight());
         const auto ui_view_width = ui_view_height * m_ui_camera2D.GetAspectRatio();
         const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
         const auto ui_view_half_extents = ui_view_extents * 0.5f;
@@ -206,17 +240,23 @@ void Game::RenderCrosshairAt(Vector2 pos) const noexcept {
 
 void Game::RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept {
     g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("crosshair"));
-    const auto scale = Vector2::One * 10.0f;
+    const auto&& [x, y, _] = g_theRenderer->GetMaterial("crosshair")->GetTexture(Material::TextureID::Diffuse)->GetDimensions().GetXYZ();
+    const auto dims = IntVector2{x, y};
+    const auto ui_scale = [this]() {
+        if(const auto& settings = dynamic_cast<const MySettings*>(this->GetSettings()); settings != nullptr) {
+            return settings->GetUiScale();
+        } else {
+            return 1.0f;
+        }
+    }();
     {
+        const auto scale = ui_scale * Vector2{ dims };
         const auto S = Matrix4::CreateScaleMatrix(scale);
         const auto R = Matrix4::I;
         const auto T = Matrix4::CreateTranslationMatrix(pos);
         const auto M = Matrix4::MakeSRT(S, R, T);
         g_theRenderer->DrawQuad2D(M, color);
     }
-    g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("__2D"));
-    g_theRenderer->SetModelMatrix();
-    g_theRenderer->DrawFilledCircle2D(Disc2{pos, 40.0f}, color);
 }
 
 void Game::EndFrame() noexcept {
@@ -227,10 +267,10 @@ void Game::EndFrame() noexcept {
     m_explosionManager.EndFrame();
 }
 
-const GameSettings& Game::GetSettings() const noexcept {
-    return GameBase::GetSettings();
+const GameSettings* Game::GetSettings() const noexcept {
+    return &m_mySettings;
 }
 
-GameSettings& Game::GetSettings() noexcept {
-    return GameBase::GetSettings();
+GameSettings* Game::GetSettings() noexcept {
+    return &m_mySettings;
 }
