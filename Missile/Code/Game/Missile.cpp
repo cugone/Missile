@@ -22,6 +22,7 @@ Missile::Missile(Vector2 startPosition, Vector2 target, TimeUtils::FPSeconds tim
     , m_target{ target }
     , m_startPosition{ startPosition }
     , m_timeToTarget{timeToTarget}
+    , m_speed{(target - startPosition).CalcLength() / timeToTarget.count()}
 {
     //g_theAudioSystem->Play(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameData) / std::filesystem::path{ "Audio" } / std::filesystem::path{ std::format("LaunchMissile{}.wav", idx) }, AudioSystem::SoundDesc{});
     idx = (idx + 1) % GameConstants::max_launch_sounds;
@@ -33,10 +34,8 @@ void Missile::BeginFrame() noexcept {
 
 void Missile::Update([[maybe_unused]] TimeUtils::FPSeconds deltaTime) noexcept {
     if(TimeUtils::FPSeconds::zero() < m_timeToTarget) {
-        auto direction = (m_target - m_position);
-        const auto distanceInPixels = direction.Normalize();
-        const auto pixelsPerSecond = distanceInPixels / m_timeToTarget.count();
-        m_position += direction * pixelsPerSecond * deltaTime.count();
+        auto direction = (m_target - m_position).GetNormalize();
+        m_position += direction * m_speed * deltaTime.count();
         m_timeToTarget -= deltaTime;
         if(m_timeToTarget <= TimeUtils::FPSeconds::zero()) {
             m_timeToTarget = TimeUtils::FPSeconds::zero();
