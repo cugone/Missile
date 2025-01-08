@@ -20,6 +20,11 @@ void MissileManager::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     for (auto& m : m_missiles) {
         m.AppendToMesh(m_builder);
     }
+    for (std::size_t i = 0u; i < m_missiles.size(); ++i) {
+        if (m_missiles[i].IsDead()) {
+            m_deadMissiles.push_back(i);
+        }
+    }
 }
 
 void MissileManager::Render() const noexcept {
@@ -31,7 +36,12 @@ void MissileManager::EndFrame() noexcept {
     for (auto& m : m_missiles) {
         m.EndFrame();
     }
-    m_missiles.erase(std::remove_if(std::begin(m_missiles), std::end(m_missiles), [](const Missile& m) { return m.IsDead(); }), std::end(m_missiles));
+    std::sort(std::begin(m_deadMissiles), std::end(m_deadMissiles), std::greater<std::size_t>());
+    for (const auto& i : m_deadMissiles) {
+        std::swap(m_missiles[i], m_missiles.back());
+        m_missiles.pop_back();
+    }
+    m_deadMissiles.clear();
 }
 
 void MissileManager::LaunchMissile(Vector2 position, Direction direction, TimeUtils::FPSeconds timeToTarget) noexcept {
@@ -41,7 +51,7 @@ void MissileManager::LaunchMissile(Vector2 position, Direction direction, TimeUt
 void MissileManager::LaunchMissile(Vector2 position, Target target, TimeUtils::FPSeconds timeToTarget) noexcept {
     if (m_missileFired) {
         m_missileFired = false;
-        m_missiles.push_back(Missile{ position, target.value, timeToTarget });
+        m_missiles.emplace_back( position, target.value, timeToTarget );
     }
 }
 

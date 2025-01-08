@@ -32,6 +32,7 @@ protected:
 private:
     Vector2 m_position{};
     std::vector<Missile> m_missiles{};
+    std::vector<std::size_t> m_deadMissiles{};
     mutable Mesh::Builder m_builder{};
     bool m_missileFired{false};
 };
