@@ -12,17 +12,20 @@
 
 class ExplosionManager {
 public:
+    struct ExplosionData {
+        Vector4 position2_radius_ttlSeconds;
+    };
 
     void BeginFrame() noexcept;
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void Render() const noexcept;
     void EndFrame() noexcept;
 
-    void CreateExplosionAt(Vector2 position, float maxRadius, TimeUtils::FPSeconds ttl) noexcept;
+    void CreateExplosionAt(ExplosionData&& newExplosionData) noexcept;
 
 protected:
 private:
-    std::vector<Explosion> m_explosions{};
-    std::vector<Explosion> m_pendingExplosions{};
     mutable Mesh::Builder m_builder{};
+    std::vector<Explosion> m_explosions{};
+    std::vector<std::size_t> m_deadExplosions{};
 };
