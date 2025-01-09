@@ -80,6 +80,6 @@ void Explosion::DoSizeEaseOut() noexcept {
     if (_t > _ttl) {
         _t = _ttl;
     }
-    const auto delta = _t / _ttl;
-    _current_radius = _max_radius * MathUtils::EasingFunctions::SmoothStop<1>(MathUtils::EasingFunctions::Arc<5>(delta));
+    const auto lifetime_ratio = _t / _ttl;
+    _current_radius = _max_radius * MathUtils::EasingFunctions::SmoothStop<1>(MathUtils::EasingFunctions::Arc<5>(lifetime_ratio));
 }
