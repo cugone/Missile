@@ -64,6 +64,8 @@ private:
     void RenderGround() const noexcept;
     void RenderBase() const noexcept;
 
+    void HandleMissileExplosionCollisions() noexcept;
+
     void HandleDebugInput(TimeUtils::FPSeconds deltaSeconds);
     void HandleDebugKeyboardInput(TimeUtils::FPSeconds deltaSeconds);
     void HandleDebugMouseInput(TimeUtils::FPSeconds deltaSeconds);

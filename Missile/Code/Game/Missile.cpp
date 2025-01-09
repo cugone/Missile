@@ -33,6 +33,9 @@ void Missile::BeginFrame() noexcept {
 }
 
 void Missile::Update([[maybe_unused]] TimeUtils::FPSeconds deltaTime) noexcept {
+    if(IsDead()) {
+        return;
+    }
     if(TimeUtils::FPSeconds::zero() < m_timeToTarget) {
         auto direction = (m_target - m_position).GetNormalize();
         m_position += direction * m_speed * deltaTime.count();
@@ -81,6 +84,10 @@ void Missile::EndFrame() noexcept {
     if(IsDead()) {
         GetGameAs<Game>()->CreateExplosionAt(m_position);
     }
+}
+
+Vector2 Missile::GetPosition() const noexcept {
+    return m_position;
 }
 
 void Missile::SetTarget(Vector2 newTarget) noexcept {

@@ -96,6 +96,7 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     m_missileManager.LaunchMissile(BaseLocation(), MissileManager::Target{ CalculatePlayerMissileTarget() }, TimeUtils::FPSeconds{1.0f});
     m_missileManager.Update(deltaSeconds);
     m_explosionManager.Update(deltaSeconds);
+    HandleMissileExplosionCollisions();
 }
 
 Vector2 Game::CalculatePlayerMissileTarget() noexcept {
@@ -226,6 +227,19 @@ void Game::RenderBase() const noexcept {
     g_theRenderer->SetModelMatrix(M);
 
     //g_theRenderer->DrawFilledPolygon2D(p, Rgba::Red);
+}
+
+void Game::HandleMissileExplosionCollisions() noexcept {
+    const auto& missiles = m_missileManager.GetMissilePositions();
+    const auto& explosions = m_explosionManager.GetExplosionCollisionMeshes();
+    for(const auto& e : explosions) {
+        for (auto idx = std::size_t{}; idx < missiles.size(); ++idx) {
+            const auto& m = missiles[idx];
+            if(MathUtils::IsPointInside(e, m)) {
+                m_missileManager.KillMissile(idx);
+            }
+        }
+    }
 }
 
 void Game::RenderCrosshair() const noexcept {

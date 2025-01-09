@@ -28,6 +28,10 @@ public:
     void LaunchMissile(Vector2 position, Direction direction, TimeUtils::FPSeconds timeToTarget) noexcept;
     void LaunchMissile(Vector2 position, Target target, TimeUtils::FPSeconds timeToTarget) noexcept;
     void FireMissile() noexcept;
+
+    std::vector<Vector2> GetMissilePositions() const noexcept;
+    void KillMissile(std::size_t idx) noexcept;
+
 protected:
 private:
     Vector2 m_position{};

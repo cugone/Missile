@@ -58,3 +58,18 @@ void MissileManager::LaunchMissile(Vector2 position, Target target, TimeUtils::F
 void MissileManager::FireMissile() noexcept {
     m_missileFired = true;
 }
+
+std::vector<Vector2> MissileManager::GetMissilePositions() const noexcept {
+    std::vector<Vector2> results;
+    results.reserve(m_missiles.size());
+    for(const auto& m : m_missiles) {
+        results.push_back(m.GetPosition());
+    }
+    return results;
+}
+
+void MissileManager::KillMissile(std::size_t idx) noexcept {
+    if(std::find(std::cbegin(m_deadMissiles), std::cend(m_deadMissiles), idx) == std::cend(m_deadMissiles)) {
+        m_deadMissiles.push_back(idx);
+    }
+}

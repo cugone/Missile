@@ -2,6 +2,7 @@
 
 #include "Engine/Core/TimeUtils.hpp"
 
+#include "Engine/Math/Disc2.hpp"
 #include "Engine/Math/Vector2.hpp"
 
 #include "Engine/Renderer/Mesh.hpp"
@@ -22,6 +23,7 @@ public:
     void EndFrame() noexcept;
 
     void CreateExplosionAt(ExplosionData&& newExplosionData) noexcept;
+    std::vector<Disc2> GetExplosionCollisionMeshes() const noexcept;
 
 protected:
 private:

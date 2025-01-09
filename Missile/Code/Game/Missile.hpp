@@ -23,6 +23,8 @@ public:
     void AppendToMesh(Mesh::Builder& builder) noexcept;
     void EndFrame() noexcept;
 
+    Vector2 GetPosition() const noexcept;
+
     void SetTarget(Vector2 newTarget) noexcept;
     Vector2 GetTarget() const noexcept;
     bool ReachedTarget() const noexcept;

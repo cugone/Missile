@@ -47,3 +47,12 @@ void ExplosionManager::CreateExplosionAt(ExplosionData&& newExplosionData) noexc
     m_explosions.emplace_back(newExplosionData.position2_radius_ttlSeconds.GetXY(), newExplosionData.position2_radius_ttlSeconds.z, TimeUtils::FPSeconds{newExplosionData.position2_radius_ttlSeconds.w});
 }
 
+std::vector<Disc2> ExplosionManager::GetExplosionCollisionMeshes() const noexcept {
+    std::vector<Disc2> results;
+    results.reserve(m_explosions.size());
+    for(const auto& e : m_explosions) {
+        results.push_back(e.GetCollisionMesh());
+    }
+    return results;
+}
+
