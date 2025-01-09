@@ -31,7 +31,7 @@ public:
 protected:
 private:
 
-    void DoSizeEaseOut(TimeUtils::FPSeconds deltaTime) noexcept;
+    void DoSizeEaseOut() noexcept;
 
     Vector2 _position{};
     float _max_radius{};

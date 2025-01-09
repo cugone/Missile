@@ -17,7 +17,6 @@
 Explosion::Explosion(Vector2 position, float maxRadius, TimeUtils::FPSeconds lifetime) noexcept
     : _position{position}
     , _max_radius{maxRadius}
-    , _t{TimeUtils::FPSeconds::zero()}
     , _ttl{lifetime}
     , _color{ Rgba::Random() }
 {
@@ -30,7 +29,8 @@ void Explosion::BeginFrame() noexcept {
 }
 
 void Explosion::Update([[maybe_unused]] TimeUtils::FPSeconds deltaTime) noexcept {
-    DoSizeEaseOut(deltaTime);
+    DoSizeEaseOut();
+    _t += deltaTime;
 }
 
 void Explosion::AppendToMesh(Mesh::Builder& builder) noexcept {
@@ -62,7 +62,7 @@ void Explosion::EndFrame() noexcept {
 }
 
 bool Explosion::IsDead() const noexcept {
-    return _ttl <= _t;
+    return MathUtils::IsEquivalent(_t.count(), _ttl.count());
 }
 
 Disc2 Explosion::GetCollisionMesh() const noexcept {
@@ -73,7 +73,7 @@ Rgba Explosion::GetColor() const noexcept {
     return _color;
 }
 
-void Explosion::DoSizeEaseOut(TimeUtils::FPSeconds deltaTime) noexcept {
+void Explosion::DoSizeEaseOut() noexcept {
     if (_t < TimeUtils::FPSeconds::zero()) {
         _t = TimeUtils::FPSeconds::zero();
     }
@@ -81,6 +81,5 @@ void Explosion::DoSizeEaseOut(TimeUtils::FPSeconds deltaTime) noexcept {
         _t = _ttl;
     }
     const auto delta = _t / _ttl;
-    _current_radius = _max_radius * (MathUtils::EasingFunctions::SmoothStart<5>(delta) + MathUtils::EasingFunctions::SmoothStart<5>(delta));
-    _t += deltaTime;
+    _current_radius = _max_radius * MathUtils::EasingFunctions::SmoothStop<1>(MathUtils::EasingFunctions::Arc<5>(delta));
 }
