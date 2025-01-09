@@ -23,7 +23,7 @@ public:
     virtual float DefaultUiScale() const noexcept;
 
 protected:
-    float m_UiScale{};
+    float m_UiScale{1.0f};
     float m_defaultUiScale{1.0f};
 };
 
@@ -53,7 +53,7 @@ public:
 protected:
 private:
 
-
+    void LoadOrCreateConfigFile() noexcept;
     void CalculateCrosshairLocation() noexcept;
     Vector2 CalcCrosshairPositionFromRawMousePosition() noexcept;
     void ClampCrosshairToView() noexcept;

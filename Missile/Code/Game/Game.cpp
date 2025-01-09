@@ -48,18 +48,23 @@ float MySettings::DefaultUiScale() const noexcept {
     return m_defaultUiScale;
 }
 
+void Game::LoadOrCreateConfigFile() noexcept {
+    if (!g_theConfig->AppendFromFile(GameConstants::game_config_path)) {
+        if (g_theConfig->HasKey("uiScale")) {
+            float value = m_mySettings.GetUiScale();
+            g_theConfig->GetValueOr("uiScale", value, m_mySettings.DefaultUiScale());
+            m_mySettings.SetUiScale(value);
+        } else {
+            m_mySettings.SaveToConfig(*g_theConfig);
+        }
+        if (!g_theConfig->SaveToFile(GameConstants::game_config_path)) {
+            g_theFileLogger->LogWarnLine("Could not save game config.");
+        }
+    }
+}
+
 void Game::Initialize() noexcept {
-    (void)g_theConfig->AppendFromFile(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameConfig) / "game.config");
-    if(g_theConfig->HasKey("uiScale")) {
-        float value = m_mySettings.GetUiScale();
-        g_theConfig->GetValueOr("uiScale", value, m_mySettings.DefaultUiScale());
-        m_mySettings.SetUiScale(value);
-    } else {
-        g_theConfig->SetValue("uiScale", 1.0f);
-    }
-    if(!g_theConfig->SaveToFile(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameConfig) / "game.config")) {
-        g_theFileLogger->LogWarnLine("Could not save game config.");
-    }
+    LoadOrCreateConfigFile();
     g_theRenderer->SetVSync(true);
     g_theRenderer->RegisterMaterialsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameMaterials));
     g_theRenderer->RegisterFontsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameFonts));
