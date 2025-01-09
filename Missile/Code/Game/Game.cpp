@@ -158,9 +158,6 @@ void Game::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::F4)) {
         g_theUISystem->ToggleImguiDemoWindow();
     }
-    if(g_theInputSystem->WasKeyJustPressed(KeyCode::M)) {
-        Utils::FlipFlop([]() {g_theAudioSystem->SuspendAudio(); }, []() {g_theAudioSystem->ResumeAudio(); });
-    }
 }
 
 void Game::HandleDebugMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
@@ -195,10 +192,6 @@ void Game::Render() const noexcept {
         RenderGround();
         RenderBase();
         RenderCrosshairAt(m_mouse_world_pos);
-
-        const auto t = std::format("Mouse: {}", m_mouse_world_pos);
-        g_theRenderer->SetModelMatrix();
-        g_theRenderer->DrawTextLine(g_theRenderer->GetFont("System32"), t);
 
     }
 }
