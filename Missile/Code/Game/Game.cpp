@@ -167,7 +167,7 @@ void Game::HandleDebugMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
 }
 
 void Game::CreateExplosionAt(Vector2 position) noexcept {
-    m_explosionManager.CreateExplosionAt(position, 40.0f, TimeUtils::FPSeconds{3.0f});
+    m_explosionManager.CreateExplosionAt(ExplosionManager::ExplosionData{Vector4{position, 40.0f, 3.0f}});
 }
 
 void Game::Render() const noexcept {
