@@ -26,6 +26,7 @@ public:
     void Fire(MissileManager::Target target) noexcept;
     void RemoveAllMissiles() noexcept;
     bool HasMissilesRemaining() const noexcept;
+    bool OutOfMissiles() const noexcept;
     void DecrementMissiles() noexcept;
     void IncrementMissiles() noexcept;
 
@@ -42,5 +43,5 @@ private:
     Vector2 m_position{};
     MissileManager m_missileManager{};
     int m_maxMissiles{10};
-    int m_missilesRemaining{};
+    int m_missilesRemaining{m_maxMissiles};
 };

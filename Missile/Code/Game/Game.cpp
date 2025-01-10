@@ -81,7 +81,7 @@ void Game::Initialize() noexcept {
 
     g_theInputSystem->HideMouseCursor();
 
-    const auto groundplane = m_ground.CalcCenter().y - m_ground.CalcDimensions().y * 0.5f;
+    const auto groundplane = m_ground.CalcCenter().y - m_ground.CalcDimensions().y;
     const auto basePosition = Vector2::Y_Axis * groundplane;
     m_missileBase.SetPosition(basePosition);
 }

@@ -30,13 +30,21 @@ void MissileBase::Render() const noexcept {
     g_theRenderer->SetModelMatrix();
     g_theRenderer->SetMaterial("__2D");
     {
-        const auto S = Matrix4::CreateScaleMatrix(Vector2::One * 8.0f);
+        const auto S = Matrix4::CreateScaleMatrix(Vector2{66.0f, 48.0f});
         const auto R = Matrix4::I;
         const auto T = Matrix4::CreateTranslationMatrix(m_position);
         const auto M = Matrix4::MakeSRT(S, R, T);
         g_theRenderer->DrawQuad2D(M, Rgba::Orange);
     }
     m_missileManager.Render();
+    if(OutOfMissiles()) {
+        const auto* font = g_theRenderer->GetFont("System32");
+        const auto S = Matrix4::I;
+        const auto R = Matrix4::I;
+        const auto T = Matrix4::CreateTranslationMatrix(m_position + Vector2::X_Axis * -0.5f * font->CalculateTextWidth("OUT"));
+        const auto M = Matrix4::MakeSRT(S, R, T);
+        g_theRenderer->DrawTextLine(M, font, "OUT");
+    }
 }
 
 void MissileBase::EndFrame() noexcept {
@@ -52,7 +60,11 @@ void MissileBase::Fire(MissileManager::Target target) noexcept {
 }
 
 bool MissileBase::HasMissilesRemaining() const noexcept {
-    return m_missilesRemaining == 0;
+    return m_missilesRemaining != 0;
+}
+
+bool MissileBase::OutOfMissiles() const noexcept {
+    return !HasMissilesRemaining();
 }
 
 void MissileBase::DecrementMissiles() noexcept {
