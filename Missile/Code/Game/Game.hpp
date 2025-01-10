@@ -5,9 +5,12 @@
 #include "Engine/Core/TimeUtils.hpp"
 #include "Engine/Core/OrthographicCameraController.hpp"
 
+#include "Engine/Math/AABB2.hpp"
+
 #include "Engine/Renderer/Camera2D.hpp"
 
 #include "Game/Missile.hpp"
+#include "Game/MissileBase.hpp"
 #include "Game/MissileManager.hpp"
 #include "Game/ExplosionManager.hpp"
 
@@ -62,9 +65,9 @@ private:
     void RenderCrosshair() const noexcept;
     void RenderCrosshairAt(Vector2 pos) const noexcept;
     void RenderGround() const noexcept;
-    void RenderBase() const noexcept;
 
-    void HandleMissileExplosionCollisions() noexcept;
+    void HandleMissileExplosionCollisions(MissileManager& missileManager) noexcept;
+    void HandleMissileGroundCollisions(MissileManager& missileManager) noexcept;
 
     void HandleDebugInput(TimeUtils::FPSeconds deltaSeconds);
     void HandleDebugKeyboardInput(TimeUtils::FPSeconds deltaSeconds);
@@ -80,7 +83,8 @@ private:
     Vector2 m_mouse_pos{};
     Vector2 m_mouse_world_pos{};
     Vector2 m_mouse_delta{};
-    MissileManager m_missileManager{};
+    AABB2 m_ground{ Vector2::Y_Axis * 450.0f, 800.0f, 20.0f };
+    MissileBase m_missileBase{};
     ExplosionManager m_explosionManager{};
     MySettings m_mySettings{};
     bool m_debug_render{false};

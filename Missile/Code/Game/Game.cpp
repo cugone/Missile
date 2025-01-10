@@ -9,6 +9,7 @@
 
 #include "Engine/Input/InputSystem.hpp"
 
+#include "Engine/Math/AABB2.hpp"
 #include "Engine/Math/Disc2.hpp"
 #include "Engine/Math/Polygon2.hpp"
 
@@ -73,15 +74,21 @@ void Game::Initialize() noexcept {
     m_cameraController.SetPosition(Vector2::Zero);
     m_cameraController.SetZoomLevelRange(Vector2{8.0f, 450.0f});
     m_cameraController.SetZoomLevel(450.0f);
+    
     g_theInputSystem->SetCursorToWindowCenter();
     m_mouse_delta = Vector2::Zero;
     m_mouse_pos = g_theInputSystem->GetMouseCoords();
+
     g_theInputSystem->HideMouseCursor();
+
+    const auto groundplane = m_ground.CalcCenter().y - m_ground.CalcDimensions().y * 0.5f;
+    const auto basePosition = Vector2::Y_Axis * groundplane;
+    m_missileBase.SetPosition(basePosition);
 }
 
 void Game::BeginFrame() noexcept {
+    m_missileBase.BeginFrame();
     m_explosionManager.BeginFrame();
-    m_missileManager.BeginFrame();
 }
 
 void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -93,10 +100,10 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     m_cameraController.Update(deltaSeconds);
 
     CalculateCrosshairLocation();
-    m_missileManager.LaunchMissile(BaseLocation(), MissileManager::Target{ CalculatePlayerMissileTarget() }, TimeUtils::FPSeconds{1.0f});
-    m_missileManager.Update(deltaSeconds);
+    m_missileBase.Update(deltaSeconds);
     m_explosionManager.Update(deltaSeconds);
-    HandleMissileExplosionCollisions();
+    HandleMissileExplosionCollisions(m_missileBase.GetMissileManager());
+    HandleMissileGroundCollisions(m_missileBase.GetMissileManager());
 }
 
 Vector2 Game::CalculatePlayerMissileTarget() noexcept {
@@ -104,7 +111,7 @@ Vector2 Game::CalculatePlayerMissileTarget() noexcept {
 }
 
 Vector2 Game::BaseLocation() const noexcept {
-    return Vector2::Y_Axis * m_cameraController.CalcViewBounds().maxs.y;
+    return Vector2::Y_Axis * (m_cameraController.CalcViewBounds().maxs.y - (m_ground.CalcDimensions().y + 1));
 }
 
 Vector2 Game::CalcCrosshairPositionFromRawMousePosition() noexcept {
@@ -145,7 +152,7 @@ void Game::HandleMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
         m_mouse_delta = g_theInputSystem->GetMouseDeltaFromWindowCenter();
     }
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::LButton)) {
-        m_missileManager.FireMissile();
+        m_missileBase.Fire(MissileManager::Target{ CalculatePlayerMissileTarget() });
     }
 }
 
@@ -194,16 +201,15 @@ void Game::Render() const noexcept {
         const auto ui_cam_pos = Vector2::Zero;
         g_theRenderer->BeginHUDRender(m_ui_camera2D, ui_cam_pos, ui_view_height);
 
-        RenderObjects();
         RenderGround();
-        RenderBase();
+        RenderObjects();
         RenderCrosshairAt(m_mouse_world_pos);
 
     }
 }
 
 void Game::RenderObjects() const noexcept {
-    m_missileManager.Render();
+    m_missileBase.Render();
     m_explosionManager.Render();
 }
 
@@ -215,29 +221,30 @@ void Game::RenderGround() const noexcept {
     const auto M = Matrix4::MakeSRT(S, R, T);
 
     g_theRenderer->DrawQuad2D(M, Rgba::Red);
+
 }
 
-void Game::RenderBase() const noexcept {
-    g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("__2D"));
-    const auto S = Matrix4::CreateScaleMatrix(320.0f);
-    const auto R = Matrix4::Create2DRotationDegreesMatrix(135.0f);
-    const auto p = Polygon2(6);
-    const auto T = Matrix4::CreateTranslationMatrix(BaseLocation());
-    const auto M = Matrix4::MakeSRT(S, R, T);
-    g_theRenderer->SetModelMatrix(M);
-
-    //g_theRenderer->DrawFilledPolygon2D(p, Rgba::Red);
-}
-
-void Game::HandleMissileExplosionCollisions() noexcept {
-    const auto& missiles = m_missileManager.GetMissilePositions();
+void Game::HandleMissileExplosionCollisions(MissileManager& missileManager) noexcept {
+    const auto& missiles = missileManager.GetMissilePositions();
     const auto& explosions = m_explosionManager.GetExplosionCollisionMeshes();
     for(const auto& e : explosions) {
         for (auto idx = std::size_t{}; idx < missiles.size(); ++idx) {
             const auto& m = missiles[idx];
             if(MathUtils::IsPointInside(e, m)) {
-                m_missileManager.KillMissile(idx);
+                missileManager.KillMissile(idx);
             }
+        }
+    }
+}
+
+void Game::HandleMissileGroundCollisions(MissileManager& missileManager) noexcept {
+    const auto& missiles = missileManager.GetMissilePositions();
+    const auto ground = AABB2(Vector2::Y_Axis * 450.0f, 800.0f, 20.0f);
+    const auto s = missiles.size();
+    for (auto idx = std::size_t{}; idx < s; ++idx) {
+        const auto& m = missiles[idx];
+        if (MathUtils::IsPointInside(ground, m)) {
+            missileManager.KillMissile(idx);
         }
     }
 }
@@ -275,7 +282,7 @@ void Game::EndFrame() noexcept {
     m_mouse_pos += m_mouse_delta;
     g_theInputSystem->SetCursorToWindowCenter();
     m_mouse_delta = Vector2::Zero;
-    m_missileManager.EndFrame();
+    m_missileBase.EndFrame();
     m_explosionManager.EndFrame();
 }
 

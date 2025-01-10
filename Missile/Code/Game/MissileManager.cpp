@@ -44,15 +44,13 @@ void MissileManager::EndFrame() noexcept {
     m_deadMissiles.clear();
 }
 
-void MissileManager::LaunchMissile(Vector2 position, Direction direction, TimeUtils::FPSeconds timeToTarget) noexcept {
-    LaunchMissile(position, Target{position + direction.value * 1000.0f}, timeToTarget);
+bool MissileManager::LaunchMissile(Vector2 position, Direction direction, TimeUtils::FPSeconds timeToTarget) noexcept {
+    return LaunchMissile(position, Target{position + direction.value * 1000.0f}, timeToTarget);
 }
 
-void MissileManager::LaunchMissile(Vector2 position, Target target, TimeUtils::FPSeconds timeToTarget) noexcept {
-    if (m_missileFired) {
-        m_missileFired = false;
-        m_missiles.emplace_back( position, target.value, timeToTarget );
-    }
+bool MissileManager::LaunchMissile(Vector2 position, Target target, TimeUtils::FPSeconds timeToTarget) noexcept {
+    m_missiles.emplace_back( position, target.value, timeToTarget );
+    return true;
 }
 
 void MissileManager::FireMissile() noexcept {
@@ -70,6 +68,8 @@ std::vector<Vector2> MissileManager::GetMissilePositions() const noexcept {
 
 void MissileManager::KillMissile(std::size_t idx) noexcept {
     if(std::find(std::cbegin(m_deadMissiles), std::cend(m_deadMissiles), idx) == std::cend(m_deadMissiles)) {
+        auto& m = *(std::begin(m_missiles) + idx);
+        m.Kill();
         m_deadMissiles.push_back(idx);
     }
 }
