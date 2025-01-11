@@ -37,6 +37,12 @@ void MissileBase::Render() const noexcept {
         g_theRenderer->DrawQuad2D(M, Rgba::Orange);
     }
     m_missileManager.Render();
+
+    if(HasMissilesRemaining()) {
+        RenderRemainingMissiles();
+    }
+
+
     if(OutOfMissiles()) {
         const auto* font = g_theRenderer->GetFont("System32");
         const auto S = Matrix4::I;
@@ -88,7 +94,31 @@ void MissileBase::RemoveAllMissiles() noexcept {
 }
 
 void MissileBase::RenderRemainingMissiles() const noexcept {
-    /* DO NOTHING */
+    auto* mat = g_theRenderer->GetMaterial("missile");
+    const auto* tex = mat->GetTexture(Material::TextureID::Diffuse);
+    const auto dims = Vector2{ IntVector2{tex->GetDimensions()} };
+    const auto S = Matrix4::CreateScaleMatrix(dims);
+    const auto R = Matrix4::I;
+    const auto missilePositions = std::vector<Vector2>{
+        m_position + Vector2{ 2.0f * dims.x, dims.y }
+        ,m_position + Vector2{ dims.x, dims.y }
+        ,m_position + Vector2{ -dims.x, dims.y }
+        ,m_position + Vector2{ -2.0f * dims.x, dims.y }
+        ,m_position + Vector2::X_Axis * dims.x
+        ,m_position
+        ,m_position - Vector2::X_Axis * dims.x
+        ,m_position - Vector2{ dims.x * -0.5f, dims.y }
+        ,m_position - Vector2{ dims.x * 0.5f, dims.y }
+        ,m_position - (Vector2::Y_Axis * dims.y * 2.0f)
+    };
+    g_theRenderer->SetMaterial(mat);
+    const auto s = missilePositions.size();
+    const auto idx = s - m_missilesRemaining;
+    for (std::size_t i = idx; i < s; ++i) {
+        const auto T = Matrix4::CreateTranslationMatrix(missilePositions[i]);
+        const auto M = Matrix4::MakeSRT(S, R, T);
+        g_theRenderer->DrawQuad2D(M);
+    }
 }
 
 Vector2 MissileBase::GetMissileLauncherPosition() noexcept {
