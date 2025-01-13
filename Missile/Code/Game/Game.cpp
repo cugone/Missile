@@ -83,6 +83,10 @@ void Game::Initialize() noexcept {
     const auto groundplane = m_ground.CalcCenter().y - m_ground.CalcDimensions().y;
     const auto basePosition = Vector2::Y_Axis * groundplane;
     m_missileBase.SetPosition(basePosition);
+    {
+        const auto desc = AudioSystem::SoundDesc{.loopCount = 10, .stopWhenFinishedLooping = true};
+        g_theAudioSystem->Play(GameConstants::game_audio_folder / "Klaxon.wav", desc);
+    }
 }
 
 void Game::BeginFrame() noexcept {

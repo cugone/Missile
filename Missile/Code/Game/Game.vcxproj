@@ -182,6 +182,7 @@
     <Media Include="..\..\Run_x64\Data\Audio\Explosion2.wav" />
     <Media Include="..\..\Run_x64\Data\Audio\Explosion3.wav" />
     <Media Include="..\..\Run_x64\Data\Audio\Explosion4.wav" />
+    <Media Include="..\..\Run_x64\Data\Audio\Klaxon.wav" />
     <Media Include="..\..\Run_x64\Data\Audio\LaunchMissile0.wav" />
     <Media Include="..\..\Run_x64\Data\Audio\LaunchMissile1.wav" />
     <Media Include="..\..\Run_x64\Data\Audio\NoMissiles.wav" />
