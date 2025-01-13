@@ -1,11 +1,10 @@
 #pragma once
 
 #include "Engine/Core/TimeUtils.hpp"
-
 #include "Engine/Math/Vector2.hpp"
-
 #include "Engine/Renderer/Mesh.hpp"
 
+#include "Game/GameCommon.hpp"
 #include "Game/Missile.hpp"
 
 #include <vector>
@@ -25,8 +24,8 @@ public:
     void Render() const noexcept;
     void EndFrame() noexcept;
 
-    bool LaunchMissile(Vector2 position, Direction direction, TimeUtils::FPSeconds timeToTarget) noexcept;
-    bool LaunchMissile(Vector2 position, Target target, TimeUtils::FPSeconds timeToTarget) noexcept;
+    bool LaunchMissile(Vector2 position, Direction direction, TimeUtils::FPSeconds timeToTarget, Faction faction) noexcept;
+    bool LaunchMissile(Vector2 position, Target target, TimeUtils::FPSeconds timeToTarget, Faction faction) noexcept;
     void FireMissile() noexcept;
 
     std::vector<Vector2> GetMissilePositions() const noexcept;

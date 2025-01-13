@@ -59,7 +59,7 @@ void MissileBase::EndFrame() noexcept {
 
 void MissileBase::Fire(MissileManager::Target target) noexcept {
     if(HasMissilesRemaining()) {
-        if(m_missileManager.LaunchMissile(GetMissileLauncherPosition(), target, TimeUtils::FPSeconds{ 1.0f })) {
+        if(m_missileManager.LaunchMissile(GetMissileLauncherPosition(), target, TimeUtils::FPSeconds{ 1.0f }, Faction::Player)) {
             DecrementMissiles();
         }
     }

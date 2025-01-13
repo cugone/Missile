@@ -8,8 +8,11 @@
 
 #include "Engine/Renderer/Mesh.hpp"
 
+#include "Game/GameCommon.hpp"
+
 class Explosion {
 public:
+
     Explosion() = default;
     Explosion(const Explosion& other) = default;
     Explosion(Explosion&& other) = default;
@@ -17,7 +20,7 @@ public:
     Explosion& operator=(Explosion&& other) = default;
     ~Explosion() = default;
 
-    Explosion(Vector2 position, float maxRadius, TimeUtils::FPSeconds lifetime) noexcept;
+    Explosion(Vector2 position, float maxRadius, TimeUtils::FPSeconds lifetime, Faction faction = Faction::None) noexcept;
 
     void BeginFrame() noexcept;
     void Update(TimeUtils::FPSeconds deltaTime) noexcept;
@@ -27,6 +30,9 @@ public:
     bool IsDead() const noexcept;
     Disc2 GetCollisionMesh() const noexcept;
     Rgba GetColor() const noexcept;
+
+    void SetFaction(Faction newFaction) noexcept;
+    Faction GetFaction() noexcept;
 
 protected:
 private:
@@ -40,4 +46,5 @@ private:
     TimeUtils::FPSeconds _ttl{1.0f};
     static inline int idx{0};
     Rgba _color{};
+    Faction m_faction{Faction::None};
 };

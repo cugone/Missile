@@ -9,6 +9,7 @@
 
 #include "Engine/Renderer/Camera2D.hpp"
 
+#include "Game/GameCommon.hpp"
 #include "Game/Missile.hpp"
 #include "Game/MissileBase.hpp"
 #include "Game/MissileManager.hpp"
@@ -48,7 +49,7 @@ public:
     const GameSettings* GetSettings() const noexcept override;
     GameSettings* GetSettings() noexcept override;
 
-    void CreateExplosionAt(Vector2 position) noexcept;
+    void CreateExplosionAt(Vector2 position, Faction faction) noexcept;
     Vector2 CalculatePlayerMissileTarget() noexcept;
     Vector2 BaseLocation() const noexcept;
     void RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept;

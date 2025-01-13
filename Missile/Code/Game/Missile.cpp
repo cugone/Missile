@@ -11,18 +11,19 @@
 #include "Game/GameCommon.hpp"
 #include "Game/Game.hpp"
 
-Missile::Missile(Vector2 startPosition, Vector2 target) noexcept
-    : Missile{ startPosition, target, TimeUtils::FPSeconds{1.0f} }
+Missile::Missile(Vector2 startPosition, Vector2 target, Faction faction) noexcept
+    : Missile{ startPosition, target, TimeUtils::FPSeconds{1.0f}, faction }
 {
     /* DO NOTHING */
 }
 
-Missile::Missile(Vector2 startPosition, Vector2 target, TimeUtils::FPSeconds timeToTarget) noexcept
+Missile::Missile(Vector2 startPosition, Vector2 target, TimeUtils::FPSeconds timeToTarget, Faction faction) noexcept
     : m_position{ startPosition }
     , m_target{ target }
     , m_startPosition{ startPosition }
     , m_timeToTarget{timeToTarget}
     , m_speed{(target - startPosition).CalcLength() / timeToTarget.count()}
+    , m_faction{ faction }
 {
     g_theAudioSystem->Play(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameData) / std::filesystem::path{ "Audio" } / std::filesystem::path{ std::format("LaunchMissile{}.wav", idx) }, AudioSystem::SoundDesc{});
     idx = (idx + 1) % GameConstants::max_launch_sounds;
@@ -82,7 +83,8 @@ void Missile::AppendToMesh(Mesh::Builder& builder) noexcept {
 
 void Missile::EndFrame() noexcept {
     if(IsDead()) {
-        GetGameAs<Game>()->CreateExplosionAt(m_position);
+        auto* g = GetGameAs<Game>();
+        g->CreateExplosionAt(m_position, m_faction);
     }
 }
 
@@ -108,6 +110,14 @@ void Missile::SetColor(Rgba newColor) noexcept {
 
 bool Missile::IsDead() const noexcept {
     return m_health <= 0;
+}
+
+void Missile::SetFaction(Faction newFaction) noexcept {
+    m_faction = newFaction;
+}
+
+Faction Missile::GetFaction() const noexcept {
+    return m_faction;
 }
 
 void Missile::Kill() noexcept {

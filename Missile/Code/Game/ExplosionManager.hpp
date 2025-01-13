@@ -8,6 +8,7 @@
 #include "Engine/Renderer/Mesh.hpp"
 
 #include "Game/Explosion.hpp"
+#include "Game/GameCommon.hpp"
 
 #include <vector>
 
@@ -15,6 +16,7 @@ class ExplosionManager {
 public:
     struct ExplosionData {
         Vector4 position2_radius_ttlSeconds;
+        Faction faction;
     };
 
     void BeginFrame() noexcept;

@@ -14,11 +14,12 @@
 
 #include <format>
 
-Explosion::Explosion(Vector2 position, float maxRadius, TimeUtils::FPSeconds lifetime) noexcept
-    : _position{position}
-    , _max_radius{maxRadius}
-    , _ttl{lifetime}
+Explosion::Explosion(Vector2 position, float maxRadius, TimeUtils::FPSeconds lifetime, Faction faction /*= Faction::None*/) noexcept
+    : _position{ position }
+    , _max_radius{ maxRadius }
+    , _ttl{ lifetime }
     , _color{ Rgba::Random() }
+    , m_faction{faction}
 {
     g_theAudioSystem->Play(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameData) / "Audio" / std::format("Explosion{}.wav", idx), AudioSystem::SoundDesc{});
     idx = (idx + 1) % GameConstants::max_explosion_sounds;
@@ -71,6 +72,14 @@ Disc2 Explosion::GetCollisionMesh() const noexcept {
 
 Rgba Explosion::GetColor() const noexcept {
     return _color;
+}
+
+void Explosion::SetFaction(Faction newFaction) noexcept {
+    m_faction = newFaction;
+}
+
+Faction Explosion::GetFaction() noexcept {
+    return m_faction;
 }
 
 void Explosion::DoSizeEaseOut() noexcept {

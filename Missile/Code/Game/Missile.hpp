@@ -6,8 +6,11 @@
 
 #include "Engine/Renderer/Mesh.hpp"
 
+#include "Game/GameCommon.hpp"
+
 class Missile {
 public:
+
     Missile() = default;
     Missile(const Missile& other) = default;
     Missile(Missile&& other) = default;
@@ -15,8 +18,8 @@ public:
     Missile& operator=(Missile&& other) = default;
     ~Missile() = default;
 
-    Missile(Vector2 startPosition, Vector2 target) noexcept;
-    Missile(Vector2 startPosition, Vector2 target, TimeUtils::FPSeconds timeToTarget) noexcept;
+    Missile(Vector2 startPosition, Vector2 target, Faction faction) noexcept;
+    Missile(Vector2 startPosition, Vector2 target, TimeUtils::FPSeconds timeToTarget, Faction faction) noexcept;
 
     void BeginFrame() noexcept;
     void Update(TimeUtils::FPSeconds deltaTime) noexcept;
@@ -33,6 +36,9 @@ public:
     void Kill() noexcept;
     bool IsDead() const noexcept;
 
+    void SetFaction(Faction newFaction) noexcept;
+    Faction GetFaction() const noexcept;
+
 protected:
 private:
 
@@ -44,5 +50,6 @@ private:
     float m_speed{};
     int m_health{1};
     static inline int idx{0};
+    Faction m_faction{Faction::None};
 
 };

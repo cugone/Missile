@@ -22,7 +22,6 @@
 
 #include "Engine/UI/UISystem.hpp"
 
-#include "Game/GameCommon.hpp"
 #include "Game/GameConfig.hpp"
 
 #include <algorithm>
@@ -179,8 +178,8 @@ void Game::HandleDebugMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
     }
 }
 
-void Game::CreateExplosionAt(Vector2 position) noexcept {
-    m_explosionManager.CreateExplosionAt(ExplosionManager::ExplosionData{Vector4{position, 40.0f, 3.0f}});
+void Game::CreateExplosionAt(Vector2 position, Faction faction) noexcept {
+    m_explosionManager.CreateExplosionAt(ExplosionManager::ExplosionData{Vector4{position, 40.0f, 3.0f}, faction});
 }
 
 void Game::Render() const noexcept {

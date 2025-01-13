@@ -44,7 +44,7 @@ void ExplosionManager::EndFrame() noexcept {
 }
 
 void ExplosionManager::CreateExplosionAt(ExplosionData&& newExplosionData) noexcept {
-    m_explosions.emplace_back(newExplosionData.position2_radius_ttlSeconds.GetXY(), newExplosionData.position2_radius_ttlSeconds.z, TimeUtils::FPSeconds{newExplosionData.position2_radius_ttlSeconds.w});
+    m_explosions.emplace_back(newExplosionData.position2_radius_ttlSeconds.GetXY(), newExplosionData.position2_radius_ttlSeconds.z, TimeUtils::FPSeconds{ newExplosionData.position2_radius_ttlSeconds.w}, newExplosionData.faction);
 }
 
 std::vector<Disc2> ExplosionManager::GetExplosionCollisionMeshes() const noexcept {

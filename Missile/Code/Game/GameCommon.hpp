@@ -2,6 +2,13 @@
 
 #include "Engine/Core/FileUtils.hpp"
 
+enum class Faction : uint8_t {
+    None
+    , Player
+    , Enemy
+    , Max
+};
+
 struct GameConstants {
     static inline constexpr const int max_launch_sounds = 2;
     static inline constexpr const int max_explosion_sounds = 5;
