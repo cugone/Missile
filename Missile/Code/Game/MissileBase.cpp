@@ -3,6 +3,7 @@
 #include "Engine/Core/TimeUtils.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 
+#include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 
 #include <utility>
@@ -62,6 +63,8 @@ void MissileBase::Fire(MissileManager::Target target) noexcept {
         if(m_missileManager.LaunchMissile(GetMissileLauncherPosition(), target, TimeUtils::FPSeconds{ 1.0f }, Faction::Player)) {
             DecrementMissiles();
         }
+    } else {
+        g_theAudioSystem->Play(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameData) / std::filesystem::path{ "Audio" } / std::filesystem::path{ "NoMissiles.wav" }, AudioSystem::SoundDesc{});
     }
 }
 
