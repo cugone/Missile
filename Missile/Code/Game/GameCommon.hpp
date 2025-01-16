@@ -2,7 +2,11 @@
 
 #include "Engine/Core/FileUtils.hpp"
 
-enum class Faction : uint8_t {
+#include <array>
+#include <filesystem>
+#include <cstdint>
+
+enum class Faction : std::uint8_t {
     None
     , Player
     , Enemy
