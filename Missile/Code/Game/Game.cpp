@@ -265,8 +265,9 @@ void Game::RenderCrosshairAt(Vector2 pos) const noexcept {
 }
 
 void Game::RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept {
-    g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("crosshair"));
-    const auto&& [x, y, _] = g_theRenderer->GetMaterial("crosshair")->GetTexture(Material::TextureID::Diffuse)->GetDimensions().GetXYZ();
+    auto* mat = g_theRenderer->GetMaterial("crosshair");
+    g_theRenderer->SetMaterial(mat);
+    const auto&& [x, y, _] = mat->GetTexture(Material::TextureID::Diffuse)->GetDimensions().GetXYZ();
     const auto dims = IntVector2{x, y};
     const auto ui_scale = [this]() {
         if(const auto& settings = dynamic_cast<const MySettings*>(this->GetSettings()); settings != nullptr) {
