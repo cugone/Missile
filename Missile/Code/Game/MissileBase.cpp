@@ -64,7 +64,7 @@ void MissileBase::Fire(MissileManager::Target target) noexcept {
             DecrementMissiles();
         }
     } else {
-        g_theAudioSystem->Play(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameData) / std::filesystem::path{ "Audio" } / std::filesystem::path{ "NoMissiles.wav" }, AudioSystem::SoundDesc{});
+        g_theAudioSystem->Play(GameConstants::game_audio_folder / std::filesystem::path{ "NoMissiles.wav" }, AudioSystem::SoundDesc{});
     }
 }
 
