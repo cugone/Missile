@@ -90,6 +90,9 @@
     <ClInclude Include="EnemyWave.hpp">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="IObject.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\Run_x64\Data\Materials\crosshair.material">

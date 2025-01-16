@@ -165,6 +165,7 @@
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="GameCommon.hpp" />
     <ClInclude Include="GameConfig.hpp" />
+    <ClInclude Include="IObject.hpp" />
     <ClInclude Include="Missile.hpp" />
     <ClInclude Include="MissileBase.hpp" />
     <ClInclude Include="MissileManager.hpp" />
