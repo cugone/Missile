@@ -247,11 +247,10 @@ void Game::HandleMissileExplosionCollisions(MissileManager& missileManager) noex
 
 void Game::HandleMissileGroundCollisions(MissileManager& missileManager) noexcept {
     const auto& missiles = missileManager.GetMissilePositions();
-    const auto ground = AABB2(Vector2::Y_Axis * 450.0f, 800.0f, 20.0f);
     const auto s = missiles.size();
     for (auto idx = std::size_t{}; idx < s; ++idx) {
         const auto& m = missiles[idx];
-        if (MathUtils::IsPointInside(ground, m)) {
+        if (MathUtils::IsPointInside(m_ground, m)) {
             missileManager.KillMissile(idx);
         }
     }
