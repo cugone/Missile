@@ -90,7 +90,7 @@ void Game::Initialize() noexcept {
 }
 
 void Game::BeginFrame() noexcept {
-    m_enemyMissiles.BeginFrame();
+    m_waves.BeginFrame();
     m_missileBase.BeginFrame();
     m_explosionManager.BeginFrame();
 }
@@ -104,10 +104,12 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     m_cameraController.Update(deltaSeconds);
 
     CalculateCrosshairLocation();
-    m_enemyMissiles.Update(deltaSeconds);
+    m_waves.Update(deltaSeconds);
     m_missileBase.Update(deltaSeconds);
     m_explosionManager.Update(deltaSeconds);
     HandleMissileExplosionCollisions(m_missileBase.GetMissileManager());
+    HandleMissileExplosionCollisions(m_waves.GetMissileManager());
+    HandleMissileGroundCollisions(m_waves.GetMissileManager());
     HandleMissileGroundCollisions(m_missileBase.GetMissileManager());
 }
 
@@ -214,7 +216,7 @@ void Game::Render() const noexcept {
 }
 
 void Game::RenderObjects() const noexcept {
-    m_enemyMissiles.Render();
+    m_waves.Render();
     m_missileBase.Render();
     m_explosionManager.Render();
 }
@@ -289,7 +291,7 @@ void Game::EndFrame() noexcept {
     g_theInputSystem->SetCursorToWindowCenter();
     m_mouse_delta = Vector2::Zero;
     m_missileBase.EndFrame();
-    m_enemyMissiles.EndFrame();
+    m_waves.EndFrame();
     m_explosionManager.EndFrame();
 }
 
