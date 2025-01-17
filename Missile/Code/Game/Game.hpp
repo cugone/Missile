@@ -93,7 +93,9 @@ private:
     Vector2 m_mouse_world_pos{};
     Vector2 m_mouse_delta{};
     AABB2 m_ground{ Vector2::Y_Axis * 450.0f, 800.0f, 20.0f };
+    MissileBase m_missileBaseLeft{};
     MissileBase m_missileBaseCenter{};
+    MissileBase m_missileBaseRight{};
     EnemyWave m_waves{};
     ExplosionManager m_explosionManager{};
     MySettings m_mySettings{};
