@@ -126,10 +126,6 @@ Vector2 Game::CalcCrosshairPositionFromRawMousePosition() noexcept {
     return g_theRenderer->ConvertScreenToWorldCoords(m_cameraController.GetCamera(), m_mouse_pos);
 }
 
-void Game::ClampCrosshairToView() noexcept {
-    ClampCrosshairToRadar();
-}
-
 void Game::ClampCrosshairToRadar() noexcept {
     AABB2 cull = m_cameraController.CalcCullBounds();
     cull.maxs.y -= GameConstants::radar_line_distance;
@@ -139,7 +135,7 @@ void Game::ClampCrosshairToRadar() noexcept {
 
 void Game::CalculateCrosshairLocation() noexcept {
     m_mouse_world_pos = CalcCrosshairPositionFromRawMousePosition();
-    ClampCrosshairToView();
+    ClampCrosshairToRadar();
 }
 
 void Game::HandlePlayerInput(TimeUtils::FPSeconds deltaSeconds) {

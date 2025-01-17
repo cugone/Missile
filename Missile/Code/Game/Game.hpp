@@ -68,7 +68,6 @@ private:
     void LoadOrCreateConfigFile() noexcept;
     void CalculateCrosshairLocation() noexcept;
     Vector2 CalcCrosshairPositionFromRawMousePosition() noexcept;
-    void ClampCrosshairToView() noexcept;
     void ClampCrosshairToRadar() noexcept;
 
     void RenderObjects() const noexcept;
