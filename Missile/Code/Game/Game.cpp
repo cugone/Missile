@@ -174,7 +174,13 @@ void Game::HandleMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
         m_mouse_delta = g_theInputSystem->GetMouseDeltaFromWindowCenter();
     }
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::LButton)) {
+        m_missileBaseLeft.Fire(MissileManager::Target{ CalculatePlayerMissileTarget() });
+    }
+    if (g_theInputSystem->WasKeyJustPressed(KeyCode::MButton)) {
         m_missileBaseCenter.Fire(MissileManager::Target{ CalculatePlayerMissileTarget() });
+    }
+    if (g_theInputSystem->WasKeyJustPressed(KeyCode::RButton)) {
+        m_missileBaseRight.Fire(MissileManager::Target{ CalculatePlayerMissileTarget() });
     }
 }
 
