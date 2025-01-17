@@ -19,6 +19,10 @@ void MissileBase::SetPosition(Vector2 position) noexcept {
     m_position = position;
 }
 
+void MissileBase::SetTimeToTarget(TimeUtils::FPSeconds newTimeToTarget) noexcept {
+    m_timeToTarget = newTimeToTarget;
+}
+
 void MissileBase::BeginFrame() noexcept {
     m_missileManager.BeginFrame();
 }
@@ -60,7 +64,7 @@ void MissileBase::EndFrame() noexcept {
 
 void MissileBase::Fire(MissileManager::Target target) noexcept {
     if(HasMissilesRemaining()) {
-        if(m_missileManager.LaunchMissile(GetMissileLauncherPosition(), target, TimeUtils::FPSeconds{ 1.0f }, Faction::Player)) {
+        if(m_missileManager.LaunchMissile(GetMissileLauncherPosition(), target, m_timeToTarget, Faction::Player)) {
             DecrementMissiles();
         }
     } else {

@@ -17,6 +17,7 @@ public:
     explicit MissileBase(Vector2 position) noexcept;
 
     void SetPosition(Vector2 position) noexcept;
+    void SetTimeToTarget(TimeUtils::FPSeconds newTimeToTarget) noexcept;
 
     void BeginFrame() noexcept;
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept;
@@ -42,6 +43,7 @@ private:
 
     Vector2 m_position{};
     MissileManager m_missileManager{};
+    TimeUtils::FPSeconds m_timeToTarget{ 1.0f };
     int m_maxMissiles{10};
     int m_missilesRemaining{m_maxMissiles};
 };
