@@ -82,7 +82,8 @@ void Game::Initialize() noexcept {
 
     const auto groundplane = m_ground.CalcCenter().y - m_ground.CalcDimensions().y;
     const auto basePosition = Vector2::Y_Axis * groundplane;
-    m_missileBase.SetPosition(basePosition);
+    m_missileBaseCenter.SetPosition(basePosition);
+    m_missileBaseCenter.SetTimeToTarget(TimeUtils::Frames{8});
     {
         const auto desc = AudioSystem::SoundDesc{.loopCount = 8, .stopWhenFinishedLooping = true};
         g_theAudioSystem->Play(GameConstants::game_audio_folder / "Klaxon.wav", desc);
@@ -91,7 +92,7 @@ void Game::Initialize() noexcept {
 
 void Game::BeginFrame() noexcept {
     m_waves.BeginFrame();
-    m_missileBase.BeginFrame();
+    m_missileBaseCenter.BeginFrame();
     m_explosionManager.BeginFrame();
 }
 
@@ -105,12 +106,12 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
     CalculateCrosshairLocation();
     m_waves.Update(deltaSeconds);
-    m_missileBase.Update(deltaSeconds);
+    m_missileBaseCenter.Update(deltaSeconds);
     m_explosionManager.Update(deltaSeconds);
-    HandleMissileExplosionCollisions(m_missileBase.GetMissileManager());
+    HandleMissileExplosionCollisions(m_missileBaseCenter.GetMissileManager());
     HandleMissileExplosionCollisions(m_waves.GetMissileManager());
     HandleMissileGroundCollisions(m_waves.GetMissileManager());
-    HandleMissileGroundCollisions(m_missileBase.GetMissileManager());
+    HandleMissileGroundCollisions(m_missileBaseCenter.GetMissileManager());
 }
 
 Vector2 Game::CalculatePlayerMissileTarget() noexcept {
@@ -164,7 +165,7 @@ void Game::HandleMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
         m_mouse_delta = g_theInputSystem->GetMouseDeltaFromWindowCenter();
     }
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::LButton)) {
-        m_missileBase.Fire(MissileManager::Target{ CalculatePlayerMissileTarget() });
+        m_missileBaseCenter.Fire(MissileManager::Target{ CalculatePlayerMissileTarget() });
     }
 }
 
@@ -222,7 +223,7 @@ void Game::Render() const noexcept {
 
 void Game::RenderObjects() const noexcept {
     m_waves.Render();
-    m_missileBase.Render();
+    m_missileBaseCenter.Render();
     m_explosionManager.Render();
 }
 
@@ -295,7 +296,7 @@ void Game::EndFrame() noexcept {
     m_mouse_pos += m_mouse_delta;
     g_theInputSystem->SetCursorToWindowCenter();
     m_mouse_delta = Vector2::Zero;
-    m_missileBase.EndFrame();
+    m_missileBaseCenter.EndFrame();
     m_waves.EndFrame();
     m_explosionManager.EndFrame();
 }
