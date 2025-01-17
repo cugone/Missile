@@ -163,6 +163,15 @@ void Game::HandleKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
         app->SetIsQuitting(true);
         return;
     }
+    if (g_theInputSystem->WasKeyJustPressed(KeyCode::A)) {
+        m_missileBaseLeft.Fire(MissileManager::Target{ CalculatePlayerMissileTarget() });
+    }
+    if (g_theInputSystem->WasKeyJustPressed(KeyCode::W)) {
+        m_missileBaseCenter.Fire(MissileManager::Target{ CalculatePlayerMissileTarget() });
+    }
+    if (g_theInputSystem->WasKeyJustPressed(KeyCode::D)) {
+        m_missileBaseRight.Fire(MissileManager::Target{ CalculatePlayerMissileTarget() });
+    }
 }
 
 void Game::HandleControllerInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
