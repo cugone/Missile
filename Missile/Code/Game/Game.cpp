@@ -85,7 +85,7 @@ void Game::Initialize() noexcept {
     m_missileBaseCenter.SetPosition(basePosition);
     m_missileBaseCenter.SetTimeToTarget(TimeUtils::Frames{8});
     {
-        const auto desc = AudioSystem::SoundDesc{.loopCount = 8, .stopWhenFinishedLooping = true};
+        const auto desc = AudioSystem::SoundDesc{.loopCount = 6, .stopWhenFinishedLooping = true};
         g_theAudioSystem->Play(GameConstants::game_audio_folder / "Klaxon.wav", desc);
     }
 }
