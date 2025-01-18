@@ -59,7 +59,9 @@ public:
 
     void CreateExplosionAt(Vector2 position, Faction faction) noexcept;
     Vector2 CalculatePlayerMissileTarget() noexcept;
-    Vector2 BaseLocation() const noexcept;
+    Vector2 BaseLocationLeft() const noexcept;
+    Vector2 BaseLocationCenter() const noexcept;
+    Vector2 BaseLocationRight() const noexcept;
     void RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept;
 
     Player* GetPlayerData() noexcept;

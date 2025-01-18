@@ -143,8 +143,18 @@ Vector2 Game::CalculatePlayerMissileTarget() noexcept {
     return CalcCrosshairPositionFromRawMousePosition();
 }
 
-Vector2 Game::BaseLocation() const noexcept {
-    return Vector2::Y_Axis * (m_cameraController.CalcViewBounds().maxs.y - (m_ground.CalcDimensions().y + 1));
+Vector2 Game::BaseLocationLeft() const noexcept {
+    return m_missileBaseLeft.GetMissileLauncherPosition();
+}
+
+
+Vector2 Game::BaseLocationCenter() const noexcept {
+    return m_missileBaseCenter.GetMissileLauncherPosition();
+}
+
+
+Vector2 Game::BaseLocationRight() const noexcept {
+    return m_missileBaseRight.GetMissileLauncherPosition();
 }
 
 Vector2 Game::CalcCrosshairPositionFromRawMousePosition() noexcept {
