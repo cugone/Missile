@@ -25,6 +25,8 @@
 #include "Game/GameConfig.hpp"
 
 #include <algorithm>
+#include <format>
+#include <utility>
 
 void MySettings::SaveToConfig(Config& config) noexcept {
     GameSettings::SaveToConfig(config);
