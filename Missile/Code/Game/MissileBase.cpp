@@ -128,6 +128,6 @@ void MissileBase::RenderRemainingMissiles() const noexcept {
     }
 }
 
-Vector2 MissileBase::GetMissileLauncherPosition() noexcept {
+Vector2 MissileBase::GetMissileLauncherPosition() const noexcept {
     return m_position;
 }

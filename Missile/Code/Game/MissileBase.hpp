@@ -34,12 +34,12 @@ public:
     const MissileManager& GetMissileManager() const noexcept;
     MissileManager& GetMissileManager() noexcept;
 
+    Vector2 GetMissileLauncherPosition() const noexcept;
+
 protected:
 private:
 
     void RenderRemainingMissiles() const noexcept;
-
-    Vector2 GetMissileLauncherPosition() noexcept;
 
     Vector2 m_position{};
     MissileManager m_missileManager{};
