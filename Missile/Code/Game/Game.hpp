@@ -80,6 +80,7 @@ private:
     void RenderGround() const noexcept;
 
     void HandleMissileExplosionCollisions(MissileManager& missileManager) noexcept;
+    void HandleBomberExplosionCollision() noexcept;
     void HandleMissileGroundCollisions(MissileManager& missileManager) noexcept;
 
     void HandleDebugInput(TimeUtils::FPSeconds deltaSeconds);
