@@ -301,6 +301,12 @@ void Game::HandleMissileExplosionCollisions(MissileManager& missileManager) noex
             const auto& m = missiles[idx];
             if(MathUtils::IsPointInside(e, m)) {
                 missileManager.KillMissile(idx);
+                m_playerData.score += GameConstants::enemy_missile_value * m_waves.GetScoreMultiplier();
+            }
+        }
+    }
+}
+
             }
         }
     }
