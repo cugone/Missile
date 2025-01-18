@@ -36,6 +36,7 @@ public:
 
     Vector2 GetMissileLauncherPosition() const noexcept;
 
+    AABB2 GetCollisionMesh() const noexcept;
 protected:
 private:
 

@@ -131,3 +131,7 @@ void MissileBase::RenderRemainingMissiles() const noexcept {
 Vector2 MissileBase::GetMissileLauncherPosition() const noexcept {
     return m_position;
 }
+
+AABB2 MissileBase::GetCollisionMesh() const noexcept {
+    return AABB2{m_position, 66.0f, 48.0f };
+}
