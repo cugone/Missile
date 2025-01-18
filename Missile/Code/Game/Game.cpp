@@ -94,7 +94,7 @@ void Game::Initialize() noexcept {
 
     {
         const auto desc = AudioSystem::SoundDesc{.loopCount = 6, .stopWhenFinishedLooping = true};
-        g_theAudioSystem->Play(GameConstants::game_audio_folder / "Klaxon.wav", desc);
+        g_theAudioSystem->Play(GameConstants::game_audio_klaxon_path, desc);
     }
 }
 
