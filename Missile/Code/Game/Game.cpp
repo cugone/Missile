@@ -124,9 +124,6 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     m_missileBaseCenter.Update(deltaSeconds);
     m_missileBaseRight.Update(deltaSeconds);
     m_explosionManager.Update(deltaSeconds);
-    HandleMissileExplosionCollisions(m_missileBaseLeft.GetMissileManager());
-    HandleMissileExplosionCollisions(m_missileBaseCenter.GetMissileManager());
-    HandleMissileExplosionCollisions(m_missileBaseRight.GetMissileManager());
     HandleMissileExplosionCollisions(m_waves.GetMissileManager());
     HandleBomberExplosionCollision();
     HandleMissileGroundCollisions(m_waves.GetMissileManager());
