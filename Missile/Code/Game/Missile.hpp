@@ -7,9 +7,8 @@
 #include "Engine/Renderer/Mesh.hpp"
 
 #include "Game/GameCommon.hpp"
-#include "Game/IObject.hpp"
 
-class Missile : public IObject {
+class Missile {
 public:
 
     Missile() = default;
@@ -40,7 +39,6 @@ public:
     void SetFaction(Faction newFaction) noexcept;
     Faction GetFaction() const noexcept;
 
-    int GetScore() noexcept override;
 protected:
 private:
 

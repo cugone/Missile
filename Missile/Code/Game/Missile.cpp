@@ -122,10 +122,6 @@ Faction Missile::GetFaction() const noexcept {
     return m_faction;
 }
 
-int Missile::GetScore() noexcept {
-    return GameConstants::enemy_missile_value;
-}
-
 void Missile::Kill() noexcept {
     m_health = 0;
 }
