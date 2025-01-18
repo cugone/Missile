@@ -147,6 +147,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Bomber.cpp" />
     <ClCompile Include="EnemyWave.cpp" />
     <ClCompile Include="Explosion.cpp" />
     <ClCompile Include="ExplosionManager.cpp" />
@@ -159,6 +160,7 @@
     <ClCompile Include="MissileManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Bomber.hpp" />
     <ClInclude Include="EnemyWave.hpp" />
     <ClInclude Include="Explosion.hpp" />
     <ClInclude Include="ExplosionManager.hpp" />
