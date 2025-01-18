@@ -62,6 +62,7 @@ public:
     Vector2 BaseLocation() const noexcept;
     void RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept;
 
+    Player* GetPlayerData() noexcept;
 
     AABB2 GetWorldBounds() const noexcept;
 
@@ -103,6 +104,7 @@ private:
     EnemyWave m_waves{};
     ExplosionManager m_explosionManager{};
     MySettings m_mySettings{};
+    Player m_playerData{};
     bool m_debug_render{false};
 };
 

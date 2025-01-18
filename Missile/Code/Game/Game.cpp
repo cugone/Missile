@@ -322,6 +322,10 @@ void Game::RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept {
     }
 }
 
+Player* Game::GetPlayerData() noexcept {
+    return &m_playerData;
+}
+
 AABB2 Game::GetWorldBounds() const noexcept {
     return m_world_bounds;
 }
