@@ -142,6 +142,9 @@
     <Media Include="..\..\Run_x64\Data\Audio\Klaxon.wav">
       <Filter>Data\Audio</Filter>
     </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Bomber.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\Run_x64\Data\Images\Crosshair.png">
