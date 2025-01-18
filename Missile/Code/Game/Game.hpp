@@ -83,6 +83,7 @@ private:
 
     void HandleMissileExplosionCollisions(MissileManager& missileManager) noexcept;
     void HandleBomberExplosionCollision() noexcept;
+    void HandleSatelliteExplosionCollision() noexcept;
     void HandleMissileGroundCollisions(MissileManager& missileManager) noexcept;
 
     void HandleDebugInput(TimeUtils::FPSeconds deltaSeconds);

@@ -128,6 +128,7 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     m_explosionManager.Update(deltaSeconds);
     HandleMissileExplosionCollisions(m_waves.GetMissileManager());
     HandleBomberExplosionCollision();
+    HandleSatelliteExplosionCollision();
     HandleMissileGroundCollisions(m_waves.GetMissileManager());
 
     UpdateHighScore();
@@ -232,6 +233,9 @@ void Game::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::B)) {
         m_waves.SpawnBomber();
     }
+    if (g_theInputSystem->WasKeyJustPressed(KeyCode::S)) {
+        m_waves.SpawnSatellite();
+    }
 }
 
 void Game::HandleDebugMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
@@ -334,6 +338,15 @@ void Game::HandleBomberExplosionCollision() noexcept {
     }
 }
 
+void Game::HandleSatelliteExplosionCollision() noexcept {
+    if(auto* sat = m_waves.GetSatellite(); sat == nullptr) {
+        return;
+    } else {
+        const auto& explosions = m_explosionManager.GetExplosionCollisionMeshes();
+        for (const auto& e : explosions) {
+            if(MathUtils::DoDiscsOverlap(e, sat->GetCollisionMesh())) {
+                sat->Kill();
+                m_playerData.score += GameConstants::enemy_satellite_value * m_waves.GetScoreMultiplier();
             }
         }
     }
