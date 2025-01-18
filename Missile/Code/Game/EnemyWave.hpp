@@ -1,6 +1,10 @@
 #pragma once
 
 #include "Game/MissileManager.hpp"
+#include "Game/Bomber.hpp"
+#include "Game/Satellite.hpp"
+
+#include <memory>
 
 class EnemyWave {
 public:
@@ -16,15 +20,27 @@ public:
     void Render() const noexcept;
     void EndFrame() noexcept;
 
-
     const MissileManager& GetMissileManager() const noexcept;
     MissileManager& GetMissileManager() noexcept;
 
     void IncrementWave() noexcept;
-    constexpr const int GetScoreMultiplier() const noexcept;
+
+    int GetScoreMultiplier() const noexcept;
+
+    void SpawnBomber() noexcept;
+    void SpawnSatellite() noexcept;
+    void SpawnMissile() noexcept;
+
+    Bomber* const GetBomber() const noexcept;
+    Satellite* const GetSatellite() const noexcept;
+
 protected:
 private:
-    MissileManager m_missiles{};
-    std::size_t m_waveId{ 0 };
+    void UpdateSatellite(TimeUtils::FPSeconds deltaSeconds) noexcept;
+    void UpdateBomber(TimeUtils::FPSeconds deltaSeconds) noexcept;
 
+    MissileManager m_missiles{};
+    std::unique_ptr<Bomber> m_bomber{};
+    std::unique_ptr<Satellite> m_satellite{};
+    std::size_t m_waveId{ 0 };
 };
