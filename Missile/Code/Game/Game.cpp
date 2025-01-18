@@ -69,8 +69,12 @@ void Game::Initialize() noexcept {
     g_theRenderer->RegisterMaterialsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameMaterials));
     g_theRenderer->RegisterFontsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameFonts));
 
-    m_cameraController = OrthographicCameraController();
-    m_cameraController.SetPosition(Vector2::Zero);
+    auto dims = Vector2{ g_theRenderer->GetOutput()->GetDimensions() };
+    m_world_bounds.ScalePadding(dims.x, dims.y);
+    m_world_bounds.Translate(-m_world_bounds.CalcCenter());
+
+    m_cameraController = OrthographicCameraController{};
+    m_cameraController.SetPosition(m_world_bounds.CalcCenter());
     m_cameraController.SetZoomLevelRange(Vector2{8.0f, 450.0f});
     m_cameraController.SetZoomLevel(450.0f);
     
@@ -316,6 +320,10 @@ void Game::RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept {
         const auto M = Matrix4::MakeSRT(S, R, T);
         g_theRenderer->DrawQuad2D(M, color);
     }
+}
+
+AABB2 Game::GetWorldBounds() const noexcept {
+    return m_world_bounds;
 }
 
 void Game::EndFrame() noexcept {
