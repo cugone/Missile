@@ -91,6 +91,8 @@ private:
     void HandleControllerInput(TimeUtils::FPSeconds deltaSeconds);
     void HandleMouseInput(TimeUtils::FPSeconds deltaSeconds);
 
+    void UpdateHighScore() noexcept;
+
     mutable Camera2D m_ui_camera2D{};
     OrthographicCameraController m_cameraController{};
     Vector2 m_mouse_pos{};
@@ -105,6 +107,7 @@ private:
     ExplosionManager m_explosionManager{};
     MySettings m_mySettings{};
     Player m_playerData{};
+    int m_currentHighScore{17000};
     bool m_debug_render{false};
 };
 

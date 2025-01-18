@@ -129,6 +129,13 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     HandleMissileExplosionCollisions(m_missileBaseRight.GetMissileManager());
     HandleMissileExplosionCollisions(m_waves.GetMissileManager());
     HandleMissileGroundCollisions(m_waves.GetMissileManager());
+
+    UpdateHighScore();
+
+}
+
+void Game::UpdateHighScore() noexcept {
+    m_currentHighScore = (std::max)(m_playerData.score, m_currentHighScore);
 }
 
 Vector2 Game::CalculatePlayerMissileTarget() noexcept {
@@ -245,6 +252,24 @@ void Game::Render() const noexcept {
         RenderGround();
         RenderObjects();
         RenderCrosshairAt(m_mouse_world_pos);
+
+        const auto highscore_line = [this]()-> std::string {
+            if (m_playerData.score < m_currentHighScore) {
+                return std::format("{} -> {}", m_playerData.score, m_currentHighScore);
+            } else {
+                return std::format("{} <- {}", m_playerData.score, m_currentHighScore);
+            }
+        }();
+
+        const auto* font = g_theRenderer->GetFont("System32");
+        const auto top = m_cameraController.CalcViewBounds().mins.y;
+        const auto font_height = font->CalculateTextHeight(highscore_line);
+        const auto font_width = font->CalculateTextWidth(highscore_line);
+        const auto S = Matrix4::I;
+        const auto R = Matrix4::I;
+        const auto T = Matrix4::CreateTranslationMatrix(Vector2{font_width * -0.5f, top + font_height});
+        const auto M = Matrix4::MakeSRT(S, R, T);
+        g_theRenderer->DrawTextLine(M, font, highscore_line);
 
     }
 }
