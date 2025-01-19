@@ -126,8 +126,9 @@ void EnemyWave::SpawnMissile() noexcept {
     missile_spawn_area.AddPaddingToSides(-100.0f, 0.0f);
     missile_spawn_area.maxs.y = g->GetWorldBounds().mins.y;
     Vector2 pos = MathUtils::GetRandomPointInside(missile_spawn_area);
+
     MissileManager::Target target{g->BaseLocationCenter()};
-    m_missiles.LaunchMissile(pos, target, TimeUtils::FPSeconds{}, Faction::Enemy);
+    m_missiles.LaunchMissile(pos, target, TimeUtils::FPSeconds{10.0f}, Faction::Enemy);
 }
 
 Bomber* const EnemyWave::GetBomber() const noexcept {
