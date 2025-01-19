@@ -26,7 +26,6 @@ public:
 
     bool LaunchMissile(Vector2 position, Direction direction, TimeUtils::FPSeconds timeToTarget, Faction faction) noexcept;
     bool LaunchMissile(Vector2 position, Target target, TimeUtils::FPSeconds timeToTarget, Faction faction) noexcept;
-    void FireMissile() noexcept;
 
     std::vector<Vector2> GetMissilePositions() const noexcept;
     void KillMissile(std::size_t idx) noexcept;
@@ -37,5 +36,4 @@ private:
     std::vector<Missile> m_missiles{};
     std::vector<std::size_t> m_deadMissiles{};
     mutable Mesh::Builder m_builder{};
-    bool m_missileFired{false};
 };
