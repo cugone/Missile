@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Engine/Core/TimeUtils.hpp"
+#include "Engine/Core/Rgba.hpp"
+
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Math/Vector2.hpp"
 
@@ -26,10 +28,12 @@ public:
     AABB2 GetCollisionMesh() const noexcept;
 
     Vector2 GetPosition() const noexcept;
+    void SetColor(Rgba newColor) noexcept;
 
 protected:
 private:
     Vector2 m_position{};
     float m_speed{100.0f};
+    Rgba m_color;
     int m_health{1};
 };

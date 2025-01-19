@@ -41,7 +41,7 @@ void Bomber::Render() const noexcept {
         const auto T = Matrix4::CreateTranslationMatrix(m_position);
         const auto M = Matrix4::MakeSRT(S, R, T);
         g_theRenderer->SetMaterial("__2D");
-        g_theRenderer->DrawQuad2D(M, Rgba::Red);
+        g_theRenderer->DrawQuad2D(M, m_color);
     }
 }
 
