@@ -40,7 +40,7 @@ void Bomber::Render() const noexcept {
         const auto R = Matrix4::I;
         const auto T = Matrix4::CreateTranslationMatrix(m_position);
         const auto M = Matrix4::MakeSRT(S, R, T);
-        g_theRenderer->SetMaterial("__2D");
+        g_theRenderer->SetMaterial(mat);
         g_theRenderer->DrawQuad2D(M, m_color);
     }
 }
@@ -66,5 +66,9 @@ AABB2 Bomber::GetCollisionMesh() const noexcept {
 
 Vector2 Bomber::GetPosition() const noexcept {
     return m_position;
+}
+
+void Bomber::SetColor(Rgba newColor) noexcept {
+    m_color = newColor;
 }
 

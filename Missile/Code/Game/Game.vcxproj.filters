@@ -113,6 +113,9 @@
     <None Include="..\..\Run_x64\Data\Materials\missile.material">
       <Filter>Data\Materials</Filter>
     </None>
+    <None Include="..\..\Run_x64\Data\Materials\bomber.material">
+      <Filter>Data\Materials</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\..\Run_x64\Data\Audio\Explosion0.wav">

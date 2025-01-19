@@ -180,6 +180,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Run_x64\Data\Materials\bomber.material" />
     <None Include="..\..\Run_x64\Data\Materials\crosshair.material" />
     <None Include="..\..\Run_x64\Data\Materials\missile.material" />
   </ItemGroup>

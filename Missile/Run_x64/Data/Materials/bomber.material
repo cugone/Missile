@@ -1,0 +1,6 @@
+<material name="bomber" >
+  <shader src="__2D" />
+  <textures>
+    <diffuse src="Data/Images/Bomber.png" />
+  </textures>
+</material>
