@@ -4,6 +4,7 @@
 #include "Engine/Core/Rgba.hpp"
 
 #include "Engine/Math/AABB2.hpp"
+#include "Engine/Math/Disc2.hpp"
 #include "Engine/Math/Vector2.hpp"
 
 class Bomber {
@@ -25,7 +26,7 @@ public:
     void Kill() noexcept;
     bool IsDead() const noexcept;
 
-    AABB2 GetCollisionMesh() const noexcept;
+    Disc2 GetCollisionMesh() const noexcept;
 
     Vector2 GetPosition() const noexcept;
     void SetColor(Rgba newColor) noexcept;

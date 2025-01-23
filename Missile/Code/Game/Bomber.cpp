@@ -60,8 +60,8 @@ bool Bomber::IsDead() const noexcept {
     return m_health < 1;
 }
 
-AABB2 Bomber::GetCollisionMesh() const noexcept {
-    return AABB2{m_position, 50.0f, 50.0f};
+Disc2 Bomber::GetCollisionMesh() const noexcept {
+    return Disc2{m_position, 15.0f};
 }
 
 Vector2 Bomber::GetPosition() const noexcept {
