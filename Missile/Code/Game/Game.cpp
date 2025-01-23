@@ -248,6 +248,9 @@ void Game::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::M)) {
         m_waves.SpawnMissile();
     }
+    if (g_theInputSystem->WasKeyJustPressed(KeyCode::I)) {
+        m_waves.IncrementWave();
+    }
 }
 
 void Game::HandleDebugMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
