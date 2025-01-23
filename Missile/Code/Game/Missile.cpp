@@ -11,16 +11,17 @@
 #include "Game/GameCommon.hpp"
 #include "Game/Game.hpp"
 
-Missile::Missile(Vector2 startPosition, Vector2 target, Faction faction) noexcept
-    : Missile{ startPosition, target, TimeUtils::FPSeconds{1.0f}, faction }
+Missile::Missile(Vector2 startPosition, Vector2 target, Faction faction, Rgba color) noexcept
+    : Missile{ startPosition, target, TimeUtils::FPSeconds{1.0f}, faction, color }
 {
     /* DO NOTHING */
 }
 
-Missile::Missile(Vector2 startPosition, Vector2 target, TimeUtils::FPSeconds timeToTarget, Faction faction) noexcept
+Missile::Missile(Vector2 startPosition, Vector2 target, TimeUtils::FPSeconds timeToTarget, Faction faction, Rgba color) noexcept
     : m_position{ startPosition }
     , m_target{ target }
     , m_startPosition{ startPosition }
+    , m_color{color}
     , m_timeToTarget{timeToTarget}
     , m_speed{(target - startPosition).CalcLength() / timeToTarget.count()}
     , m_faction{ faction }

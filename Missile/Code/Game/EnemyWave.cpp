@@ -85,12 +85,24 @@ MissileManager& EnemyWave::GetMissileManager() noexcept {
     return m_missiles;
 }
 
+std::size_t EnemyWave::GetWaveId() const noexcept {
+    return m_waveId;
+}
+
 void EnemyWave::IncrementWave() noexcept {
     m_waveId += 1;
 }
 
 int EnemyWave::GetScoreMultiplier() const noexcept {
     return m_waveId < GameConstants::wave_score_multiplier_lookup.size() ? GameConstants::wave_score_multiplier_lookup[m_waveId] : GameConstants::max_score_multiplier;
+}
+
+Rgba EnemyWave::GetObjectColor() const noexcept {
+    return get_object_color_lookup()[m_waveId % GameConstants::wave_array_size];
+}
+
+Rgba EnemyWave::GetBackgroundColor() const noexcept {
+    return get_background_color_lookup()[m_waveId % GameConstants::wave_array_size];
 }
 
 void EnemyWave::SpawnBomber() noexcept {
@@ -103,7 +115,7 @@ void EnemyWave::SpawnBomber() noexcept {
     bomber_spawn_area.AddPaddingToSides(0.0f, -100.0f);
     bomber_spawn_area.maxs.x = g->GetWorldBounds().mins.x;
     m_bomber = std::make_unique<Bomber>(MathUtils::GetRandomPointInside(bomber_spawn_area));
-
+    m_bomber->SetColor(GetObjectColor());
 }
 
 void EnemyWave::SpawnSatellite() noexcept {
@@ -116,7 +128,7 @@ void EnemyWave::SpawnSatellite() noexcept {
     satellite_spawn_area.AddPaddingToSides(0.0f, -100.0f);
     satellite_spawn_area.mins.x = g->GetWorldBounds().maxs.x;
     m_satellite = std::make_unique<Satellite>(MathUtils::GetRandomPointInside(satellite_spawn_area));
-
+    m_satellite->SetColor(GetObjectColor());
 }
 
 void EnemyWave::SpawnMissile() noexcept {
@@ -128,7 +140,7 @@ void EnemyWave::SpawnMissile() noexcept {
     Vector2 pos = MathUtils::GetRandomPointInside(missile_spawn_area);
 
     MissileManager::Target target{g->BaseLocationCenter()};
-    m_missiles.LaunchMissile(pos, target, TimeUtils::FPSeconds{10.0f}, Faction::Enemy);
+    m_missiles.LaunchMissile(pos, target, TimeUtils::FPSeconds{10.0f}, Faction::Enemy, GetObjectColor());
 }
 
 Bomber* const EnemyWave::GetBomber() const noexcept {

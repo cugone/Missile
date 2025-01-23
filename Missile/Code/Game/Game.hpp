@@ -68,6 +68,8 @@ public:
 
     AABB2 GetWorldBounds() const noexcept;
 
+    std::size_t GetWaveId() const noexcept;
+
 protected:
 private:
 

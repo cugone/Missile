@@ -6,6 +6,8 @@
 #include "Engine/Audio/AudioSystem.hpp"
 #include "Engine/Renderer/Renderer.hpp"
 
+#include "Game/Game.hpp"
+
 #include <utility>
 
 MissileBase::MissileBase(Vector2 position) noexcept
@@ -64,7 +66,7 @@ void MissileBase::EndFrame() noexcept {
 
 void MissileBase::Fire(MissileManager::Target target) noexcept {
     if(HasMissilesRemaining()) {
-        if(m_missileManager.LaunchMissile(GetMissileLauncherPosition(), target, m_timeToTarget, Faction::Player)) {
+        if(m_missileManager.LaunchMissile(GetMissileLauncherPosition(), target, m_timeToTarget, Faction::Player, GetMissileColor())) {
             DecrementMissiles();
         }
     } else {
@@ -121,11 +123,17 @@ void MissileBase::RenderRemainingMissiles() const noexcept {
     g_theRenderer->SetMaterial(mat);
     const auto s = missilePositions.size();
     const auto idx = s - m_missilesRemaining;
+    const auto color = get_player_color_lookup()[GetGameAs<Game>()->GetWaveId() % GameConstants::wave_array_size];
     for (std::size_t i = idx; i < s; ++i) {
         const auto T = Matrix4::CreateTranslationMatrix(missilePositions[i]);
         const auto M = Matrix4::MakeSRT(S, R, T);
-        g_theRenderer->DrawQuad2D(M);
+        g_theRenderer->DrawQuad2D(M, color);
     }
+}
+
+Rgba MissileBase::GetMissileColor() const noexcept {
+    const auto* g = GetGameAs<Game>();
+    return get_player_color_lookup()[g->GetWaveId() % GameConstants::wave_array_size];
 }
 
 Vector2 MissileBase::GetMissileLauncherPosition() const noexcept {

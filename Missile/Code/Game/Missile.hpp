@@ -18,8 +18,8 @@ public:
     Missile& operator=(Missile&& other) = default;
     ~Missile() = default;
 
-    Missile(Vector2 startPosition, Vector2 target, Faction faction) noexcept;
-    Missile(Vector2 startPosition, Vector2 target, TimeUtils::FPSeconds timeToTarget, Faction faction) noexcept;
+    Missile(Vector2 startPosition, Vector2 target, Faction faction, Rgba color) noexcept;
+    Missile(Vector2 startPosition, Vector2 target, TimeUtils::FPSeconds timeToTarget, Faction faction, Rgba color) noexcept;
 
     void BeginFrame() noexcept;
     void Update(TimeUtils::FPSeconds deltaTime) noexcept;

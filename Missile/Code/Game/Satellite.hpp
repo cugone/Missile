@@ -1,8 +1,12 @@
 #pragma once
 
+#include "Engine/Core/Rgba.hpp"
 #include "Engine/Core/TimeUtils.hpp"
+
 #include "Engine/Math/Disc2.hpp"
 #include "Engine/Math/Vector2.hpp"
+
+#include "Engine/Renderer/Mesh.hpp"
 
 class Satellite {
 public:
@@ -25,10 +29,13 @@ public:
 
     Disc2 GetCollisionMesh() const noexcept;
     Vector2 GetPosition() const noexcept;
+    void SetColor(Rgba newColor) noexcept;
 
 protected:
 private:
+    Mesh::Builder m_builder{};
     Vector2 m_position{};
     float m_speed{ 100.0f };
+    Rgba m_color{};
     int m_health{ 1 };
 };

@@ -41,6 +41,7 @@ protected:
 private:
 
     void RenderRemainingMissiles() const noexcept;
+    Rgba GetMissileColor() const noexcept;
 
     Vector2 m_position{};
     MissileManager m_missileManager{};

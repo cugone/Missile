@@ -253,7 +253,7 @@ void Game::CreateExplosionAt(Vector2 position, Faction faction) noexcept {
 
 void Game::Render() const noexcept {
 
-    g_theRenderer->BeginRenderToBackbuffer();
+    g_theRenderer->BeginRenderToBackbuffer(m_waves.GetBackgroundColor());
 
 
     //3D World View
@@ -309,7 +309,7 @@ void Game::RenderGround() const noexcept {
     const auto T = Matrix4::CreateTranslationMatrix(Vector2::Y_Axis * 450.0f);
     const auto M = Matrix4::MakeSRT(S, R, T);
 
-    g_theRenderer->DrawQuad2D(M, Rgba::Red);
+    g_theRenderer->DrawQuad2D(M, get_ground_color_lookup()[GetWaveId() % GameConstants::wave_array_size]);
 
 }
 
@@ -402,6 +402,10 @@ Player* Game::GetPlayerData() noexcept {
 
 AABB2 Game::GetWorldBounds() const noexcept {
     return m_world_bounds;
+}
+
+std::size_t Game::GetWaveId() const noexcept {
+    return m_waves.GetWaveId();
 }
 
 void Game::EndFrame() noexcept {

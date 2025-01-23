@@ -44,12 +44,12 @@ void MissileManager::EndFrame() noexcept {
     m_deadMissiles.clear();
 }
 
-bool MissileManager::LaunchMissile(Vector2 position, Direction direction, TimeUtils::FPSeconds timeToTarget, Faction faction) noexcept {
-    return LaunchMissile(position, Target{position + direction.value * 1000.0f}, timeToTarget, faction);
+bool MissileManager::LaunchMissile(Vector2 position, Direction direction, TimeUtils::FPSeconds timeToTarget, Faction faction, Rgba color) noexcept {
+    return LaunchMissile(position, Target{position + direction.value * 1000.0f}, timeToTarget, faction, color);
 }
 
-bool MissileManager::LaunchMissile(Vector2 position, Target target, TimeUtils::FPSeconds timeToTarget, Faction faction) noexcept {
-    m_missiles.emplace_back( position, target.value, timeToTarget, faction );
+bool MissileManager::LaunchMissile(Vector2 position, Target target, TimeUtils::FPSeconds timeToTarget, Faction faction, Rgba color) noexcept {
+    m_missiles.emplace_back( position, target.value, timeToTarget, faction, color );
     return true;
 }
 

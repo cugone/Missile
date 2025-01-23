@@ -23,9 +23,12 @@ public:
     const MissileManager& GetMissileManager() const noexcept;
     MissileManager& GetMissileManager() noexcept;
 
+    std::size_t GetWaveId() const noexcept;
     void IncrementWave() noexcept;
 
     int GetScoreMultiplier() const noexcept;
+    Rgba GetObjectColor() const noexcept;
+    Rgba GetBackgroundColor() const noexcept;
 
     void SpawnBomber() noexcept;
     void SpawnSatellite() noexcept;
