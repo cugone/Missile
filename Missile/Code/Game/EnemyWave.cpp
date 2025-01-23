@@ -139,8 +139,9 @@ void EnemyWave::SpawnMissile() noexcept {
     missile_spawn_area.maxs.y = g->GetWorldBounds().mins.y;
     Vector2 pos = MathUtils::GetRandomPointInside(missile_spawn_area);
 
-    MissileManager::Target target{g->BaseLocationCenter()};
-    m_missiles.LaunchMissile(pos, target, TimeUtils::FPSeconds{10.0f}, Faction::Enemy, GetObjectColor());
+    const auto targets = std::array<MissileManager::Target, 3>{ g->BaseLocationLeft(), g->BaseLocationCenter(), g->BaseLocationRight() };
+    const auto& target = targets[MathUtils::GetRandomLessThan(targets.size())];
+    m_missiles.LaunchMissile(pos, target, TimeUtils::FPSeconds{ 10.0f }, Faction::Enemy, GetObjectColor());
 }
 
 Bomber* const EnemyWave::GetBomber() const noexcept {
