@@ -111,7 +111,7 @@ private:
     ExplosionManager m_explosionManager{};
     MySettings m_mySettings{};
     Player m_playerData{};
-    int m_currentHighScore{17000};
+    int m_currentHighScore{GameConstants::default_highscore};
     bool m_debug_render{false};
 };
 
