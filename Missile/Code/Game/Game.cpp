@@ -173,6 +173,15 @@ void Game::CalculateCrosshairLocation() noexcept {
     ClampCrosshairToRadar();
 }
 
+const bool Game::IsCrosshairClampedToRadar() const noexcept {
+    const auto cull = [this]() {
+        auto bounds = m_cameraController.CalcCullBounds();
+        bounds.maxs.y -= GameConstants::radar_line_distance;
+        return bounds;
+    }(); //IIIL
+    return MathUtils::IsEquivalent(MathUtils::CalcClosestPoint(m_mouse_world_pos, cull).y, cull.maxs.y);
+}
+
 void Game::HandlePlayerInput(TimeUtils::FPSeconds deltaSeconds) {
     HandleKeyboardInput(deltaSeconds);
     HandleControllerInput(deltaSeconds);
@@ -272,6 +281,7 @@ void Game::Render() const noexcept {
         RenderGround();
         RenderObjects();
         RenderCrosshairAt(m_mouse_world_pos);
+        RenderRadarLine();
 
         const auto highscore_line = [this]()-> std::string {
             if (m_playerData.score < m_currentHighScore) {
@@ -291,6 +301,19 @@ void Game::Render() const noexcept {
         const auto M = Matrix4::MakeSRT(S, R, T);
         g_theRenderer->DrawTextLine(M, font, highscore_line);
 
+    }
+}
+
+void Game::RenderRadarLine() const noexcept {
+    if(IsCrosshairClampedToRadar()) {
+        g_theRenderer->SetModelMatrix();
+        g_theRenderer->SetMaterial("__2D");
+        AABB2 cull = m_cameraController.CalcCullBounds();
+        cull.maxs.y -= GameConstants::radar_line_distance;
+        const auto t = g_theRenderer->GetGameTime().count();
+        const auto alpha = MathUtils::SineWave(t, TimeUtils::FPSeconds{1.0f});
+        const auto color = Rgba{1.0f, 0.0f, 0.0f, alpha};
+        g_theRenderer->DrawLine2D(Vector2{cull.mins.x, cull.maxs.y}, Vector2{cull.maxs.x, cull.maxs.y}, color);
     }
 }
 
