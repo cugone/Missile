@@ -48,7 +48,7 @@ void Bomber::Render() const noexcept {
 void Bomber::EndFrame() noexcept {
     if(IsDead()) {
         auto* g = GetGameAs<Game>();
-        g->CreateExplosionAt(m_position, Faction::Enemy);
+        g->CreateExplosionAt(m_position, Faction::Player);
     }
 }
 
