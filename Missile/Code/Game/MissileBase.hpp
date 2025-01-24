@@ -28,6 +28,7 @@ public:
     void RemoveAllMissiles() noexcept;
     bool HasMissilesRemaining() const noexcept;
     bool OutOfMissiles() const noexcept;
+    bool LowOnMissiles() const noexcept;
     void DecrementMissiles() noexcept;
     void IncrementMissiles() noexcept;
 

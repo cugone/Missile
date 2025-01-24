@@ -49,14 +49,20 @@ void MissileBase::Render() const noexcept {
         RenderRemainingMissiles();
     }
 
-
-    if(OutOfMissiles()) {
+    if (OutOfMissiles()) {
         const auto* font = g_theRenderer->GetFont("System32");
         const auto S = Matrix4::I;
         const auto R = Matrix4::I;
-        const auto T = Matrix4::CreateTranslationMatrix(m_position + Vector2::X_Axis * -0.5f * font->CalculateTextWidth("OUT"));
+        const auto T = Matrix4::CreateTranslationMatrix(m_position + Vector2{-0.5f * font->CalculateTextWidth("OUT"), 24.0f});
         const auto M = Matrix4::MakeSRT(S, R, T);
         g_theRenderer->DrawTextLine(M, font, "OUT");
+    } else if(LowOnMissiles()) {
+        const auto* font = g_theRenderer->GetFont("System32");
+        const auto S = Matrix4::I;
+        const auto R = Matrix4::I;
+        const auto T = Matrix4::CreateTranslationMatrix(m_position + Vector2{-0.5f * font->CalculateTextWidth("LOW"), 24.0f});
+        const auto M = Matrix4::MakeSRT(S, R, T);
+        g_theRenderer->DrawTextLine(M, font, "LOW");
     }
 }
 
@@ -68,6 +74,9 @@ void MissileBase::Fire(MissileManager::Target target) noexcept {
     if(HasMissilesRemaining()) {
         if(m_missileManager.LaunchMissile(GetMissileLauncherPosition(), target, m_timeToTarget, Faction::Player, GetMissileColor())) {
             DecrementMissiles();
+            if(m_missilesRemaining == 3) {
+                g_theAudioSystem->Play(GameConstants::game_audio_lowmissiles_path, AudioSystem::SoundDesc{.loopCount = 3, .stopWhenFinishedLooping = true});
+            }
         }
     } else {
         g_theAudioSystem->Play(GameConstants::game_audio_nomissiles_path, AudioSystem::SoundDesc{});
@@ -80,6 +89,10 @@ bool MissileBase::HasMissilesRemaining() const noexcept {
 
 bool MissileBase::OutOfMissiles() const noexcept {
     return !HasMissilesRemaining();
+}
+
+bool MissileBase::LowOnMissiles() const noexcept {
+    return m_missilesRemaining < 4;
 }
 
 void MissileBase::DecrementMissiles() noexcept {
