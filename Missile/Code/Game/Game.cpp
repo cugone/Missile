@@ -288,21 +288,22 @@ void Game::Render() const noexcept {
 
         const auto highscore_line = [this]()-> std::string {
             if (m_playerData.score < m_currentHighScore) {
-                return std::format("{} -> {}", m_playerData.score, m_currentHighScore);
+                return std::format("{} -> {}\nWave: {}", m_playerData.score, m_currentHighScore, std::size_t{1u} + this->GetWaveId());
             } else {
-                return std::format("{} <- {}", m_playerData.score, m_currentHighScore);
+                return std::format("{} <- {}\nWave: {}", m_playerData.score, m_currentHighScore, std::size_t{1u} + this->GetWaveId());
             }
         }();
 
         const auto* font = g_theRenderer->GetFont("System32");
         const auto top = m_cameraController.CalcViewBounds().mins.y;
-        const auto font_height = font->CalculateTextHeight(highscore_line);
+        //const auto font_height = font->CalculateTextHeight(highscore_line);
         const auto font_width = font->CalculateTextWidth(highscore_line);
         const auto S = Matrix4::I;
         const auto R = Matrix4::I;
-        const auto T = Matrix4::CreateTranslationMatrix(Vector2{font_width * -0.5f, top + font_height});
+        const auto T = Matrix4::CreateTranslationMatrix(Vector2{font_width * -0.5f, top});
         const auto M = Matrix4::MakeSRT(S, R, T);
-        g_theRenderer->DrawTextLine(M, font, highscore_line);
+        g_theRenderer->SetModelMatrix(M);
+        g_theRenderer->DrawMultilineText(font, highscore_line);
 
     }
 }
