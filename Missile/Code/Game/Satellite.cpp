@@ -18,6 +18,7 @@ Satellite::Satellite(Vector2 position) noexcept
 }
 
 void Satellite::BeginFrame() noexcept {
+    m_builder.Clear();
     if (IsDead()) {
         return;
     }
@@ -28,6 +29,36 @@ void Satellite::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
         return;
     }
     m_position += -Vector2::X_Axis * m_speed * deltaSeconds.count();
+    m_builder.Begin(PrimitiveType::Lines);
+
+    m_builder.SetColor(m_color);
+
+    m_builder.AddVertex(m_position + Vector2{ -1.5f, -1.5f } * m_radius);
+    m_builder.AddVertex(m_position + Vector2{ +1.5f, +1.5f } * m_radius);
+    m_builder.AddIndicies(Mesh::Builder::Primitive::Line);
+
+    m_builder.AddVertex(m_position + Vector2{ +1.5f, -1.5f } * m_radius);
+    m_builder.AddVertex(m_position + Vector2{ -1.5f, +1.5f } * m_radius);
+    m_builder.AddIndicies(Mesh::Builder::Primitive::Line);
+    m_builder.End(g_theRenderer->GetMaterial("__2D"));
+
+    m_builder.Begin(PrimitiveType::Points);
+    
+    m_builder.SetColor(Rgba::Random());
+    
+    m_builder.AddVertex(m_position + Vector2{ -1.5f, -1.5f } * m_radius);
+    m_builder.AddIndicies(Mesh::Builder::Primitive::Point);
+    
+    m_builder.AddVertex(m_position + Vector2{ +1.5f, -1.5f } * m_radius);
+    m_builder.AddIndicies(Mesh::Builder::Primitive::Point);
+    
+    m_builder.AddVertex(m_position + Vector2{ -1.5f, +1.5f } * m_radius);
+    m_builder.AddIndicies(Mesh::Builder::Primitive::Point);
+    
+    m_builder.AddVertex(m_position + Vector2{ +1.5f, +1.5f } * m_radius);
+    m_builder.AddIndicies(Mesh::Builder::Primitive::Point);
+
+    m_builder.End(g_theRenderer->GetMaterial("__2D"));
 }
 
 void Satellite::Render() const noexcept {
@@ -35,23 +66,16 @@ void Satellite::Render() const noexcept {
         return;
     }
     {
-        auto* mat = g_theRenderer->GetMaterial("satellite");
-        auto* tex = mat->GetTexture(Material::TextureID::Diffuse);
-        const auto&& [x, y, _] = tex->GetDimensions().GetXYZ();
-        const auto dims = IntVector2{ x, y };
-        const auto S = Matrix4::CreateScaleMatrix(Vector2{ dims });
-        const auto R = Matrix4::I;
-        const auto T = Matrix4::CreateTranslationMatrix(m_position);
-        const auto M = Matrix4::MakeSRT(S, R, T);
-        g_theRenderer->SetMaterial("__2D");
-        g_theRenderer->DrawQuad2D(M, Rgba::Red);
+        g_theRenderer->SetModelMatrix();
+        Mesh::Render(m_builder);
+        g_theRenderer->DrawFilledCircle2D(GetCollisionMesh(), m_color);
     }
 }
 
 void Satellite::EndFrame() noexcept {
     if (IsDead()) {
         auto* g = GetGameAs<Game>();
-        g->CreateExplosionAt(m_position, Faction::Enemy);
+        g->CreateExplosionAt(m_position, Faction::Player);
     }
 }
 
@@ -64,9 +88,13 @@ bool Satellite::IsDead() const noexcept {
 }
 
 Disc2 Satellite::GetCollisionMesh() const noexcept {
-    return Disc2{ m_position, 50.0f};
+    return Disc2{ m_position, m_radius};
 }
 
 Vector2 Satellite::GetPosition() const noexcept {
     return m_position;
+}
+
+void Satellite::SetColor(Rgba newColor) noexcept {
+    m_color = newColor;
 }
