@@ -26,8 +26,10 @@ Missile::Missile(Vector2 startPosition, Vector2 target, TimeUtils::FPSeconds tim
     , m_speed{(target - startPosition).CalcLength() / timeToTarget.count()}
     , m_faction{ faction }
 {
-    g_theAudioSystem->Play(GameConstants::game_audio_folder / std::filesystem::path{ std::format("LaunchMissile{}.wav", idx) }, AudioSystem::SoundDesc{});
-    idx = (idx + 1) % GameConstants::max_launch_sounds;
+    if(m_faction == Faction::Player) {
+        g_theAudioSystem->Play(GameConstants::game_audio_folder / std::filesystem::path{ std::format("LaunchMissile{}.wav", idx) }, AudioSystem::SoundDesc{});
+        idx = (idx + 1) % GameConstants::max_launch_sounds;
+    }
 }
 
 void Missile::BeginFrame() noexcept {
