@@ -36,12 +36,18 @@ void MissileBase::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noe
 void MissileBase::Render() const noexcept {
     g_theRenderer->SetModelMatrix();
     g_theRenderer->SetMaterial("__2D");
+
     {
-        const auto S = Matrix4::CreateScaleMatrix(Vector2{66.0f, 48.0f});
+        auto* mat = g_theRenderer->GetMaterial("base");
+        auto* tex = mat->GetTexture(Material::TextureID::Diffuse);
+        const auto&& [x, y, _] = tex->GetDimensions().GetXYZ();
+        const auto dims = IntVector2{ x, y };
+        const auto S = Matrix4::CreateScaleMatrix(Vector2{ dims });
         const auto R = Matrix4::I;
         const auto T = Matrix4::CreateTranslationMatrix(m_position);
         const auto M = Matrix4::MakeSRT(S, R, T);
-        g_theRenderer->DrawQuad2D(M, Rgba::Orange);
+        g_theRenderer->SetMaterial(mat);
+        g_theRenderer->DrawQuad2D(M, GetBaseColor());
     }
     m_missileManager.Render();
 
@@ -121,17 +127,18 @@ void MissileBase::RenderRemainingMissiles() const noexcept {
     const auto dims = Vector2{ IntVector2{tex->GetDimensions()} };
     const auto S = Matrix4::CreateScaleMatrix(dims);
     const auto R = Matrix4::I;
+    const auto position = Vector2{m_position.x, m_position.y + dims.y};
     const auto missilePositions = std::vector<Vector2>{
-        m_position + Vector2{ 2.0f * dims.x, dims.y }
-        ,m_position + Vector2{ dims.x, dims.y }
-        ,m_position + Vector2{ -dims.x, dims.y }
-        ,m_position + Vector2{ -2.0f * dims.x, dims.y }
-        ,m_position + Vector2::X_Axis * dims.x
-        ,m_position
-        ,m_position - Vector2::X_Axis * dims.x
-        ,m_position - Vector2{ dims.x * -0.5f, dims.y }
-        ,m_position - Vector2{ dims.x * 0.5f, dims.y }
-        ,m_position - (Vector2::Y_Axis * dims.y * 2.0f)
+         position + Vector2{ 2.0f * dims.x, dims.y }
+        ,position + Vector2{ dims.x, dims.y }
+        ,position + Vector2{ -dims.x, dims.y }
+        ,position + Vector2{ -2.0f * dims.x, dims.y }
+        ,position + Vector2::X_Axis * dims.x
+        ,position
+        ,position - Vector2::X_Axis * dims.x
+        ,position - Vector2{ dims.x * -0.5f, dims.y }
+        ,position - Vector2{ dims.x * 0.5f, dims.y }
+        ,position - (Vector2::Y_Axis * dims.y * 2.0f)
     };
     g_theRenderer->SetMaterial(mat);
     const auto s = missilePositions.size();
@@ -147,6 +154,11 @@ void MissileBase::RenderRemainingMissiles() const noexcept {
 Rgba MissileBase::GetMissileColor() const noexcept {
     const auto* g = GetGameAs<Game>();
     return get_player_color_lookup()[g->GetWaveId() % GameConstants::wave_array_size];
+}
+
+Rgba MissileBase::GetBaseColor() const noexcept {
+    const auto* g = GetGameAs<Game>();
+    return get_ground_color_lookup()[g->GetWaveId() % GameConstants::wave_array_size];
 }
 
 Vector2 MissileBase::GetMissileLauncherPosition() const noexcept {

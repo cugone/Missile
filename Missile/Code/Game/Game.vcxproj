@@ -180,6 +180,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Run_x64\Data\Materials\base.material" />
     <None Include="..\..\Run_x64\Data\Materials\bomber.material" />
     <None Include="..\..\Run_x64\Data\Materials\crosshair.material" />
     <None Include="..\..\Run_x64\Data\Materials\missile.material" />
@@ -198,6 +199,7 @@
     <Media Include="..\..\Run_x64\Data\Audio\Satellite.wav" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\Run_x64\Data\Images\Base.png" />
     <Image Include="..\..\Run_x64\Data\Images\Bomber.png" />
     <Image Include="..\..\Run_x64\Data\Images\Crosshair.png" />
     <Image Include="..\..\Run_x64\Data\Images\Missile.png" />

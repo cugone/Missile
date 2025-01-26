@@ -38,11 +38,13 @@ public:
     Vector2 GetMissileLauncherPosition() const noexcept;
 
     AABB2 GetCollisionMesh() const noexcept;
+
 protected:
 private:
 
     void RenderRemainingMissiles() const noexcept;
     Rgba GetMissileColor() const noexcept;
+    Rgba GetBaseColor() const noexcept;
 
     Vector2 m_position{};
     MissileManager m_missileManager{};
