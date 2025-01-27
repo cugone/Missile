@@ -62,6 +62,7 @@ public:
     Vector2 BaseLocationLeft() const noexcept;
     Vector2 BaseLocationCenter() const noexcept;
     Vector2 BaseLocationRight() const noexcept;
+    const std::array<MissileManager::Target, 3>& GetValidTargets() const noexcept;
     void RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept;
 
     Player* GetPlayerData() noexcept;

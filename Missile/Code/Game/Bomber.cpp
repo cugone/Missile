@@ -32,7 +32,7 @@ void Bomber::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     m_position += Vector2::X_Axis * m_speed * deltaSeconds.count();
     if(m_timeToFire.CheckAndReset()) {
         const auto* g = GetGameAs<Game>();
-        const auto targets = std::array<MissileManager::Target, 3>{ g->BaseLocationLeft(), g->BaseLocationCenter(), g->BaseLocationRight() };
+        const auto& targets = g->GetValidTargets();
         const auto& target = targets[MathUtils::GetRandomLessThan(targets.size())];
         m_parentWave->GetMissileManager().LaunchMissile(m_position, target, TimeUtils::FPSeconds{ 5.0f }, Faction::Enemy, GameConstants::wave_object_color_lookup[m_parentWave->GetWaveId() % GameConstants::wave_array_size]);
     }

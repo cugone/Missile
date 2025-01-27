@@ -157,6 +157,10 @@ Vector2 Game::BaseLocationRight() const noexcept {
     return m_missileBaseRight.GetMissileLauncherPosition();
 }
 
+const std::array<MissileManager::Target, 3>& Game::GetValidTargets() const noexcept {
+    return std::array<MissileManager::Target, 3>{ BaseLocationLeft(), BaseLocationCenter(), BaseLocationRight() };
+}
+
 Vector2 Game::CalcCrosshairPositionFromRawMousePosition() noexcept {
     return g_theRenderer->ConvertScreenToWorldCoords(m_cameraController.GetCamera(), m_mouse_pos);
 }
