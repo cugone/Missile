@@ -2,10 +2,13 @@
 
 #include "Engine/Core/TimeUtils.hpp"
 #include "Engine/Core/Rgba.hpp"
+#include "Engine/Core/Stopwatch.hpp"
 
 #include "Engine/Math/AABB2.hpp"
 #include "Engine/Math/Disc2.hpp"
 #include "Engine/Math/Vector2.hpp"
+
+class EnemyWave;
 
 class Bomber {
 public:
@@ -16,7 +19,7 @@ public:
     Bomber& operator=(Bomber&& other) = default;
     ~Bomber() = default;
 
-    explicit Bomber(Vector2 position) noexcept;
+    explicit Bomber(EnemyWave* parent, Vector2 position) noexcept;
 
     void BeginFrame() noexcept;
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept;
@@ -34,7 +37,9 @@ public:
 protected:
 private:
     Vector2 m_position{};
+    Stopwatch m_timeToFire{};
     float m_speed{100.0f};
     Rgba m_color;
     int m_health{1};
+    EnemyWave* m_parentWave{};
 };

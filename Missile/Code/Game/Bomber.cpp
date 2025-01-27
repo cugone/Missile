@@ -3,15 +3,20 @@
 #include "Engine/Audio/AudioSystem.hpp"
 
 #include "Engine/Core/EngineCommon.hpp"
-#include "Game/Game.hpp"
-#include "Game/GameCommon.hpp"
 
 #include "Engine/Renderer/Renderer.hpp"
 
-Bomber::Bomber(Vector2 position) noexcept
+#include "Game/Game.hpp"
+#include "Game/GameCommon.hpp"
+#include "Game/EnemyWave.hpp"
+
+
+Bomber::Bomber(EnemyWave* parent, Vector2 position) noexcept
     : m_position{ position }
+    , m_parentWave{parent}
 {
     g_theAudioSystem->Play(GameConstants::game_audio_bomber_path, AudioSystem::SoundDesc{});
+    m_timeToFire.SetSeconds(TimeUtils::FPSeconds{MathUtils::GetRandomInRange(2.0f, 15.0f)});
 }
 
 void Bomber::BeginFrame() noexcept {
@@ -25,6 +30,12 @@ void Bomber::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
         return;
     }
     m_position += Vector2::X_Axis * m_speed * deltaSeconds.count();
+    if(m_timeToFire.CheckAndReset()) {
+        const auto* g = GetGameAs<Game>();
+        const auto targets = std::array<MissileManager::Target, 3>{ g->BaseLocationLeft(), g->BaseLocationCenter(), g->BaseLocationRight() };
+        const auto& target = targets[MathUtils::GetRandomLessThan(targets.size())];
+        m_parentWave->GetMissileManager().LaunchMissile(m_position, target, TimeUtils::FPSeconds{ 5.0f }, Faction::Enemy, GameConstants::wave_object_color_lookup[m_parentWave->GetWaveId() % GameConstants::wave_array_size]);
+    }
 }
 
 void Bomber::Render() const noexcept {
