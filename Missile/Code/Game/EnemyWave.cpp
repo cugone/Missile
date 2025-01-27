@@ -98,11 +98,11 @@ int EnemyWave::GetScoreMultiplier() const noexcept {
 }
 
 Rgba EnemyWave::GetObjectColor() const noexcept {
-    return get_object_color_lookup()[m_waveId % GameConstants::wave_array_size];
+    return GameConstants::wave_object_color_lookup[m_waveId % GameConstants::wave_array_size];
 }
 
 Rgba EnemyWave::GetBackgroundColor() const noexcept {
-    return get_background_color_lookup()[m_waveId % GameConstants::wave_array_size];
+    return GameConstants::wave_background_color_lookup[m_waveId % GameConstants::wave_array_size];
 }
 
 void EnemyWave::SpawnBomber() noexcept {
@@ -114,7 +114,7 @@ void EnemyWave::SpawnBomber() noexcept {
     bomber_spawn_area.Translate(Vector2::X_Axis * -100.0f);
     bomber_spawn_area.AddPaddingToSides(0.0f, -100.0f);
     bomber_spawn_area.maxs.x = g->GetWorldBounds().mins.x;
-    m_bomber = std::make_unique<Bomber>(MathUtils::GetRandomPointInside(bomber_spawn_area));
+    m_bomber = std::make_unique<Bomber>(this, MathUtils::GetRandomPointInside(bomber_spawn_area));
     m_bomber->SetColor(GetObjectColor());
 }
 

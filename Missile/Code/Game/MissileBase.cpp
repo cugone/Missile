@@ -143,7 +143,7 @@ void MissileBase::RenderRemainingMissiles() const noexcept {
     g_theRenderer->SetMaterial(mat);
     const auto s = missilePositions.size();
     const auto idx = s - m_missilesRemaining;
-    const auto color = get_player_color_lookup()[GetGameAs<Game>()->GetWaveId() % GameConstants::wave_array_size];
+    const auto color = GameConstants::wave_player_color_lookup[GetGameAs<Game>()->GetWaveId() % GameConstants::wave_array_size];
     for (std::size_t i = idx; i < s; ++i) {
         const auto T = Matrix4::CreateTranslationMatrix(missilePositions[i]);
         const auto M = Matrix4::MakeSRT(S, R, T);
@@ -153,12 +153,12 @@ void MissileBase::RenderRemainingMissiles() const noexcept {
 
 Rgba MissileBase::GetMissileColor() const noexcept {
     const auto* g = GetGameAs<Game>();
-    return get_player_color_lookup()[g->GetWaveId() % GameConstants::wave_array_size];
+    return GameConstants::wave_player_color_lookup[g->GetWaveId() % GameConstants::wave_array_size];
 }
 
 Rgba MissileBase::GetBaseColor() const noexcept {
     const auto* g = GetGameAs<Game>();
-    return get_ground_color_lookup()[g->GetWaveId() % GameConstants::wave_array_size];
+    return GameConstants::wave_ground_color_lookup[g->GetWaveId() % GameConstants::wave_array_size];
 }
 
 Vector2 MissileBase::GetMissileLauncherPosition() const noexcept {
