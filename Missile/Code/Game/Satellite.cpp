@@ -42,7 +42,7 @@ void Satellite::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
     m_builder.Begin(PrimitiveType::Lines);
 
-    m_builder.SetColor(m_color);
+    m_builder.SetColor(m_parentWave->GetObjectColor());
 
     m_builder.AddVertex(m_position + Vector2{ -1.5f, -1.5f } * m_radius);
     m_builder.AddVertex(m_position + Vector2{ +1.5f, +1.5f } * m_radius);
@@ -79,7 +79,7 @@ void Satellite::Render() const noexcept {
     {
         g_theRenderer->SetModelMatrix();
         Mesh::Render(m_builder);
-        g_theRenderer->DrawFilledCircle2D(GetCollisionMesh(), m_color);
+        g_theRenderer->DrawFilledCircle2D(GetCollisionMesh(), m_parentWave->GetObjectColor());
     }
 }
 
@@ -104,8 +104,4 @@ Disc2 Satellite::GetCollisionMesh() const noexcept {
 
 Vector2 Satellite::GetPosition() const noexcept {
     return m_position;
-}
-
-void Satellite::SetColor(Rgba newColor) noexcept {
-    m_color = newColor;
 }

@@ -115,7 +115,6 @@ void EnemyWave::SpawnBomber() noexcept {
     bomber_spawn_area.AddPaddingToSides(0.0f, -100.0f);
     bomber_spawn_area.maxs.x = g->GetWorldBounds().mins.x;
     m_bomber = std::make_unique<Bomber>(this, MathUtils::GetRandomPointInside(bomber_spawn_area));
-    m_bomber->SetColor(GetObjectColor());
 }
 
 void EnemyWave::SpawnSatellite() noexcept {
@@ -127,8 +126,7 @@ void EnemyWave::SpawnSatellite() noexcept {
     satellite_spawn_area.Translate(Vector2::X_Axis * 100.0f);
     satellite_spawn_area.AddPaddingToSides(0.0f, -100.0f);
     satellite_spawn_area.mins.x = g->GetWorldBounds().maxs.x;
-    m_satellite = std::make_unique<Satellite>(MathUtils::GetRandomPointInside(satellite_spawn_area));
-    m_satellite->SetColor(GetObjectColor());
+    m_satellite = std::make_unique<Satellite>(this, MathUtils::GetRandomPointInside(satellite_spawn_area));
 }
 
 void EnemyWave::SpawnMissile() noexcept {

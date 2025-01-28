@@ -32,14 +32,12 @@ public:
     Disc2 GetCollisionMesh() const noexcept;
 
     Vector2 GetPosition() const noexcept;
-    void SetColor(Rgba newColor) noexcept;
 
 protected:
 private:
     Vector2 m_position{};
     Stopwatch m_timeToFire{};
     float m_speed{100.0f};
-    Rgba m_color;
     int m_health{1};
     EnemyWave* m_parentWave{};
 };

@@ -34,7 +34,7 @@ void Bomber::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
         const auto* g = GetGameAs<Game>();
         const auto& targets = g->GetValidTargets();
         const auto& target = targets[MathUtils::GetRandomLessThan(targets.size())];
-        m_parentWave->GetMissileManager().LaunchMissile(m_position, target, TimeUtils::FPSeconds{ 5.0f }, Faction::Enemy, GameConstants::wave_object_color_lookup[m_parentWave->GetWaveId() % GameConstants::wave_array_size]);
+        m_parentWave->GetMissileManager().LaunchMissile(m_position, target, TimeUtils::FPSeconds{ 5.0f }, Faction::Enemy, m_parentWave->GetObjectColor());
     }
 }
 
@@ -52,7 +52,7 @@ void Bomber::Render() const noexcept {
         const auto T = Matrix4::CreateTranslationMatrix(m_position);
         const auto M = Matrix4::MakeSRT(S, R, T);
         g_theRenderer->SetMaterial(mat);
-        g_theRenderer->DrawQuad2D(M, m_color);
+        g_theRenderer->DrawQuad2D(M, m_parentWave->GetObjectColor());
     }
 }
 
@@ -78,8 +78,3 @@ Disc2 Bomber::GetCollisionMesh() const noexcept {
 Vector2 Bomber::GetPosition() const noexcept {
     return m_position;
 }
-
-void Bomber::SetColor(Rgba newColor) noexcept {
-    m_color = newColor;
-}
-
