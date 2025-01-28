@@ -7,6 +7,9 @@
 #include <algorithm>
 
 void ExplosionManager::BeginFrame() noexcept {
+    if(m_deadExplosions.size() < m_explosions.size()) {
+        m_deadExplosions.reserve(static_cast<std::size_t>(std::ceil(1.5f * (m_deadExplosions.size() + m_explosions.size()))));
+    }
     for (auto& e : m_explosions) {
         e.BeginFrame();
     }
@@ -27,7 +30,8 @@ void ExplosionManager::Render() const noexcept {
     g_theRenderer->SetModelMatrix();
     g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("__2D"));
     for (const auto& e : m_explosions) {
-        g_theRenderer->DrawFilledCircle2D(e.GetCollisionMesh().center, e.GetCollisionMesh().radius, e.GetColor());
+        const auto& c = e.GetCollisionMesh();
+        g_theRenderer->DrawFilledCircle2D(c.center, c.radius, e.GetColor());
     }
 }
 

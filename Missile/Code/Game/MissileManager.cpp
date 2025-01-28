@@ -8,6 +8,9 @@
 
 void MissileManager::BeginFrame() noexcept {
     m_builder.Clear();
+    if(m_deadMissiles.size() < m_missiles.size()) {
+        m_deadMissiles.reserve(static_cast<std::size_t>(std::ceil(1.5f * (m_deadMissiles.size() + m_missiles.size()))));
+    }
     for (auto& m : m_missiles) {
         m.BeginFrame();
     }
