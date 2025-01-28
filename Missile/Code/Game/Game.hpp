@@ -65,6 +65,8 @@ public:
     const std::array<MissileManager::Target, 3> GetValidTargets() const noexcept;
     void RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept;
 
+    MissileManager& GetMissileManager() noexcept;
+
     Player* GetPlayerData() noexcept;
 
     AABB2 GetWorldBounds() const noexcept;

@@ -433,6 +433,10 @@ void Game::RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept {
     }
 }
 
+MissileManager& Game::GetMissileManager() noexcept {
+    return m_waves.GetMissileManager();
+}
+
 Player* Game::GetPlayerData() noexcept {
     return &m_playerData;
 }
