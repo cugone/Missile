@@ -1,0 +1,6 @@
+<material name="city" >
+  <shader src="__2D" />
+  <textures>
+    <diffuse src="Data/Images/City.png" />
+  </textures>
+</material>

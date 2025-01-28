@@ -119,6 +119,9 @@
     <None Include="..\..\Run_x64\Data\Materials\base.material">
       <Filter>Data\Materials</Filter>
     </None>
+    <None Include="..\..\Run_x64\Data\Materials\city.material">
+      <Filter>Data\Materials</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\..\Run_x64\Data\Audio\Explosion0.wav">
@@ -166,6 +169,9 @@
       <Filter>Data\Images</Filter>
     </Image>
     <Image Include="..\..\Run_x64\Data\Images\Base.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\City.png">
       <Filter>Data\Images</Filter>
     </Image>
   </ItemGroup>

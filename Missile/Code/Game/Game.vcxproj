@@ -182,6 +182,7 @@
   <ItemGroup>
     <None Include="..\..\Run_x64\Data\Materials\base.material" />
     <None Include="..\..\Run_x64\Data\Materials\bomber.material" />
+    <None Include="..\..\Run_x64\Data\Materials\city.material" />
     <None Include="..\..\Run_x64\Data\Materials\crosshair.material" />
     <None Include="..\..\Run_x64\Data\Materials\missile.material" />
   </ItemGroup>
@@ -201,6 +202,7 @@
   <ItemGroup>
     <Image Include="..\..\Run_x64\Data\Images\Base.png" />
     <Image Include="..\..\Run_x64\Data\Images\Bomber.png" />
+    <Image Include="..\..\Run_x64\Data\Images\City.png" />
     <Image Include="..\..\Run_x64\Data\Images\Crosshair.png" />
     <Image Include="..\..\Run_x64\Data\Images\Missile.png" />
   </ItemGroup>
