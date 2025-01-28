@@ -100,6 +100,27 @@ void Game::Initialize() noexcept {
     m_missileBaseRight.SetTimeToTarget(TimeUtils::FPSeconds{1.0f});
 
     {
+        const auto left_center_displacement = m_missileBaseCenter.GetMissileLauncherPosition() - m_missileBaseLeft.GetMissileLauncherPosition();
+        const auto len = left_center_displacement.GetNormalize();
+        const auto pos0 = Vector2{ m_missileBaseLeft.GetMissileLauncherPosition() + left_center_displacement * len * 0.25f};
+        m_cities[0].SetPosition(pos0);
+        const auto pos1 = Vector2{ m_missileBaseLeft.GetMissileLauncherPosition() + left_center_displacement * len * 0.50f};
+        m_cities[1].SetPosition(pos1);
+        const auto pos2 = Vector2{ m_missileBaseLeft.GetMissileLauncherPosition() + left_center_displacement * len * 0.75f};
+        m_cities[2].SetPosition(pos2);
+    }
+    {
+        const auto right_center_displacement = m_missileBaseCenter.GetMissileLauncherPosition() - m_missileBaseRight.GetMissileLauncherPosition();
+        const auto len = right_center_displacement.GetNormalize();
+        const auto pos3 = Vector2{ m_missileBaseRight.GetMissileLauncherPosition() - right_center_displacement * len * 0.25f };
+        m_cities[3].SetPosition(pos3);
+        const auto pos4 = Vector2{ m_missileBaseRight.GetMissileLauncherPosition() - right_center_displacement * len * 0.50f };
+        m_cities[4].SetPosition(pos4);
+        const auto pos5 = Vector2{ m_missileBaseRight.GetMissileLauncherPosition() - right_center_displacement * len * 0.75f };
+        m_cities[5].SetPosition(pos5);
+    }
+
+    {
         const auto desc = AudioSystem::SoundDesc{.loopCount = 6, .stopWhenFinishedLooping = true};
         g_theAudioSystem->Play(GameConstants::game_audio_klaxon_path, desc);
     }
@@ -111,6 +132,9 @@ void Game::BeginFrame() noexcept {
     m_missileBaseCenter.BeginFrame();
     m_missileBaseRight.BeginFrame();
     m_explosionManager.BeginFrame();
+    for(std::size_t i = 0; i < 6; ++i) {
+        m_cities[i].BeginFrame();
+    }
 }
 
 void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -131,6 +155,9 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     HandleBomberExplosionCollision();
     HandleSatelliteExplosionCollision();
     HandleMissileGroundCollisions(m_waves.GetMissileManager());
+    for (std::size_t i = 0; i < 6; ++i) {
+        m_cities[i].Update(deltaSeconds);
+    }
 
     UpdateHighScore();
 
@@ -337,6 +364,10 @@ void Game::RenderObjects() const noexcept {
     m_missileBaseLeft.Render();
     m_missileBaseCenter.Render();
     m_missileBaseRight.Render();
+    for(std::size_t i = 0; i < 6; ++i) {
+        m_cities[i].Render();
+    }
+
     m_explosionManager.Render();
 }
 
@@ -456,6 +487,9 @@ void Game::EndFrame() noexcept {
     m_missileBaseLeft.EndFrame();
     m_missileBaseCenter.EndFrame();
     m_missileBaseRight.EndFrame();
+    for (std::size_t i = 0; i < 6; ++i) {
+        m_cities[i].Render();
+    }
     m_waves.EndFrame();
     m_explosionManager.EndFrame();
 }
