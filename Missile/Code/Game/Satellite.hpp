@@ -1,12 +1,15 @@
 #pragma once
 
 #include "Engine/Core/Rgba.hpp"
+#include "Engine/Core/Stopwatch.hpp"
 #include "Engine/Core/TimeUtils.hpp"
 
 #include "Engine/Math/Disc2.hpp"
 #include "Engine/Math/Vector2.hpp"
 
 #include "Engine/Renderer/Mesh.hpp"
+
+class EnemyWave;
 
 class Satellite {
 public:
@@ -17,7 +20,7 @@ public:
     Satellite& operator=(Satellite&& other) = default;
     ~Satellite() = default;
 
-    explicit Satellite(Vector2 position) noexcept;
+    explicit Satellite(EnemyWave* parent, Vector2 position) noexcept;
 
     void BeginFrame() noexcept;
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept;
@@ -38,5 +41,7 @@ private:
     float m_speed{ 100.0f };
     float m_radius{ 25.0f };
     Rgba m_color{};
+    Stopwatch m_timeToFire{};
+    EnemyWave* m_parentWave{};
     int m_health{ 1 };
 };

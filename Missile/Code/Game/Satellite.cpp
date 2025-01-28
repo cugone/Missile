@@ -11,10 +11,14 @@
 #include "Game/Game.hpp"
 #include "Game/GameCommon.hpp"
 
-Satellite::Satellite(Vector2 position) noexcept
+#include "Game/EnemyWave.hpp"
+
+Satellite::Satellite(EnemyWave* parent, Vector2 position) noexcept
     : m_position{position}
+    , m_parentWave{parent}
 {
     g_theAudioSystem->Play(GameConstants::game_audio_satellite_path, AudioSystem::SoundDesc{});
+    m_timeToFire.SetSeconds(TimeUtils::FPSeconds{ MathUtils::GetRandomInRange(2.0f, 15.0f) });
 }
 
 void Satellite::BeginFrame() noexcept {
@@ -29,6 +33,13 @@ void Satellite::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
         return;
     }
     m_position += -Vector2::X_Axis * m_speed * deltaSeconds.count();
+    if(m_timeToFire.CheckAndReset()) {
+        const auto* g = GetGameAs<Game>();
+        const auto& targets = g->GetValidTargets();
+        const auto& target = targets[MathUtils::GetRandomLessThan(targets.size())];
+        m_parentWave->GetMissileManager().LaunchMissile(m_position, target, TimeUtils::FPSeconds{ 5.0f }, Faction::Enemy, m_parentWave->GetObjectColor());
+    }
+
     m_builder.Begin(PrimitiveType::Lines);
 
     m_builder.SetColor(m_color);
