@@ -3,6 +3,7 @@
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/FileUtils.hpp"
 #include "Engine/Core/KerningFont.hpp"
+#include "Engine/Core/Rgba.hpp"
 #include "Engine/Core/Utilities.hpp"
 
 #include "Engine/Audio/AudioSystem.hpp"
@@ -340,7 +341,7 @@ void Game::RenderGround() const noexcept {
     const auto T = Matrix4::CreateTranslationMatrix(Vector2::Y_Axis * 450.0f);
     const auto M = Matrix4::MakeSRT(S, R, T);
 
-    g_theRenderer->DrawQuad2D(M, GameConstants::wave_ground_color_lookup[GetWaveId() % GameConstants::wave_array_size]);
+    g_theRenderer->DrawQuad2D(M, Rgba(GameConstants::wave_ground_color_lookup[GetWaveId() % GameConstants::wave_array_size]));
 }
 
 void Game::HandleMissileExplosionCollisions(MissileManager& missileManager) noexcept {

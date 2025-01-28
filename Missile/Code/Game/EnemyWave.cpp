@@ -1,6 +1,8 @@
 #include "Game/EnemyWave.hpp"
 
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Core/Rgba.hpp"
+
 #include "Engine/Math/MathUtils.hpp"
 
 #include "Game/Game.hpp"
@@ -98,11 +100,11 @@ int EnemyWave::GetScoreMultiplier() const noexcept {
 }
 
 Rgba EnemyWave::GetObjectColor() const noexcept {
-    return GameConstants::wave_object_color_lookup[m_waveId % GameConstants::wave_array_size];
+    return Rgba(GameConstants::wave_object_color_lookup[m_waveId % GameConstants::wave_array_size]);
 }
 
 Rgba EnemyWave::GetBackgroundColor() const noexcept {
-    return GameConstants::wave_background_color_lookup[m_waveId % GameConstants::wave_array_size];
+    return Rgba(GameConstants::wave_background_color_lookup[m_waveId % GameConstants::wave_array_size]);
 }
 
 void EnemyWave::SpawnBomber() noexcept {
