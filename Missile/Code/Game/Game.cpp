@@ -331,7 +331,6 @@ void Game::Render() const noexcept {
 
         const auto* font = g_theRenderer->GetFont("System32");
         const auto top = m_cameraController.CalcViewBounds().mins.y;
-        //const auto font_height = font->CalculateTextHeight(highscore_line);
         const auto font_width = font->CalculateTextWidth(highscore_line);
         const auto S = Matrix4::I;
         const auto R = Matrix4::I;
