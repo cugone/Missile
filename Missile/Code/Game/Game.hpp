@@ -17,6 +17,7 @@
 #include "Game/EnemyWave.hpp"
 #include "Game/City.hpp"
 
+#include <array>
 #include <vector>
 
 class MySettings : public GameSettings {
@@ -115,7 +116,7 @@ private:
     MissileBase m_missileBaseLeft{};
     MissileBase m_missileBaseCenter{};
     MissileBase m_missileBaseRight{};
-    std::vector<City> m_cities = std::vector<City>(6);
+    std::array<City, 6> m_cities{};
     EnemyWave m_waves{};
     ExplosionManager m_explosionManager{};
     MySettings m_mySettings{};
