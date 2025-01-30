@@ -121,7 +121,9 @@ void Game::Initialize() noexcept {
     }
 
     {
-        const auto desc = AudioSystem::SoundDesc{.loopCount = 6, .stopWhenFinishedLooping = true};
+        auto desc = AudioSystem::SoundDesc{};
+        desc.loopCount = 6;
+        desc.stopWhenFinishedLooping = true;
         g_theAudioSystem->Play(GameConstants::game_audio_klaxon_path, desc);
     }
 }
