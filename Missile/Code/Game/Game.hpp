@@ -123,6 +123,7 @@ private:
     MySettings m_mySettings{};
     Player m_playerData{};
     int m_currentHighScore{GameConstants::default_highscore};
+    int m_bonusCities{};
     bool m_debug_render{false};
 };
 
