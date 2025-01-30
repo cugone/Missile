@@ -132,8 +132,8 @@ void Game::BeginFrame() noexcept {
     m_missileBaseCenter.BeginFrame();
     m_missileBaseRight.BeginFrame();
     m_explosionManager.BeginFrame();
-    for(std::size_t i = 0; i < 6; ++i) {
-        m_cities[i].BeginFrame();
+    for(auto& city : m_cities) {
+        city.BeginFrame();
     }
 }
 
@@ -155,12 +155,10 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     HandleBomberExplosionCollision();
     HandleSatelliteExplosionCollision();
     HandleMissileGroundCollisions(m_waves.GetMissileManager());
-    for (std::size_t i = 0; i < 6; ++i) {
-        m_cities[i].Update(deltaSeconds);
+    for (auto& city : m_cities) {
+        city.Update(deltaSeconds);
     }
-
     UpdateHighScore();
-
 }
 
 void Game::UpdateHighScore() noexcept {
@@ -364,8 +362,8 @@ void Game::RenderObjects() const noexcept {
     m_missileBaseLeft.Render();
     m_missileBaseCenter.Render();
     m_missileBaseRight.Render();
-    for(std::size_t i = 0; i < 6; ++i) {
-        m_cities[i].Render();
+    for(const auto& city : m_cities) {
+        city.Render();
     }
 
     m_explosionManager.Render();
@@ -487,8 +485,8 @@ void Game::EndFrame() noexcept {
     m_missileBaseLeft.EndFrame();
     m_missileBaseCenter.EndFrame();
     m_missileBaseRight.EndFrame();
-    for (std::size_t i = 0; i < 6; ++i) {
-        m_cities[i].Render();
+    for (auto& city : m_cities) {
+        city.EndFrame();
     }
     m_waves.EndFrame();
     m_explosionManager.EndFrame();
