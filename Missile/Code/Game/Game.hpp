@@ -90,6 +90,7 @@ private:
     void RenderCrosshairAt(Vector2 pos) const noexcept;
     void RenderGround() const noexcept;
     void RenderRadarLine() const noexcept;
+    void RenderHighscoreAndWave() const noexcept;
 
     void HandleMissileExplosionCollisions(MissileManager& missileManager) noexcept;
     void HandleBomberExplosionCollision() noexcept;

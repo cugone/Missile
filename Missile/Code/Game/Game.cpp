@@ -320,26 +320,28 @@ void Game::Render() const noexcept {
         RenderObjects();
         RenderCrosshairAt(m_mouse_world_pos);
         RenderRadarLine();
+        RenderHighscoreAndWave();
+    }
+}
 
-        const auto highscore_line = [this]()-> std::string {
-            if (m_playerData.score < m_currentHighScore) {
-                return std::format("{} -> {}\nWave: {}", m_playerData.score, m_currentHighScore, std::size_t{1u} + this->GetWaveId());
-            } else {
-                return std::format("{} <- {}\nWave: {}", m_playerData.score, m_currentHighScore, std::size_t{1u} + this->GetWaveId());
-            }
+void Game::RenderHighscoreAndWave() const noexcept {
+    const auto highscore_line = [this]()-> std::string {
+        if (m_playerData.score < m_currentHighScore) {
+            return std::format("{} -> {}\nWave: {}", m_playerData.score, m_currentHighScore, std::size_t{ 1u } + this->GetWaveId());
+        } else {
+            return std::format("{} <- {}\nWave: {}", m_playerData.score, m_currentHighScore, std::size_t{ 1u } + this->GetWaveId());
+        }
         }();
 
-        const auto* font = g_theRenderer->GetFont("System32");
-        const auto top = m_cameraController.CalcViewBounds().mins.y;
-        const auto font_width = font->CalculateTextWidth(highscore_line);
-        const auto S = Matrix4::I;
-        const auto R = Matrix4::I;
-        const auto T = Matrix4::CreateTranslationMatrix(Vector2{font_width * -0.5f, top});
-        const auto M = Matrix4::MakeSRT(S, R, T);
-        g_theRenderer->SetModelMatrix(M);
-        g_theRenderer->DrawMultilineText(font, highscore_line);
-
-    }
+    const auto* font = g_theRenderer->GetFont("System32");
+    const auto top = m_cameraController.CalcViewBounds().mins.y;
+    const auto font_width = font->CalculateTextWidth(highscore_line);
+    const auto S = Matrix4::I;
+    const auto R = Matrix4::I;
+    const auto T = Matrix4::CreateTranslationMatrix(Vector2{ font_width * -0.5f, top });
+    const auto M = Matrix4::MakeSRT(S, R, T);
+    g_theRenderer->SetModelMatrix(M);
+    g_theRenderer->DrawMultilineText(font, highscore_line);
 }
 
 void Game::RenderRadarLine() const noexcept {
