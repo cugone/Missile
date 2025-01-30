@@ -183,8 +183,13 @@ Vector2 Game::BaseLocationRight() const noexcept {
     return m_missileBaseRight.GetMissileLauncherPosition();
 }
 
-const std::array<MissileManager::Target, 3> Game::GetValidTargets() const noexcept {
-    return std::array<MissileManager::Target, 3>{ BaseLocationLeft(), BaseLocationCenter(), BaseLocationRight() };
+Vector2 Game::CityLocation(std::size_t index) const noexcept {
+    GUARANTEE_OR_DIE(index < m_cities.size(), "City index ouf of bounds.");
+    return m_cities[index].GetCollisionMesh().CalcCenter();
+}
+
+const std::array<MissileManager::Target, 9> Game::GetValidTargets() const noexcept {
+    return std::array<MissileManager::Target, 9>{ BaseLocationLeft(), BaseLocationCenter(), BaseLocationRight(), CityLocation(0), CityLocation(1), CityLocation(2), CityLocation(3), CityLocation(4), CityLocation(5) };
 }
 
 Vector2 Game::CalcCrosshairPositionFromRawMousePosition() noexcept {
