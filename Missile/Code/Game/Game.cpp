@@ -100,8 +100,8 @@ void Game::Initialize() noexcept {
     m_missileBaseRight.SetTimeToTarget(TimeUtils::FPSeconds{1.0f});
 
     {
-        const auto left_center_displacement = m_missileBaseCenter.GetMissileLauncherPosition() - m_missileBaseLeft.GetMissileLauncherPosition();
-        const auto len = left_center_displacement.GetNormalize();
+        auto left_center_displacement = m_missileBaseCenter.GetMissileLauncherPosition() - m_missileBaseLeft.GetMissileLauncherPosition();
+        const auto len = left_center_displacement.Normalize();
         const auto pos0 = Vector2{ m_missileBaseLeft.GetMissileLauncherPosition() + left_center_displacement * len * 0.25f};
         m_cities[0].SetPosition(pos0);
         const auto pos1 = Vector2{ m_missileBaseLeft.GetMissileLauncherPosition() + left_center_displacement * len * 0.50f};
@@ -110,8 +110,8 @@ void Game::Initialize() noexcept {
         m_cities[2].SetPosition(pos2);
     }
     {
-        const auto right_center_displacement = m_missileBaseCenter.GetMissileLauncherPosition() - m_missileBaseRight.GetMissileLauncherPosition();
-        const auto len = right_center_displacement.GetNormalize();
+        auto right_center_displacement = m_missileBaseCenter.GetMissileLauncherPosition() - m_missileBaseRight.GetMissileLauncherPosition();
+        const auto len = right_center_displacement.Normalize();
         const auto pos3 = Vector2{ m_missileBaseRight.GetMissileLauncherPosition() - right_center_displacement * len * 0.25f };
         m_cities[3].SetPosition(pos3);
         const auto pos4 = Vector2{ m_missileBaseRight.GetMissileLauncherPosition() - right_center_displacement * len * 0.50f };
