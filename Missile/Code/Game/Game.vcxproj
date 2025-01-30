@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClCompile Include="Bomber.cpp" />
     <ClCompile Include="City.cpp" />
+    <ClCompile Include="CityManager.cpp" />
     <ClCompile Include="EnemyWave.cpp" />
     <ClCompile Include="Explosion.cpp" />
     <ClCompile Include="ExplosionManager.cpp" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClInclude Include="Bomber.hpp" />
     <ClInclude Include="City.hpp" />
+    <ClInclude Include="CityManager.hpp" />
     <ClInclude Include="EnemyWave.hpp" />
     <ClInclude Include="Explosion.hpp" />
     <ClInclude Include="ExplosionManager.hpp" />

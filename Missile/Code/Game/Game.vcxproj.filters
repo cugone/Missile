@@ -70,6 +70,9 @@
     <ClCompile Include="City.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="CityManager.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -109,6 +112,9 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="City.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="CityManager.hpp">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
