@@ -26,10 +26,14 @@ public:
 
     AABB2 GetCollisionMesh() const noexcept;
 
+    bool IsDead() const noexcept;
+    void Kill() noexcept;
+
 protected:
 private:
 
     Rgba GetCityColor() const noexcept;
 
     Vector2 m_position{};
+    int m_health{1};
 };

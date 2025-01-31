@@ -58,3 +58,11 @@ Rgba City::GetCityColor() const noexcept {
 AABB2 City::GetCollisionMesh() const noexcept {
     return AABB2{m_position, 33.0f, 24.0f };
 }
+
+bool City::IsDead() const noexcept {
+    return m_health < 1;
+}
+
+void City::Kill() noexcept {
+    m_health = 0;
+}

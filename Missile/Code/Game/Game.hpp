@@ -16,6 +16,7 @@
 #include "Game/ExplosionManager.hpp"
 #include "Game/EnemyWave.hpp"
 #include "Game/City.hpp"
+#include "Game/CityManager.hpp"
 
 #include <array>
 #include <vector>
@@ -118,8 +119,8 @@ private:
     MissileBase m_missileBaseLeft{};
     MissileBase m_missileBaseCenter{};
     MissileBase m_missileBaseRight{};
-    std::array<City, 6> m_cities{};
     EnemyWave m_waves{};
+    CityManager m_cityManager{};
     ExplosionManager m_explosionManager{};
     MySettings m_mySettings{};
     Player m_playerData{};
