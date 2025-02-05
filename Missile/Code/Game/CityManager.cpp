@@ -30,7 +30,7 @@ bool CityManager::IsBonusCityAvailable() const noexcept {
     return m_bonusCities > 0;
 }
 
-void CityManager::AddBonusCity() noexcept {
+void CityManager::GrantBonusCIty() noexcept {
     m_bonusCities += 1;
 }
 
