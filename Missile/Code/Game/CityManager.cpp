@@ -34,6 +34,10 @@ void CityManager::GrantBonusCIty() noexcept {
     m_bonusCities += 1;
 }
 
+void CityManager::RedeemBonusCIty() noexcept {
+    m_bonusCities -= 1;
+}
+
 std::size_t CityManager::RemainingCities() const noexcept {
     return std::count_if(std::cbegin(m_cities), std::cend(m_cities), [](const City& city) { return !city.IsDead(); });
 }

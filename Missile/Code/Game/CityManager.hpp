@@ -16,6 +16,7 @@ public:
 
     bool IsBonusCityAvailable() const noexcept;
     void GrantBonusCIty() noexcept;
+    void RedeemBonusCIty() noexcept;
 
     std::size_t RemainingCities() const noexcept;
 
