@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Engine/Core/Stopwatch.hpp"
+
 #include "Game/MissileManager.hpp"
 #include "Game/Bomber.hpp"
 #include "Game/Satellite.hpp"
@@ -29,6 +31,7 @@ public:
     int GetScoreMultiplier() const noexcept;
     Rgba GetObjectColor() const noexcept;
     Rgba GetBackgroundColor() const noexcept;
+    TimeUtils::FPSeconds GetMissileImpactTime() const noexcept;
 
     void SpawnBomber() noexcept;
     void SpawnSatellite() noexcept;
@@ -37,13 +40,25 @@ public:
     Bomber* const GetBomber() const noexcept;
     Satellite* const GetSatellite() const noexcept;
 
+    void SetMissileCount(int newMissileCount) noexcept;
+    
+    bool IsWaveActive() const noexcept;
+    void ActivateWave() noexcept;
+    void DeactivateWave() noexcept;
+
+    void SetMissileSpawnRate(TimeUtils::FPSeconds secondsBetween) noexcept;
+
 protected:
 private:
+    void UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void UpdateSatellite(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void UpdateBomber(TimeUtils::FPSeconds deltaSeconds) noexcept;
 
     MissileManager m_missiles{};
     std::unique_ptr<Bomber> m_bomber{};
     std::unique_ptr<Satellite> m_satellite{};
+    Stopwatch m_missileSpawnRate{};
     std::size_t m_waveId{ 0 };
+    int m_missileCount{};
+    bool m_waveActive{false};
 };

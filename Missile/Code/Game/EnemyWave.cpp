@@ -7,6 +7,8 @@
 
 #include "Game/Game.hpp"
 
+#include <utility>
+
 void EnemyWave::BeginFrame() noexcept {
     m_missiles.BeginFrame();
     if(m_bomber) {
@@ -18,9 +20,19 @@ void EnemyWave::BeginFrame() noexcept {
 }
 
 void EnemyWave::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    m_missiles.Update(deltaSeconds);
+    UpdateMissiles(deltaSeconds);
     UpdateBomber(deltaSeconds);
     UpdateSatellite(deltaSeconds);
+}
+
+void EnemyWave::UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept {
+    if(m_waveActive && m_missileCount) {
+        if(m_missileSpawnRate.CheckAndReset()) {
+            SpawnMissile();
+            m_missileCount = (std::max)(0, m_missileCount - 1);
+        }
+    }
+    m_missiles.Update(deltaSeconds);
 }
 
 void EnemyWave::UpdateSatellite(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -107,6 +119,30 @@ Rgba EnemyWave::GetBackgroundColor() const noexcept {
     return Rgba(GameConstants::wave_background_color_lookup[m_waveId % GameConstants::wave_array_size]);
 }
 
+TimeUtils::FPSeconds EnemyWave::GetMissileImpactTime() const noexcept {
+    return TimeUtils::FPSeconds{m_waveId < GameConstants::wave_missile_impact_time.size() ? GameConstants::wave_missile_impact_time[m_waveId] : GameConstants::min_missile_impact_time};
+}
+
+void EnemyWave::SetMissileSpawnRate(TimeUtils::FPSeconds secondsBetween) noexcept {
+    m_missileSpawnRate.SetSeconds(secondsBetween);
+}
+
+void EnemyWave::SetMissileCount(int newMissileCount) noexcept {
+    m_missileCount = newMissileCount;
+}
+
+bool EnemyWave::IsWaveActive() const noexcept {
+    return m_waveActive;
+}
+
+void EnemyWave::ActivateWave() noexcept {
+    m_waveActive = true;
+}
+
+void EnemyWave::DeactivateWave() noexcept {
+    m_waveActive = false;
+}
+
 void EnemyWave::SpawnBomber() noexcept {
     if(m_bomber) {
         return;
@@ -141,7 +177,7 @@ void EnemyWave::SpawnMissile() noexcept {
 
     const auto& targets = g->GetValidTargets();
     const auto& target = targets[MathUtils::GetRandomLessThan(targets.size())];
-    m_missiles.LaunchMissile(pos, target, TimeUtils::FPSeconds{ 10.0f }, Faction::Enemy, GetObjectColor());
+    m_missiles.LaunchMissile(pos, target, GetMissileImpactTime(), Faction::Enemy, GetObjectColor());
 }
 
 Bomber* const EnemyWave::GetBomber() const noexcept {

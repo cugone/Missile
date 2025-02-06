@@ -111,6 +111,10 @@ void Game::Initialize() noexcept {
     m_cityManager.GetCity(4).SetPosition(m_missileBaseRight.GetMissileLauncherPosition() + right_center_displacement * right_len * 0.50f);
     m_cityManager.GetCity(5).SetPosition(m_missileBaseRight.GetMissileLauncherPosition() + right_center_displacement * right_len * 0.75f);
 
+    m_waves.SetMissileCount(20);
+    m_waves.ActivateWave();
+    m_waves.SetMissileSpawnRate(TimeUtils::FPSeconds{1.0f});
+
     auto desc = AudioSystem::SoundDesc{};
     desc.loopCount = 6;
     desc.stopWhenFinishedLooping = true;
