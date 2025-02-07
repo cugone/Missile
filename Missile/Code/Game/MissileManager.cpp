@@ -56,6 +56,10 @@ bool MissileManager::LaunchMissile(Vector2 position, Target target, TimeUtils::F
     return true;
 }
 
+std::size_t MissileManager::ActiveMissileCount() const noexcept {
+    return m_missiles.size();
+}
+
 std::vector<Vector2> MissileManager::GetMissilePositions() const noexcept {
     std::vector<Vector2> results;
     results.reserve(m_missiles.size());

@@ -27,6 +27,7 @@ public:
     bool LaunchMissile(Vector2 position, Direction direction, TimeUtils::FPSeconds timeToTarget, Faction faction, Rgba color) noexcept;
     bool LaunchMissile(Vector2 position, Target target, TimeUtils::FPSeconds timeToTarget, Faction faction, Rgba color) noexcept;
 
+    std::size_t ActiveMissileCount() const noexcept;
     std::vector<Vector2> GetMissilePositions() const noexcept;
     void KillMissile(std::size_t idx) noexcept;
 

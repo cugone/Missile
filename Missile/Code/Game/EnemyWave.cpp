@@ -27,9 +27,11 @@ void EnemyWave::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
 void EnemyWave::UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept {
     if(m_waveActive && m_missileCount) {
-        if(m_missileSpawnRate.CheckAndReset()) {
-            SpawnMissile();
-            m_missileCount = (std::max)(0, m_missileCount - 1);
+        if(m_missiles.ActiveMissileCount() < GameConstants::max_missles_on_screen) {
+            if(m_missileSpawnRate.CheckAndReset()) {
+                SpawnMissile();
+                m_missileCount = (std::max)(0, m_missileCount - 1);
+            }
         }
     }
     m_missiles.Update(deltaSeconds);
