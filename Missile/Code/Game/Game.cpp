@@ -311,6 +311,11 @@ void Game::Render() const noexcept {
         RenderCrosshairAt(m_mouse_world_pos);
         RenderRadarLine();
         RenderHighscoreAndWave();
+
+        if(m_debug_render) {
+            Debug_RenderObjects();
+        }
+
     }
 }
 
@@ -360,6 +365,15 @@ void Game::RenderObjects() const noexcept {
     m_missileBaseRight.Render();
     m_cityManager.Render();
     m_explosionManager.Render();
+}
+
+void Game::Debug_RenderObjects() const noexcept {
+    m_waves.DebugRender();
+    m_missileBaseLeft.DebugRender();
+    m_missileBaseCenter.DebugRender();
+    m_missileBaseRight.DebugRender();
+    m_cityManager.DebugRender();
+    m_explosionManager.DebugRender();
 }
 
 void Game::RenderGround() const noexcept {

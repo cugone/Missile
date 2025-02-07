@@ -87,6 +87,7 @@ private:
     const bool IsCrosshairClampedToRadar() const noexcept;
 
     void RenderObjects() const noexcept;
+    void Debug_RenderObjects() const noexcept;
     void RenderCrosshair() const noexcept;
     void RenderCrosshairAt(Vector2 pos) const noexcept;
     void RenderGround() const noexcept;
