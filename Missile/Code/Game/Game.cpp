@@ -285,7 +285,7 @@ void Game::HandleDebugMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
 }
 
 void Game::CreateExplosionAt(Vector2 position, Faction faction) noexcept {
-    m_explosionManager.CreateExplosionAt(ExplosionManager::ExplosionData{Vector4{position, 40.0f, 3.0f}, faction});
+    m_explosionManager.CreateExplosionAt(ExplosionManager::ExplosionData{ Vector4{position, GameConstants::max_explosion_size, 3.0f}, faction });
 }
 
 void Game::Render() const noexcept {
