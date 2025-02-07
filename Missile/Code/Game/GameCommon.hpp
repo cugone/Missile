@@ -19,6 +19,7 @@ namespace GameConstants {
     constexpr const int max_explosion_sounds{5};
     constexpr const int max_score_multiplier{6};
     constexpr const int max_missles_on_screen{4};
+    constexpr const int max_cities{6};
     constexpr const float min_missile_impact_time{2.0f};
     constexpr const float max_explosion_size{45.0f};
     constexpr const int enemy_missile_value{25};
