@@ -56,6 +56,15 @@ void Bomber::Render() const noexcept {
     }
 }
 
+void Bomber::DebugRender() const noexcept {
+    if(IsDead()) {
+        return;
+    }
+    g_theRenderer->SetMaterial("__2D");
+    g_theRenderer->SetModelMatrix();
+    g_theRenderer->DrawCircle2D(GetCollisionMesh(), Rgba::Orange);
+}
+
 void Bomber::EndFrame() noexcept {
     if(IsDead()) {
         auto* g = GetGameAs<Game>();

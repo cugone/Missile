@@ -35,6 +35,10 @@ void MissileManager::Render() const noexcept {
     Mesh::Render(m_builder);
 }
 
+void MissileManager::DebugRender() const noexcept {
+    /* DO NOTHING */
+}
+
 void MissileManager::EndFrame() noexcept {
     for (auto& m : m_missiles) {
         m.EndFrame();

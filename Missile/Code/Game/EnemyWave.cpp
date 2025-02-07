@@ -77,6 +77,16 @@ void EnemyWave::Render() const noexcept {
     }
 }
 
+void EnemyWave::DebugRender() const noexcept {
+    m_missiles.DebugRender();
+    if(m_bomber) {
+        m_bomber->DebugRender();
+    }
+    if(m_satellite) {
+        m_satellite->DebugRender();
+    }
+}
+
 void EnemyWave::EndFrame() noexcept {
     m_missiles.EndFrame();
     if(m_bomber) {

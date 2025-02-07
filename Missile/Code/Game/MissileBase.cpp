@@ -73,6 +73,12 @@ void MissileBase::Render() const noexcept {
     }
 }
 
+void MissileBase::DebugRender() const noexcept {
+    g_theRenderer->SetModelMatrix();
+    g_theRenderer->SetMaterial("__2D");
+    g_theRenderer->DrawAABB2(GetCollisionMesh(), Rgba::Green, Rgba::NoAlpha);
+}
+
 void MissileBase::EndFrame() noexcept {
     m_missileManager.EndFrame();
 }

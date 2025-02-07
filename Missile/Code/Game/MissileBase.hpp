@@ -22,6 +22,7 @@ public:
     void BeginFrame() noexcept;
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void Render() const noexcept;
+    void DebugRender() const noexcept;
     void EndFrame() noexcept;
 
     void Fire(MissileManager::Target target) noexcept;

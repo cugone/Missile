@@ -35,6 +35,15 @@ void ExplosionManager::Render() const noexcept {
     }
 }
 
+void ExplosionManager::DebugRender() const noexcept {
+    g_theRenderer->SetModelMatrix();
+    g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("__2D"));
+    for (const auto& e : m_explosions) {
+        const auto& c = e.GetCollisionMesh();
+        g_theRenderer->DrawCircle2D(c.center, c.radius, Rgba::Orange);
+    }
+}
+
 void ExplosionManager::EndFrame() noexcept {
     for (auto& e : m_explosions) {
         e.EndFrame();

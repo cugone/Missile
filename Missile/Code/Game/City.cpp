@@ -46,6 +46,13 @@ void City::Render() const noexcept {
 
 }
 
+void City::DebugRender() const noexcept {
+    g_theRenderer->SetModelMatrix();
+    g_theRenderer->SetMaterial("__2D");
+    g_theRenderer->DrawAABB2(GetCollisionMesh(), Rgba::Green, Rgba::NoAlpha);
+
+}
+
 void City::EndFrame() noexcept {
     /* DO NOTHING */
 }

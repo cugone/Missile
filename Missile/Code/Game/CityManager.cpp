@@ -20,6 +20,12 @@ void CityManager::Render() const noexcept {
     }
 }
 
+void CityManager::DebugRender() const noexcept {
+    for (auto& city : m_cities) {
+        city.DebugRender();
+    }
+}
+
 void CityManager::EndFrame() noexcept {
     for (auto& city : m_cities) {
         city.EndFrame();

@@ -22,6 +22,7 @@ public:
     void BeginFrame() noexcept;
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void Render() const noexcept;
+    void DebugRender() const noexcept;
     void EndFrame() noexcept;
 
     bool LaunchMissile(Vector2 position, Direction direction, TimeUtils::FPSeconds timeToTarget, Faction faction, Rgba color) noexcept;
