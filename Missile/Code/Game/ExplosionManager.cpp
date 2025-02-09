@@ -69,3 +69,7 @@ std::vector<Disc2> ExplosionManager::GetExplosionCollisionMeshes() const noexcep
     return results;
 }
 
+std::size_t ExplosionManager::ActiveExplosionCount() const noexcept {
+    return m_explosions.size();
+}
+

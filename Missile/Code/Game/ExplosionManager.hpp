@@ -28,6 +28,8 @@ public:
     void CreateExplosionAt(ExplosionData&& newExplosionData) noexcept;
     std::vector<Disc2> GetExplosionCollisionMeshes() const noexcept;
 
+    std::size_t ActiveExplosionCount() const noexcept;
+
 protected:
 private:
     mutable Mesh::Builder m_builder{};
