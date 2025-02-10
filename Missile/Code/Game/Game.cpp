@@ -493,6 +493,14 @@ MissileManager& Game::GetMissileManager() noexcept {
     return m_waves.GetMissileManager();
 }
 
+const ExplosionManager& Game::GetExplosionManager() const noexcept {
+    return m_explosionManager;
+}
+
+ExplosionManager& Game::GetExplosionManager() noexcept {
+    return m_explosionManager;
+}
+
 Player* Game::GetPlayerData() noexcept {
     return &m_playerData;
 }

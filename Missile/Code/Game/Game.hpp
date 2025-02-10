@@ -70,6 +70,8 @@ public:
     void RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept;
 
     MissileManager& GetMissileManager() noexcept;
+    const ExplosionManager& GetExplosionManager() const noexcept;
+    ExplosionManager& GetExplosionManager() noexcept;
 
     Player* GetPlayerData() noexcept;
 
