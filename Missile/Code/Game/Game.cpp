@@ -271,7 +271,7 @@ void Game::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::S)) {
         m_waves.SpawnSatellite();
     }
-    if (g_theInputSystem->WasKeyJustPressed(KeyCode::M)) {
+    if (g_theInputSystem->IsKeyDown(KeyCode::M)) {
         m_waves.SpawnMissile();
     }
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::I)) {
