@@ -38,6 +38,10 @@ void Bomber::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     }
 }
 
+float Bomber::GetFireRate() const noexcept {
+    return m_parentWave->GetWaveId() < GameConstants::wave_flier_firerate_lookup.size() ? GameConstants::wave_flier_firerate_lookup[m_parentWave->GetWaveId()] : GameConstants::min_bomber_firerate;
+}
+
 void Bomber::Render() const noexcept {
     if(IsDead()) {
         return;

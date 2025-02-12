@@ -36,6 +36,9 @@ public:
 
 protected:
 private:
+
+    float GetFireRate() const noexcept;
+
     Vector2 m_position{};
     Stopwatch m_timeToFire{};
     float m_speed{100.0f};
