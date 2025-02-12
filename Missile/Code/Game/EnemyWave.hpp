@@ -42,15 +42,26 @@ public:
     Satellite* const GetSatellite() const noexcept;
 
     void SetMissileCount(int newMissileCount) noexcept;
-    
+    int GetMissileCount() const noexcept;
+    int GetRemainingMissiles() const noexcept;
+
     bool IsWaveActive() const noexcept;
     void ActivateWave() noexcept;
     void DeactivateWave() noexcept;
+    bool IsWaveOver() const noexcept;
 
     void SetMissileSpawnRate(TimeUtils::FPSeconds secondsBetween) noexcept;
+    void SetBomberSpawnRate(TimeUtils::FPSeconds secondsBetween) noexcept;
+    float GetFlierCooldown() const noexcept;
+
+    bool CanSpawnMissile() const noexcept;
+    bool LaunchMissileFrom(Vector2 position) noexcept;
 
 protected:
 private:
+
+    
+
     void UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void UpdateSatellite(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void UpdateBomber(TimeUtils::FPSeconds deltaSeconds) noexcept;
@@ -59,7 +70,10 @@ private:
     std::unique_ptr<Bomber> m_bomber{};
     std::unique_ptr<Satellite> m_satellite{};
     Stopwatch m_missileSpawnRate{};
+    Stopwatch m_bomberSpawnRate{};
+    Stopwatch m_satelliteSpawnRate{};
     std::size_t m_waveId{ 0 };
     int m_missileCount{};
     bool m_waveActive{false};
+
 };

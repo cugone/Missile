@@ -10,13 +10,12 @@
 #include "Game/GameCommon.hpp"
 #include "Game/EnemyWave.hpp"
 
-
 Bomber::Bomber(EnemyWave* parent, Vector2 position) noexcept
     : m_position{ position }
     , m_parentWave{parent}
 {
     g_theAudioSystem->Play(GameConstants::game_audio_bomber_path, AudioSystem::SoundDesc{});
-    m_timeToFire.SetSeconds(TimeUtils::FPSeconds{MathUtils::GetRandomInRange(2.0f, 15.0f)});
+    m_timeToFire.SetSeconds(TimeUtils::FPFrames{GetFireRate()});
 }
 
 void Bomber::BeginFrame() noexcept {
@@ -31,10 +30,7 @@ void Bomber::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     }
     m_position += Vector2::X_Axis * m_speed * deltaSeconds.count();
     if(m_timeToFire.CheckAndReset()) {
-        const auto* g = GetGameAs<Game>();
-        const auto& targets = g->GetValidTargets();
-        const auto& target = targets[MathUtils::GetRandomLessThan(targets.size())];
-        m_parentWave->GetMissileManager().LaunchMissile(m_position, target, TimeUtils::FPSeconds{ 5.0f }, Faction::Enemy, m_parentWave->GetObjectColor());
+        m_parentWave->LaunchMissileFrom(m_position);
     }
 }
 
