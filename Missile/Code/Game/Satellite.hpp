@@ -36,6 +36,9 @@ public:
 
 protected:
 private:
+
+    float GetFireRate() const noexcept;
+
     Mesh::Builder m_builder{};
     Vector2 m_position{};
     float m_speed{ 100.0f };

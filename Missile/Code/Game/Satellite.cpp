@@ -18,7 +18,7 @@ Satellite::Satellite(EnemyWave* parent, Vector2 position) noexcept
     , m_parentWave{parent}
 {
     g_theAudioSystem->Play(GameConstants::game_audio_satellite_path, AudioSystem::SoundDesc{});
-    m_timeToFire.SetSeconds(TimeUtils::FPSeconds{ MathUtils::GetRandomInRange(2.0f, 15.0f) });
+    m_timeToFire.SetSeconds(TimeUtils::FPFrames{GetFireRate()});
 }
 
 void Satellite::BeginFrame() noexcept {
@@ -113,4 +113,8 @@ Disc2 Satellite::GetCollisionMesh() const noexcept {
 
 Vector2 Satellite::GetPosition() const noexcept {
     return m_position;
+}
+
+float Satellite::GetFireRate() const noexcept {
+    return m_parentWave->GetWaveId() < GameConstants::wave_flier_firerate_lookup.size() ? GameConstants::wave_flier_firerate_lookup[m_parentWave->GetWaveId()] : GameConstants::min_bomber_firerate;
 }
