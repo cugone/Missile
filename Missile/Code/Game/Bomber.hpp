@@ -41,7 +41,7 @@ private:
 
     Vector2 m_position{};
     Stopwatch m_timeToFire{};
-    float m_speed{100.0f};
+    float m_speed{20.0f};
     int m_health{1};
     EnemyWave* m_parentWave{};
 };

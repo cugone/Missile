@@ -41,7 +41,7 @@ private:
 
     Mesh::Builder m_builder{};
     Vector2 m_position{};
-    float m_speed{ 100.0f };
+    float m_speed{ 30.0f };
     float m_radius{ 25.0f };
     Stopwatch m_timeToFire{};
     EnemyWave* m_parentWave{};
