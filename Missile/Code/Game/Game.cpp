@@ -443,18 +443,12 @@ void Game::HandleMissileGroundCollisions(MissileManager& missileManager) noexcep
 
 void Game::HandleCityExplosionCollisions() noexcept {
     const auto& explosions = m_explosionManager.GetExplosionCollisionMeshes();
-    for (int i = 0; i < GameConstants::max_cities; ++i) {
+    for(int i = 0; i < GameConstants::max_cities; ++i) {
         auto& city = m_cityManager.GetCity(i);
-        for (const auto& explosion : explosions) {
-            const auto& aabb = city.GetCollisionMesh();
-            if(const auto is_contained = MathUtils::IsPointInside(explosion, Vector2{ aabb.mins.x, aabb.maxs.y })
-                && MathUtils::IsPointInside(explosion, Vector2{ aabb.mins.x, aabb.mins.y })
-                && MathUtils::IsPointInside(explosion, Vector2{ aabb.maxs.x, aabb.mins.y })
-                && MathUtils::IsPointInside(explosion, Vector2{ aabb.maxs.x, aabb.maxs.y });
-                is_contained == true) {
+        for(const auto& explosion : explosions) {
+            if(MathUtils::Contains(explosion, city.GetCollisionMesh())) {
                 city.Kill();
             }
-
         }
     }
 
