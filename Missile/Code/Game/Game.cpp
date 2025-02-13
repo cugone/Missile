@@ -534,8 +534,8 @@ void Game::EndFrame() noexcept {
     m_missileBaseCenter.EndFrame();
     m_missileBaseRight.EndFrame();
     m_cityManager.EndFrame();
-    m_waves.EndFrame();
     m_explosionManager.EndFrame();
+    m_waves.EndFrame();
 }
 
 void Game::ResetMissileCount() noexcept {
