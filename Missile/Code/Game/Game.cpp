@@ -538,6 +538,12 @@ void Game::EndFrame() noexcept {
     m_explosionManager.EndFrame();
 }
 
+void Game::ResetMissileCount() noexcept {
+    m_missileBaseLeft.ResetMissiles();
+    m_missileBaseCenter.ResetMissiles();
+    m_missileBaseRight.ResetMissiles();
+}
+
 const GameSettings* Game::GetSettings() const noexcept {
     return &m_mySettings;
 }

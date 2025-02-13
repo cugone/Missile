@@ -56,7 +56,6 @@ public:
     void Update(TimeUtils::FPSeconds deltaSeconds) noexcept override;
     void Render() const noexcept override;
     void EndFrame() noexcept override;
-
     const GameSettings* GetSettings() const noexcept override;
     GameSettings* GetSettings() noexcept override;
 
@@ -79,6 +78,7 @@ public:
 
     std::size_t GetWaveId() const noexcept;
     bool HasMissilesRemaining() const noexcept;
+    void ResetMissileCount() noexcept;
 
 protected:
 private:
