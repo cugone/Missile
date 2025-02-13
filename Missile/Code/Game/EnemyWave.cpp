@@ -82,8 +82,11 @@ bool EnemyWave::LaunchMissileFrom(Vector2 position) noexcept {
 }
 
 bool EnemyWave::IsWaveOver() const noexcept {
-    if (auto* g = GetGameAs<Game>(); g != nullptr) {
-        if (m_missileCount == 0 && !m_bomber && !m_satellite && g->GetExplosionManager().ActiveExplosionCount() == 0) {
+    if(auto* g = GetGameAs<Game>(); g != nullptr) {
+        const auto all_explosions_finished = g->GetExplosionManager().ActiveExplosionCount() == 0;
+        const auto cant_score_points = !g->HasMissilesRemaining() && g->GetMissileManager().ActiveMissileCount() == 0 && all_explosions_finished;
+        const auto everything_dead = m_missileCount == 0 && !m_bomber && !m_satellite && all_explosions_finished;
+        if(cant_score_points || everything_dead) {
             return true;
         }
     }
