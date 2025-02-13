@@ -129,16 +129,20 @@ void EnemyWave::EndFrame() noexcept {
     }
     if(IsWaveActive() && m_waveId > 0) {
         if (const auto is_bomber = MathUtils::GetRandomBool(); is_bomber) {
-            if (!m_bomber && m_bomberSpawnRate.Check()) {
-                SpawnBomber();
-                m_bomberSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
-                m_bomberSpawnRate.Reset();
+            if(m_missileCount) {
+                if (!m_bomber && m_bomberSpawnRate.Check()) {
+                    SpawnBomber();
+                    m_bomberSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
+                    m_bomberSpawnRate.Reset();
+                }
             }
         } else {
-            if (!m_satellite && m_satelliteSpawnRate.Check()) {
-                SpawnSatellite();
-                m_satelliteSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
-                m_satelliteSpawnRate.Reset();
+            if(m_missileCount) {
+                if (!m_satellite && m_satelliteSpawnRate.Check()) {
+                    SpawnSatellite();
+                    m_satelliteSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
+                    m_satelliteSpawnRate.Reset();
+                }
             }
         }
     }
