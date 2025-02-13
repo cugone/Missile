@@ -175,3 +175,7 @@ Vector2 MissileBase::GetMissileLauncherPosition() const noexcept {
 AABB2 MissileBase::GetCollisionMesh() const noexcept {
     return AABB2{m_position, 33.0f, 24.0f };
 }
+
+void MissileBase::Kill() noexcept {
+    RemoveAllMissiles();
+}

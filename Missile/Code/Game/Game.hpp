@@ -101,6 +101,7 @@ private:
     void HandleSatelliteExplosionCollision() noexcept;
     void HandleMissileGroundCollisions(MissileManager& missileManager) noexcept;
     void HandleCityExplosionCollisions() noexcept;
+    void HandleBaseExplosionCollisions() noexcept;
 
     void HandleDebugInput(TimeUtils::FPSeconds deltaSeconds);
     void HandleDebugKeyboardInput(TimeUtils::FPSeconds deltaSeconds);

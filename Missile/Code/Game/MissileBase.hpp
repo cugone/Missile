@@ -40,6 +40,8 @@ public:
 
     AABB2 GetCollisionMesh() const noexcept;
 
+    void Kill() noexcept;
+
 protected:
 private:
 

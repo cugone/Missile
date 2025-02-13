@@ -148,6 +148,7 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     HandleBomberExplosionCollision();
     HandleSatelliteExplosionCollision();
     HandleCityExplosionCollisions();
+    HandleBaseExplosionCollisions();
     HandleMissileGroundCollisions(m_waves.GetMissileManager());
     m_cityManager.Update(deltaSeconds);
     UpdateHighScore();
@@ -457,6 +458,20 @@ void Game::HandleCityExplosionCollisions() noexcept {
         }
     }
 
+}
+
+void Game::HandleBaseExplosionCollisions() noexcept {
+    for(const auto& explosion : m_explosionManager.GetExplosionCollisionMeshes()) {
+        if(MathUtils::Contains(explosion, m_missileBaseLeft.GetCollisionMesh())) {
+            m_missileBaseLeft.Kill();
+        }
+        if(MathUtils::Contains(explosion, m_missileBaseCenter.GetCollisionMesh())) {
+            m_missileBaseCenter.Kill();
+        }
+        if(MathUtils::Contains(explosion, m_missileBaseRight.GetCollisionMesh())) {
+            m_missileBaseRight.Kill();
+        }
+    }
 }
 
 void Game::RenderCrosshair() const noexcept {
