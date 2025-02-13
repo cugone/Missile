@@ -147,10 +147,24 @@ void EnemyWave::EndFrame() noexcept {
         }
     }
     if(IsWaveOver()) {
-        DeactivateWave();
-        IncrementWave();
-        SetMissileCount(GetMissileCount());
+        AdvanceToNextWave();
     }
+}
+
+void EnemyWave::AdvanceToNextWave() noexcept {
+    DeactivateWave();
+    m_bomber.reset();
+    m_satellite.reset();
+    IncrementWave();
+    SetMissileCount(GetMissileCount());
+    m_bomberSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
+    m_bomberSpawnRate.Reset();
+    m_satelliteSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
+    m_satelliteSpawnRate.Reset();
+    if (auto* g = GetGameAs<Game>(); g != nullptr) {
+        g->ResetMissileCount();
+    }
+    ActivateWave();
 }
 
 float EnemyWave::GetFlierCooldown() const noexcept {

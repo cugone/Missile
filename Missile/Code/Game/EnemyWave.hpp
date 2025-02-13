@@ -60,7 +60,7 @@ public:
 protected:
 private:
 
-    
+    void AdvanceToNextWave() noexcept;
 
     void UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void UpdateSatellite(TimeUtils::FPSeconds deltaSeconds) noexcept;
