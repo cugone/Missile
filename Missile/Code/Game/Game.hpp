@@ -78,6 +78,7 @@ public:
     AABB2 GetWorldBounds() const noexcept;
 
     std::size_t GetWaveId() const noexcept;
+    bool HasMissilesRemaining() const noexcept;
 
 protected:
 private:

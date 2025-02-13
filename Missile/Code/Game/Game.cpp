@@ -522,6 +522,10 @@ std::size_t Game::GetWaveId() const noexcept {
     return m_waves.GetWaveId();
 }
 
+bool Game::HasMissilesRemaining() const noexcept {
+    return m_missileBaseLeft.HasMissilesRemaining() || m_missileBaseCenter.HasMissilesRemaining() || m_missileBaseRight.HasMissilesRemaining();
+}
+
 void Game::EndFrame() noexcept {
     m_mouse_pos += m_mouse_delta;
     g_theInputSystem->SetCursorToWindowCenter();
