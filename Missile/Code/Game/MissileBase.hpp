@@ -32,6 +32,7 @@ public:
     bool LowOnMissiles() const noexcept;
     void DecrementMissiles() noexcept;
     void IncrementMissiles() noexcept;
+    void ResetMissiles() noexcept;
 
     const MissileManager& GetMissileManager() const noexcept;
     MissileManager& GetMissileManager() noexcept;

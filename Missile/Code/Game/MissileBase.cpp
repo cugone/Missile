@@ -116,6 +116,10 @@ void MissileBase::IncrementMissiles() noexcept {
     m_missilesRemaining = (std::min)(m_maxMissiles, m_missilesRemaining + 1);
 }
 
+void MissileBase::ResetMissiles() noexcept {
+    m_missilesRemaining = m_maxMissiles;
+}
+
 const MissileManager& MissileBase::GetMissileManager() const noexcept {
     return m_missileManager;
 }
