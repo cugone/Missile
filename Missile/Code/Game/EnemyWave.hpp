@@ -70,8 +70,7 @@ private:
     std::unique_ptr<Bomber> m_bomber{};
     std::unique_ptr<Satellite> m_satellite{};
     Stopwatch m_missileSpawnRate{};
-    Stopwatch m_bomberSpawnRate{};
-    Stopwatch m_satelliteSpawnRate{};
+    Stopwatch m_flierSpawnRate{};
     std::size_t m_waveId{ 0 };
     int m_missileCount{};
     bool m_waveActive{false};
