@@ -60,6 +60,7 @@ public:
 protected:
 private:
 
+    bool CanSpawnFlier() const noexcept;
     void AdvanceToNextWave() noexcept;
 
     void UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept;
@@ -74,5 +75,4 @@ private:
     std::size_t m_waveId{ 0 };
     int m_missileCount{};
     bool m_waveActive{false};
-
 };

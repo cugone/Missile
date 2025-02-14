@@ -68,6 +68,10 @@ void EnemyWave::UpdateBomber(TimeUtils::FPSeconds deltaSeconds) noexcept {
     }
 }
 
+bool EnemyWave::CanSpawnFlier() const noexcept {
+    return IsWaveActive() && m_waveId > 0 && m_missileCount && (!m_bomber || !m_satellite) && m_flierSpawnRate.Check();
+}
+
 bool EnemyWave::CanSpawnMissile() const noexcept {
     return m_missileCount != 0 && m_missiles.ActiveMissileCount() < GameConstants::max_missles_on_screen;
 }
@@ -129,22 +133,18 @@ void EnemyWave::EndFrame() noexcept {
             m_satellite.reset();
         }
     }
-    if(IsWaveActive() && m_waveId > 0) {
-        if (const auto is_bomber = MathUtils::GetRandomBool(); is_bomber) {
-            if(m_missileCount) {
-                if (!m_bomber && m_flierSpawnRate.Check()) {
-                    SpawnBomber();
-                    m_flierSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
-                    m_flierSpawnRate.Reset();
-                }
+    if(CanSpawnFlier()) {
+        if(const auto is_bomber = MathUtils::GetRandomBool(); is_bomber) {
+            if(!m_bomber) {
+                SpawnBomber();
+                m_flierSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
+                m_flierSpawnRate.Reset();
             }
         } else {
-            if(m_missileCount) {
-                if (!m_satellite && m_flierSpawnRate.Check()) {
-                    SpawnSatellite();
-                    m_flierSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
-                    m_flierSpawnRate.Reset();
-                }
+            if(!m_satellite) {
+                SpawnSatellite();
+                m_flierSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
+                m_flierSpawnRate.Reset();
             }
         }
     }
