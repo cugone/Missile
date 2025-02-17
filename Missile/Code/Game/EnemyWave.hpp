@@ -6,10 +6,17 @@
 #include "Game/Bomber.hpp"
 #include "Game/Satellite.hpp"
 
+#include <cstdint>
 #include <memory>
 
 class EnemyWave {
 public:
+    enum class State : uint8_t {
+        Inactive
+        ,Prewave
+        ,Active
+        ,Postwave
+    };
     EnemyWave() = default;
     EnemyWave(const EnemyWave& other) = default;
     EnemyWave(EnemyWave&& other) = default;
@@ -57,11 +64,38 @@ public:
     bool CanSpawnMissile() const noexcept;
     bool LaunchMissileFrom(Vector2 position) noexcept;
 
+    void SetState(State newState) noexcept;
+
 protected:
 private:
 
     bool CanSpawnFlier() const noexcept;
     void AdvanceToNextWave() noexcept;
+
+    void BeginFrame_Inactive() noexcept;
+    void BeginFrame_Prewave() noexcept;
+    void BeginFrame_Active() noexcept;
+    void BeginFrame_Postwave() noexcept;
+
+    void Update_Inactive(TimeUtils::FPSeconds deltaSeconds) noexcept;
+    void Update_Prewave (TimeUtils::FPSeconds deltaSeconds) noexcept;
+    void Update_Active  (TimeUtils::FPSeconds deltaSeconds) noexcept;
+    void Update_Postwave(TimeUtils::FPSeconds deltaSeconds) noexcept;
+
+    void Render_Inactive() const noexcept;
+    void Render_Prewave() const noexcept;
+    void Render_Active() const noexcept;
+    void Render_Postwave() const noexcept;
+    
+    void DebugRender_Inactive() const noexcept;
+    void DebugRender_Prewave() const noexcept;
+    void DebugRender_Active() const noexcept;
+    void DebugRender_Postwave() const noexcept;
+
+    void EndFrame_Inactive() noexcept;
+    void EndFrame_Prewave() noexcept;
+    void EndFrame_Active() noexcept;
+    void EndFrame_Postwave() noexcept;
 
     void UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void UpdateSatellite(TimeUtils::FPSeconds deltaSeconds) noexcept;
@@ -74,5 +108,5 @@ private:
     Stopwatch m_flierSpawnRate{};
     std::size_t m_waveId{ 0 };
     int m_missileCount{};
-    bool m_waveActive{false};
+    State m_state{State::Inactive};
 };

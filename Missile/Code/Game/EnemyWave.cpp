@@ -1,6 +1,8 @@
 #include "Game/EnemyWave.hpp"
 
 #include "Engine/Core/EngineCommon.hpp"
+#include "Engine/Core/ErrorWarningAssert.hpp"
+
 #include "Engine/Core/Rgba.hpp"
 
 #include "Engine/Math/MathUtils.hpp"
@@ -10,19 +12,81 @@
 #include <utility>
 
 void EnemyWave::BeginFrame() noexcept {
+    switch (m_state) {
+    case State::Inactive:
+        BeginFrame_Inactive();
+        break;
+    case State::Prewave:
+        BeginFrame_Prewave();
+        break;
+    case State::Active:
+        BeginFrame_Active();
+        break;
+    case State::Postwave:
+        BeginFrame_Postwave();
+        break;
+    default:
+        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
+    }
+}
+
+void EnemyWave::BeginFrame_Inactive() noexcept {
+    /* DO NOTHING */
+}
+
+void EnemyWave::BeginFrame_Prewave() noexcept {
+    /* DO NOTHING */
+}
+
+void EnemyWave::BeginFrame_Active() noexcept {
     m_missiles.BeginFrame();
-    if(m_bomber) {
+    if (m_bomber) {
         m_bomber->BeginFrame();
     }
-    if(m_satellite) {
+    if (m_satellite) {
         m_satellite->BeginFrame();
     }
 }
 
+void EnemyWave::BeginFrame_Postwave() noexcept {
+    /* DO NOTHING */
+}
+
 void EnemyWave::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
+    switch (m_state) {
+    case State::Inactive:
+        Update_Inactive(deltaSeconds);
+        break;
+    case State::Prewave:
+        Update_Prewave(deltaSeconds);
+        break;
+    case State::Active:
+        Update_Active(deltaSeconds);
+        break;
+    case State::Postwave:
+        Update_Postwave(deltaSeconds);
+        break;
+    default:
+        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
+    }
+}
+
+void EnemyWave::Update_Inactive([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+
+}
+
+void EnemyWave::Update_Prewave([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+
+}
+
+void EnemyWave::Update_Active(TimeUtils::FPSeconds deltaSeconds) noexcept {
     UpdateMissiles(deltaSeconds);
     UpdateBomber(deltaSeconds);
     UpdateSatellite(deltaSeconds);
+}
+
+void EnemyWave::Update_Postwave([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+
 }
 
 void EnemyWave::UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -103,57 +167,150 @@ bool EnemyWave::IsWaveOver() const noexcept {
 }
 
 void EnemyWave::Render() const noexcept {
+    switch (m_state) {
+    case State::Inactive:
+        Render_Inactive();
+        break;
+    case State::Prewave:
+        Render_Prewave();
+        break;
+    case State::Active:
+        Render_Active();
+        break;
+    case State::Postwave:
+        Render_Postwave();
+        break;
+    default:
+        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
+    }
+}
+
+void EnemyWave::Render_Inactive() const noexcept {
+
+}
+
+void EnemyWave::Render_Prewave() const noexcept {
+
+}
+
+void EnemyWave::Render_Active() const noexcept {
     m_missiles.Render();
-    if(m_bomber) {
+    if (m_bomber) {
         m_bomber->Render();
     }
-    if(m_satellite) {
+    if (m_satellite) {
         m_satellite->Render();
     }
 }
 
+void EnemyWave::Render_Postwave() const noexcept {
+
+}
+
 void EnemyWave::DebugRender() const noexcept {
+    switch (m_state) {
+    case State::Inactive:
+        DebugRender_Inactive();
+        break;
+    case State::Prewave:
+        DebugRender_Prewave();
+        break;
+    case State::Active:
+        DebugRender_Active();
+        break;
+    case State::Postwave:
+        DebugRender_Postwave();
+        break;
+    default:
+        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
+    }
+}
+
+void EnemyWave::DebugRender_Inactive() const noexcept {
+
+}
+
+void EnemyWave::DebugRender_Prewave() const noexcept {
+
+}
+
+void EnemyWave::DebugRender_Active() const noexcept {
     m_missiles.DebugRender();
-    if(m_bomber) {
+    if (m_bomber) {
         m_bomber->DebugRender();
     }
-    if(m_satellite) {
+    if (m_satellite) {
         m_satellite->DebugRender();
     }
 }
 
+void EnemyWave::DebugRender_Postwave() const noexcept {
+
+}
+
 void EnemyWave::EndFrame() noexcept {
+    switch (m_state) {
+    case State::Inactive:
+        EndFrame_Inactive();
+        break;
+    case State::Prewave:
+        EndFrame_Prewave();
+        break;
+    case State::Active:
+        EndFrame_Active();
+        break;
+    case State::Postwave:
+        EndFrame_Postwave();
+        break;
+    default:
+        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
+    }
+}
+
+void EnemyWave::EndFrame_Inactive() noexcept {
+
+}
+
+void EnemyWave::EndFrame_Prewave() noexcept {
+
+}
+
+void EnemyWave::EndFrame_Active() noexcept {
     m_missiles.EndFrame();
-    if(m_bomber) {
+    if (m_bomber) {
         m_bomber->EndFrame();
-        if(m_bomber->IsDead()) {
+        if (m_bomber->IsDead()) {
             m_bomber.reset();
         }
     }
-    if(m_satellite) {
+    if (m_satellite) {
         m_satellite->EndFrame();
-        if(m_satellite->IsDead()) {
+        if (m_satellite->IsDead()) {
             m_satellite.reset();
         }
     }
-    if(CanSpawnFlier()) {
-        if(const auto is_bomber = MathUtils::GetRandomBool(); is_bomber) {
-            if(!m_bomber) {
+    if (CanSpawnFlier()) {
+        if (const auto is_bomber = MathUtils::GetRandomBool(); is_bomber) {
+            if (!m_bomber) {
                 SpawnBomber();
                 m_flierSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
                 m_flierSpawnRate.Reset();
             }
         } else {
-            if(!m_satellite) {
+            if (!m_satellite) {
                 SpawnSatellite();
                 m_flierSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
                 m_flierSpawnRate.Reset();
             }
         }
     }
-    if(IsWaveOver()) {
+    if (IsWaveOver()) {
         AdvanceToNextWave();
     }
+}
+
+void EnemyWave::EndFrame_Postwave() noexcept {
+
 }
 
 void EnemyWave::AdvanceToNextWave() noexcept {
@@ -227,15 +384,19 @@ int EnemyWave::GetRemainingMissiles() const noexcept {
 }
 
 bool EnemyWave::IsWaveActive() const noexcept {
-    return m_waveActive;
+    return m_state == State::Active;
 }
 
 void EnemyWave::ActivateWave() noexcept {
-    m_waveActive = true;
+    SetState(State::Active);
 }
 
 void EnemyWave::DeactivateWave() noexcept {
-    m_waveActive = false;
+    SetState(State::Inactive);
+}
+
+void EnemyWave::SetState(State newState) noexcept {
+    m_state = newState;
 }
 
 void EnemyWave::SpawnBomber() noexcept {
