@@ -1,0 +1,6 @@
+<material name="missile" >
+  <shader src="__2D" />
+  <textures>
+    <diffuse src="Data/Images/Missile.png" />
+  </textures>
+</material>

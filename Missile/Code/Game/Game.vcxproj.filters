@@ -26,6 +26,9 @@
     <Filter Include="Data\Shaders">
       <UniqueIdentifier>{38c32011-edaf-4083-bb77-be03e4e3d720}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Data\Audio">
+      <UniqueIdentifier>{743a0ba7-e9a0-4f5f-abfc-5d50f84175ae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main_Win32.cpp">
@@ -40,6 +43,36 @@
     <ClCompile Include="GameConfig.cpp">
       <Filter>General</Filter>
     </ClCompile>
+    <ClCompile Include="Missile.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Explosion.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="ExplosionManager.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="MissileManager.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="MissileBase.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyWave.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Bomber.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Satellite.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="City.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="CityManager.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -51,5 +84,107 @@
     <ClInclude Include="GameConfig.hpp">
       <Filter>General</Filter>
     </ClInclude>
+    <ClInclude Include="Missile.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Explosion.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="ExplosionManager.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="MissileManager.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="MissileBase.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyWave.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Bomber.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Satellite.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="City.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="CityManager.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\Run_x64\Data\Materials\crosshair.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Materials\missile.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Materials\bomber.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Materials\base.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+    <None Include="..\..\Run_x64\Data\Materials\city.material">
+      <Filter>Data\Materials</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion0.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion1.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion2.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion3.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Explosion4.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\LaunchMissile0.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\LaunchMissile1.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\NoMissiles.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Klaxon.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Bomber.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+    <Media Include="..\..\Run_x64\Data\Audio\Satellite.wav">
+      <Filter>Data\Audio</Filter>
+    </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\Run_x64\Data\Images\Crosshair.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\Missile.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\Bomber.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\Base.png">
+      <Filter>Data\Images</Filter>
+    </Image>
+    <Image Include="..\..\Run_x64\Data\Images\City.png">
+      <Filter>Data\Images</Filter>
+    </Image>
   </ItemGroup>
 </Project>
