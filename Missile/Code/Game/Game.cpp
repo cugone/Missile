@@ -122,6 +122,74 @@ void Game::Initialize() noexcept {
 }
 
 void Game::BeginFrame() noexcept {
+    switch (m_state) {
+    case State::Title:
+        BeginFrame_Title();
+        break;
+    case State::Main:
+        BeginFrame_Main();
+        break;
+    case State::GameOver:
+        BeginFrame_GameOver();
+        break;
+    default:
+        ERROR_AND_DIE("Game State scoped enum has changed.");
+    }
+}
+
+void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
+    switch (m_state) {
+    case State::Title:
+        Update_Title(deltaSeconds);
+        break;
+    case State::Main:
+        Update_Main(deltaSeconds);
+        break;
+    case State::GameOver:
+        Update_GameOver(deltaSeconds);
+        break;
+    default:
+        ERROR_AND_DIE("Game State scoped enum has changed.");
+    }
+}
+
+void Game::Render() const noexcept {
+    switch (m_state) {
+    case State::Title:
+        Render_Title();
+        break;
+    case State::Main:
+        Render_Main();
+        break;
+    case State::GameOver:
+        Render_GameOver();
+        break;
+    default:
+        ERROR_AND_DIE("Game State scoped enum has changed.");
+    }
+}
+
+void Game::EndFrame() noexcept {
+    switch (m_state) {
+    case State::Title:
+        EndFrame_Title();
+        break;
+    case State::Main:
+        EndFrame_Main();
+        break;
+    case State::GameOver:
+        EndFrame_GameOver();
+        break;
+    default:
+        ERROR_AND_DIE("Game State scoped enum has changed.");
+    }
+}
+
+void Game::BeginFrame_Title() noexcept {
+
+}
+
+void Game::BeginFrame_Main() noexcept {
     m_waves.BeginFrame();
     m_missileBaseLeft.BeginFrame();
     m_missileBaseCenter.BeginFrame();
@@ -130,7 +198,16 @@ void Game::BeginFrame() noexcept {
     m_cityManager.BeginFrame();
 }
 
-void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
+void Game::BeginFrame_GameOver() noexcept {
+
+}
+
+void Game::Update_Title([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+
+}
+
+void Game::Update_Main(TimeUtils::FPSeconds deltaSeconds) noexcept {
+
     g_theRenderer->UpdateGameTime(deltaSeconds);
     HandleDebugInput(deltaSeconds);
     HandlePlayerInput(deltaSeconds);
@@ -152,6 +229,69 @@ void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     HandleMissileGroundCollisions(m_waves.GetMissileManager());
     m_cityManager.Update(deltaSeconds);
     UpdateHighScore();
+}
+
+void Game::Update_GameOver([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+
+}
+
+void Game::Render_Title() const noexcept {
+
+}
+
+void Game::Render_Main() const noexcept {
+
+    g_theRenderer->BeginRenderToBackbuffer(m_waves.GetBackgroundColor());
+
+
+    //3D World View
+
+
+    //2D World / HUD View
+    {
+
+        const auto ui_view_height = static_cast<float>(GetSettings()->GetWindowHeight());
+        const auto ui_view_width = ui_view_height * m_ui_camera2D.GetAspectRatio();
+        const auto ui_view_extents = Vector2{ ui_view_width, ui_view_height };
+        const auto ui_view_half_extents = ui_view_extents * 0.5f;
+        const auto ui_cam_pos = Vector2::Zero;
+        g_theRenderer->BeginHUDRender(m_ui_camera2D, ui_cam_pos, ui_view_height);
+
+        RenderGround();
+        RenderObjects();
+        RenderCrosshairAt(m_mouse_world_pos);
+        RenderRadarLine();
+        RenderHighscoreAndWave();
+
+        if (m_debug_render) {
+            Debug_RenderObjects();
+        }
+
+    }
+}
+
+void Game::Render_GameOver() const noexcept {
+
+}
+
+void Game::EndFrame_Title() noexcept {
+
+}
+
+void Game::EndFrame_Main() noexcept {
+    m_mouse_pos += m_mouse_delta;
+    g_theInputSystem->SetCursorToWindowCenter();
+    m_mouse_delta = Vector2::Zero;
+    m_missileBaseLeft.EndFrame();
+    m_missileBaseCenter.EndFrame();
+    m_missileBaseRight.EndFrame();
+    m_cityManager.EndFrame();
+    m_explosionManager.EndFrame();
+    m_waves.EndFrame();
+}
+
+void Game::EndFrame_GameOver() noexcept {
+
 }
 
 void Game::UpdateHighScore() noexcept {
@@ -288,37 +428,6 @@ void Game::HandleDebugMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
 
 void Game::CreateExplosionAt(Vector2 position, Faction faction) noexcept {
     m_explosionManager.CreateExplosionAt(ExplosionManager::ExplosionData{ Vector4{position, GameConstants::max_explosion_size, 3.0f}, faction });
-}
-
-void Game::Render() const noexcept {
-
-    g_theRenderer->BeginRenderToBackbuffer(m_waves.GetBackgroundColor());
-
-
-    //3D World View
-
-
-    //2D World / HUD View
-    {
-
-        const auto ui_view_height = static_cast<float>(GetSettings()->GetWindowHeight());
-        const auto ui_view_width = ui_view_height * m_ui_camera2D.GetAspectRatio();
-        const auto ui_view_extents = Vector2{ui_view_width, ui_view_height};
-        const auto ui_view_half_extents = ui_view_extents * 0.5f;
-        const auto ui_cam_pos = Vector2::Zero;
-        g_theRenderer->BeginHUDRender(m_ui_camera2D, ui_cam_pos, ui_view_height);
-
-        RenderGround();
-        RenderObjects();
-        RenderCrosshairAt(m_mouse_world_pos);
-        RenderRadarLine();
-        RenderHighscoreAndWave();
-
-        if(m_debug_render) {
-            Debug_RenderObjects();
-        }
-
-    }
 }
 
 void Game::RenderHighscoreAndWave() const noexcept {
@@ -524,18 +633,6 @@ std::size_t Game::GetWaveId() const noexcept {
 
 bool Game::HasMissilesRemaining() const noexcept {
     return m_missileBaseLeft.HasMissilesRemaining() || m_missileBaseCenter.HasMissilesRemaining() || m_missileBaseRight.HasMissilesRemaining();
-}
-
-void Game::EndFrame() noexcept {
-    m_mouse_pos += m_mouse_delta;
-    g_theInputSystem->SetCursorToWindowCenter();
-    m_mouse_delta = Vector2::Zero;
-    m_missileBaseLeft.EndFrame();
-    m_missileBaseCenter.EndFrame();
-    m_missileBaseRight.EndFrame();
-    m_cityManager.EndFrame();
-    m_explosionManager.EndFrame();
-    m_waves.EndFrame();
 }
 
 void Game::ResetMissileCount() noexcept {
