@@ -86,6 +86,22 @@ public:
 protected:
 private:
 
+    void BeginFrame_Title() noexcept;
+    void BeginFrame_Main() noexcept;
+    void BeginFrame_GameOver() noexcept;
+
+    void Update_Title(TimeUtils::FPSeconds deltaSeconds) noexcept;
+    void Update_Main(TimeUtils::FPSeconds deltaSeconds) noexcept;
+    void Update_GameOver(TimeUtils::FPSeconds deltaSeconds) noexcept;
+
+    void Render_Title() const noexcept;
+    void Render_Main() const noexcept;
+    void Render_GameOver() const noexcept;
+
+    void EndFrame_Title() noexcept;
+    void EndFrame_Main() noexcept;
+    void EndFrame_GameOver() noexcept;
+
     void LoadOrCreateConfigFile() noexcept;
     void CalculateCrosshairLocation() noexcept;
     Vector2 CalcCrosshairPositionFromRawMousePosition() noexcept;

@@ -30,6 +30,67 @@ void EnemyWave::BeginFrame() noexcept {
     }
 }
 
+void EnemyWave::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
+    switch (m_state) {
+    case State::Inactive:
+        Update_Inactive(deltaSeconds);
+        break;
+    case State::Prewave:
+        Update_Prewave(deltaSeconds);
+        break;
+    case State::Active:
+        Update_Active(deltaSeconds);
+        break;
+    case State::Postwave:
+        Update_Postwave(deltaSeconds);
+        break;
+    default:
+        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
+    }
+}
+
+void EnemyWave::Render() const noexcept {
+    switch (m_state) {
+    case State::Inactive:
+        Render_Inactive();
+        break;
+    case State::Prewave:
+        Render_Prewave();
+        break;
+    case State::Active:
+        Render_Active();
+        break;
+    case State::Postwave:
+        Render_Postwave();
+        break;
+    default:
+        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
+    }
+}
+
+void EnemyWave::EndFrame() noexcept {
+    switch (m_state) {
+    case State::Inactive:
+        EndFrame_Inactive();
+        break;
+    case State::Prewave:
+        EndFrame_Prewave();
+        break;
+    case State::Active:
+        EndFrame_Active();
+        break;
+    case State::Postwave:
+        EndFrame_Postwave();
+        break;
+    default:
+        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
+    }
+}
+
+/************************************************************************/
+/*                         BEGIN FRAME                                  */
+/************************************************************************/
+
 void EnemyWave::BeginFrame_Inactive() noexcept {
     /* DO NOTHING */
 }
@@ -52,24 +113,10 @@ void EnemyWave::BeginFrame_Postwave() noexcept {
     /* DO NOTHING */
 }
 
-void EnemyWave::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    switch (m_state) {
-    case State::Inactive:
-        Update_Inactive(deltaSeconds);
-        break;
-    case State::Prewave:
-        Update_Prewave(deltaSeconds);
-        break;
-    case State::Active:
-        Update_Active(deltaSeconds);
-        break;
-    case State::Postwave:
-        Update_Postwave(deltaSeconds);
-        break;
-    default:
-        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
-    }
-}
+/************************************************************************/
+/*                         UPDATE                                       */
+/************************************************************************/
+
 
 void EnemyWave::Update_Inactive([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
 
@@ -98,6 +145,10 @@ void EnemyWave::UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept {
         }
     }
     m_missiles.Update(deltaSeconds);
+}
+
+bool EnemyWave::CanSpawnMissile() const noexcept {
+    return m_missileCount != 0 && m_missiles.ActiveMissileCount() < GameConstants::max_missles_on_screen;
 }
 
 void EnemyWave::UpdateSatellite(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -132,14 +183,6 @@ void EnemyWave::UpdateBomber(TimeUtils::FPSeconds deltaSeconds) noexcept {
     }
 }
 
-bool EnemyWave::CanSpawnFlier() const noexcept {
-    return IsWaveActive() && m_waveId > 0 && m_missileCount && (!m_bomber || !m_satellite) && m_flierSpawnRate.Check();
-}
-
-bool EnemyWave::CanSpawnMissile() const noexcept {
-    return m_missileCount != 0 && m_missiles.ActiveMissileCount() < GameConstants::max_missles_on_screen;
-}
-
 bool EnemyWave::LaunchMissileFrom(Vector2 position) noexcept {
     if(CanSpawnMissile()) {
         const auto* g = GetGameAs<Game>();
@@ -151,39 +194,9 @@ bool EnemyWave::LaunchMissileFrom(Vector2 position) noexcept {
     return false;
 }
 
-bool EnemyWave::IsWaveOver() const noexcept {
-    if(auto* g = GetGameAs<Game>(); g != nullptr) {
-        const auto all_explosions_finished = g->GetExplosionManager().ActiveExplosionCount() == 0;
-        const auto no_missiles_in_flight = g->GetMissileManager().ActiveMissileCount() == 0;
-        const auto player_has_no_missiles_remaining = !g->HasMissilesRemaining();
-        const auto wave_has_no_missiles_remaining = m_missileCount == 0;
-        const auto cant_score_points = player_has_no_missiles_remaining && no_missiles_in_flight && all_explosions_finished;
-        const auto everything_dead = wave_has_no_missiles_remaining && !m_bomber && !m_satellite && all_explosions_finished;
-        if(cant_score_points || everything_dead) {
-            return true;
-        }
-    }
-    return false;
-}
-
-void EnemyWave::Render() const noexcept {
-    switch (m_state) {
-    case State::Inactive:
-        Render_Inactive();
-        break;
-    case State::Prewave:
-        Render_Prewave();
-        break;
-    case State::Active:
-        Render_Active();
-        break;
-    case State::Postwave:
-        Render_Postwave();
-        break;
-    default:
-        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
-    }
-}
+/************************************************************************/
+/*                         RENDER                                       */
+/************************************************************************/
 
 void EnemyWave::Render_Inactive() const noexcept {
 
@@ -248,24 +261,9 @@ void EnemyWave::DebugRender_Postwave() const noexcept {
 
 }
 
-void EnemyWave::EndFrame() noexcept {
-    switch (m_state) {
-    case State::Inactive:
-        EndFrame_Inactive();
-        break;
-    case State::Prewave:
-        EndFrame_Prewave();
-        break;
-    case State::Active:
-        EndFrame_Active();
-        break;
-    case State::Postwave:
-        EndFrame_Postwave();
-        break;
-    default:
-        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
-    }
-}
+/************************************************************************/
+/*                         END FRAME                                    */
+/************************************************************************/
 
 void EnemyWave::EndFrame_Inactive() noexcept {
 
@@ -325,6 +323,25 @@ void EnemyWave::AdvanceToNextWave() noexcept {
         g->ResetMissileCount();
     }
     ActivateWave();
+}
+
+bool EnemyWave::CanSpawnFlier() const noexcept {
+    return IsWaveActive() && m_waveId > 0 && m_missileCount && (!m_bomber || !m_satellite) && m_flierSpawnRate.Check();
+}
+
+bool EnemyWave::IsWaveOver() const noexcept {
+    if (auto* g = GetGameAs<Game>(); g != nullptr) {
+        const auto all_explosions_finished = g->GetExplosionManager().ActiveExplosionCount() == 0;
+        const auto no_missiles_in_flight = g->GetMissileManager().ActiveMissileCount() == 0;
+        const auto player_has_no_missiles_remaining = !g->HasMissilesRemaining();
+        const auto wave_has_no_missiles_remaining = m_missileCount == 0;
+        const auto cant_score_points = player_has_no_missiles_remaining && no_missiles_in_flight && all_explosions_finished;
+        const auto everything_dead = wave_has_no_missiles_remaining && !m_bomber && !m_satellite && all_explosions_finished;
+        if (cant_score_points || everything_dead) {
+            return true;
+        }
+    }
+    return false;
 }
 
 float EnemyWave::GetFlierCooldown() const noexcept {
