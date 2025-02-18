@@ -35,10 +35,7 @@ void Satellite::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
     m_position += -Vector2::X_Axis * m_speed * deltaSeconds.count();
     if(m_timeToFire.CheckAndReset()) {
         if(m_parentWave->CanSpawnMissile()) {
-            const auto* g = GetGameAs<Game>();
-            const auto& targets = g->GetValidTargets();
-            const auto& target = targets[MathUtils::GetRandomLessThan(targets.size())];
-            m_parentWave->GetMissileManager().LaunchMissile(m_position, target, m_parentWave->GetMissileImpactTime(), Faction::Enemy, m_parentWave->GetObjectColor());
+            m_parentWave->LaunchMissileFrom(m_position);
         }
     }
 
