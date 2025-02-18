@@ -37,9 +37,6 @@ protected:
 
 struct Player {
     int score{ 0ull };
-    int bonus_cities{ 0u };
-    int current_level{1u};
-    int score_multiplier{ 1u };
 };
 
 class Game : public GameBase {
