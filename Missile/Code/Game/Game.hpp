@@ -120,20 +120,20 @@ private:
 
     mutable Camera2D m_ui_camera2D{};
     OrthographicCameraController m_cameraController{};
-    Vector2 m_mouse_pos{};
-    Vector2 m_mouse_world_pos{};
-    Vector2 m_mouse_delta{};
-    AABB2 m_world_bounds{ AABB2::Zero_to_One };
-    AABB2 m_ground{ Vector2::Y_Axis * 450.0f, 800.0f, 20.0f };
+    EnemyWave m_waves{};
     MissileBase m_missileBaseLeft{};
     MissileBase m_missileBaseCenter{};
     MissileBase m_missileBaseRight{};
-    EnemyWave m_waves{};
-    CityManager m_cityManager{};
     ExplosionManager m_explosionManager{};
+    CityManager m_cityManager{};
+    int m_currentHighScore{ GameConstants::default_highscore };
     MySettings m_mySettings{};
+    AABB2 m_world_bounds{ AABB2::Zero_to_One };
+    AABB2 m_ground{ Vector2::Y_Axis * 450.0f, 800.0f, 20.0f };
+    Vector2 m_mouse_pos{};
+    Vector2 m_mouse_world_pos{};
+    Vector2 m_mouse_delta{};
     Player m_playerData{};
-    int m_currentHighScore{GameConstants::default_highscore};
-    bool m_debug_render{false};
+    bool m_debug_render{ false };
+    State m_state{ State::Main };
 };
-
