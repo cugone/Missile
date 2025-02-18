@@ -19,6 +19,7 @@
 #include "Game/CityManager.hpp"
 
 #include <array>
+#include <cstdint>
 #include <vector>
 
 class MySettings : public GameSettings {
@@ -41,6 +42,11 @@ struct Player {
 
 class Game : public GameBase {
 public:
+    enum class State : uint8_t {
+        Title
+        , Main
+        , GameOver
+    };
     Game() = default;
     Game(const Game& other) = default;
     Game(Game&& other) = default;
