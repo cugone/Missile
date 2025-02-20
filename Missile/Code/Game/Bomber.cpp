@@ -68,7 +68,8 @@ void Bomber::DebugRender() const noexcept {
 void Bomber::EndFrame() noexcept {
     if(IsDead()) {
         auto* g = GetGameAs<Game>();
-        g->CreateExplosionAt(m_position, Faction::Player);
+        auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+        state->CreateExplosionAt(m_position, Faction::Player);
     }
 }
 

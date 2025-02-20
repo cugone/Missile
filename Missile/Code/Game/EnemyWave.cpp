@@ -137,11 +137,9 @@ void EnemyWave::Update_Postwave([[maybe_unused]] TimeUtils::FPSeconds deltaSecon
 }
 
 void EnemyWave::UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    if(IsWaveActive() && m_missileCount) {
-        if(CanSpawnMissile()) {
-            if(m_missileSpawnRate.CheckAndReset()) {
-                SpawnMissile();
-            }
+    if(IsWaveActive() && CanSpawnMissile()) {
+        if(m_missileSpawnRate.CheckAndReset()) {
+            SpawnMissile();
         }
     }
     m_missiles.Update(deltaSeconds);
@@ -159,7 +157,8 @@ void EnemyWave::UpdateSatellite(TimeUtils::FPSeconds deltaSeconds) noexcept {
     Disc2 satellite_visible{ m_satellite->GetPosition(), 50.0f };
     const auto satellite_right = satellite_visible.center.x + satellite_visible.radius;
     auto* g = GetGameAs<Game>();
-    AABB2 bounds = g->GetWorldBounds();
+    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+    AABB2 bounds = state->GetWorldBounds();
     const auto bounds_left = bounds.mins.x;
     if (satellite_right < bounds_left) {
         m_satellite.reset();
@@ -175,7 +174,8 @@ void EnemyWave::UpdateBomber(TimeUtils::FPSeconds deltaSeconds) noexcept {
     Disc2 bomber_visible{ m_bomber->GetPosition(), 50.0f };
     const auto bomber_left = bomber_visible.center.x - bomber_visible.radius;
     auto* g = GetGameAs<Game>();
-    AABB2 bounds = g->GetWorldBounds();
+    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+    AABB2 bounds = state->GetWorldBounds();
     const auto bounds_right = bounds.maxs.x;
     if(bounds_right < bomber_left) {
         m_bomber.reset();
@@ -185,11 +185,14 @@ void EnemyWave::UpdateBomber(TimeUtils::FPSeconds deltaSeconds) noexcept {
 
 bool EnemyWave::LaunchMissileFrom(Vector2 position) noexcept {
     if(CanSpawnMissile()) {
-        const auto* g = GetGameAs<Game>();
-        const auto& targets = g->GetValidTargets();
-        const auto& target = targets[MathUtils::GetRandomLessThan(targets.size())];
-        m_missileCount = (std::max)(0, m_missileCount - 1);
-        return m_missiles.LaunchMissile(position, target, GetMissileImpactTime(), Faction::Enemy, GetObjectColor());
+        if (const auto* g = GetGameAs<Game>(); g != nullptr) {
+            if (const auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState()); state != nullptr) {
+                const auto& targets = state->GetValidTargets();
+                const auto& target = targets[MathUtils::GetRandomLessThan(targets.size())];
+                m_missileCount = (std::max)(0, m_missileCount - 1);
+                return m_missiles.LaunchMissile(position, target, GetMissileImpactTime(), Faction::Enemy, GetObjectColor());
+            }
+        }
     }
     return false;
 }
@@ -319,9 +322,9 @@ void EnemyWave::AdvanceToNextWave() noexcept {
     SetMissileCount(GetMissileCount());
     m_flierSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
     m_flierSpawnRate.Reset();
-    if (auto* g = GetGameAs<Game>(); g != nullptr) {
-        g->ResetMissileCount();
-    }
+    auto* g = GetGameAs<Game>();
+    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+    state->ResetMissileCount();
     ActivateWave();
 }
 
@@ -331,14 +334,16 @@ bool EnemyWave::CanSpawnFlier() const noexcept {
 
 bool EnemyWave::IsWaveOver() const noexcept {
     if (auto* g = GetGameAs<Game>(); g != nullptr) {
-        const auto all_explosions_finished = g->GetExplosionManager().ActiveExplosionCount() == 0;
-        const auto no_missiles_in_flight = g->GetMissileManager().ActiveMissileCount() == 0;
-        const auto player_has_no_missiles_remaining = !g->HasMissilesRemaining();
-        const auto wave_has_no_missiles_remaining = m_missileCount == 0;
-        const auto cant_score_points = player_has_no_missiles_remaining && no_missiles_in_flight && all_explosions_finished;
-        const auto everything_dead = wave_has_no_missiles_remaining && !m_bomber && !m_satellite && all_explosions_finished;
-        if (cant_score_points || everything_dead) {
-            return true;
+        if (auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState()); state != nullptr) {
+            const auto all_explosions_finished = state->GetExplosionManager().ActiveExplosionCount() == 0;
+            const auto no_missiles_in_flight = state->GetMissileManager().ActiveMissileCount() == 0;
+            const auto player_has_no_missiles_remaining = !state->HasMissilesRemaining();
+            const auto wave_has_no_missiles_remaining = m_missileCount == 0;
+            const auto cant_score_points = player_has_no_missiles_remaining && no_missiles_in_flight && all_explosions_finished;
+            const auto everything_dead = wave_has_no_missiles_remaining && !m_bomber && !m_satellite && all_explosions_finished;
+            if (cant_score_points || everything_dead) {
+                return true;
+            }
         }
     }
     return false;
@@ -421,10 +426,11 @@ void EnemyWave::SpawnBomber() noexcept {
         return;
     }
     auto* g = GetGameAs<Game>();
-    AABB2 bomber_spawn_area = g->GetWorldBounds();
+    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+    AABB2 bomber_spawn_area = state->GetWorldBounds();
     bomber_spawn_area.Translate(Vector2::X_Axis * -100.0f);
     bomber_spawn_area.AddPaddingToSides(0.0f, -GameConstants::radar_line_distance);
-    bomber_spawn_area.maxs.x = g->GetWorldBounds().mins.x;
+    bomber_spawn_area.maxs.x = state->GetWorldBounds().mins.x;
     m_bomber = std::make_unique<Bomber>(this, MathUtils::GetRandomPointInside(bomber_spawn_area));
 }
 
@@ -433,19 +439,21 @@ void EnemyWave::SpawnSatellite() noexcept {
         return;
     }
     auto* g = GetGameAs<Game>();
-    AABB2 satellite_spawn_area = g->GetWorldBounds();
+    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+    AABB2 satellite_spawn_area = state->GetWorldBounds();
     satellite_spawn_area.Translate(Vector2::X_Axis * 100.0f);
     satellite_spawn_area.AddPaddingToSides(0.0f, -100.0f);
-    satellite_spawn_area.mins.x = g->GetWorldBounds().maxs.x;
+    satellite_spawn_area.mins.x = state->GetWorldBounds().maxs.x;
     m_satellite = std::make_unique<Satellite>(this, MathUtils::GetRandomPointInside(satellite_spawn_area));
 }
 
 void EnemyWave::SpawnMissile() noexcept {
     auto* g = GetGameAs<Game>();
-    AABB2 missile_spawn_area = g->GetWorldBounds();
+    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+    AABB2 missile_spawn_area = state->GetWorldBounds();
     missile_spawn_area.Translate(Vector2::Y_Axis * -100.0f);
     missile_spawn_area.AddPaddingToSides(-100.0f, 0.0f);
-    missile_spawn_area.maxs.y = g->GetWorldBounds().mins.y;
+    missile_spawn_area.maxs.y = state->GetWorldBounds().mins.y;
     Vector2 pos = MathUtils::GetRandomPointInside(missile_spawn_area);
 
     LaunchMissileFrom(pos);
