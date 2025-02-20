@@ -73,6 +73,18 @@
     <ClCompile Include="CityManager.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="GameStateGameOver.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="GameStateMain.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="GameStateTitle.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="GameState.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -115,6 +127,18 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="CityManager.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="GameState.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStateGameOver.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStateMain.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStateTitle.hpp">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

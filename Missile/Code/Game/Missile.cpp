@@ -89,7 +89,8 @@ void Missile::AppendToMesh(Mesh::Builder& builder) noexcept {
 void Missile::EndFrame() noexcept {
     if(IsDead()) {
         auto* g = GetGameAs<Game>();
-        g->CreateExplosionAt(m_position, m_faction);
+        auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+        state->CreateExplosionAt(m_position, m_faction);
     }
 }
 
