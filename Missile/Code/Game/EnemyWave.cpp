@@ -7,12 +7,22 @@
 
 #include "Engine/Math/MathUtils.hpp"
 
+#include "Engine/Renderer/Renderer.hpp"
+
 #include "Game/Game.hpp"
 
 #include <utility>
 
 void EnemyWave::BeginFrame() noexcept {
-    switch (m_state) {
+    if(m_nextState != m_currentState) {
+        m_currentState = m_nextState;
+        if(m_currentState != State::Active) {
+            DeactivateWave();
+        } else {
+            ActivateWave();
+        }
+    }
+    switch (m_currentState) {
     case State::Inactive:
         BeginFrame_Inactive();
         break;
@@ -31,7 +41,7 @@ void EnemyWave::BeginFrame() noexcept {
 }
 
 void EnemyWave::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    switch (m_state) {
+    switch (m_currentState) {
     case State::Inactive:
         Update_Inactive(deltaSeconds);
         break;
@@ -50,7 +60,7 @@ void EnemyWave::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void EnemyWave::Render() const noexcept {
-    switch (m_state) {
+    switch (m_currentState) {
     case State::Inactive:
         Render_Inactive();
         break;
@@ -69,7 +79,7 @@ void EnemyWave::Render() const noexcept {
 }
 
 void EnemyWave::EndFrame() noexcept {
-    switch (m_state) {
+    switch (m_currentState) {
     case State::Inactive:
         EndFrame_Inactive();
         break;
@@ -96,7 +106,9 @@ void EnemyWave::BeginFrame_Inactive() noexcept {
 }
 
 void EnemyWave::BeginFrame_Prewave() noexcept {
-    /* DO NOTHING */
+    if(m_preWaveTimer.CheckAndReset()) {
+        ChangeState(EnemyWave::State::Active);
+    }
 }
 
 void EnemyWave::BeginFrame_Active() noexcept {
@@ -119,11 +131,11 @@ void EnemyWave::BeginFrame_Postwave() noexcept {
 
 
 void EnemyWave::Update_Inactive([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
-
+    /* DO NOTHING */
 }
 
 void EnemyWave::Update_Prewave([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
-
+    /* DO NOTHING */
 }
 
 void EnemyWave::Update_Active(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -202,11 +214,26 @@ bool EnemyWave::LaunchMissileFrom(Vector2 position) noexcept {
 /************************************************************************/
 
 void EnemyWave::Render_Inactive() const noexcept {
-
+    /* DO NOTHING */
 }
 
 void EnemyWave::Render_Prewave() const noexcept {
 
+    const auto* font = g_theRenderer->GetFont("System32");
+    const auto* g = GetGameAs<Game>();
+    const auto* state = g->GetCurrentState();
+    const auto* main_state = dynamic_cast<const GameStateMain*>(state);
+    const auto& camera_controller = main_state->GetCameraController();
+    const auto center = camera_controller.CalcViewBounds().CalcCenter();
+    const auto points_line = std::format("{} X POINTS", this->GetScoreMultiplier());
+    const auto font_width = font->CalculateTextWidth(points_line);
+    const auto font_height = font->CalculateTextHeight(points_line);
+    const auto S = Matrix4::I;
+    const auto R = Matrix4::I;
+    const auto T = Matrix4::CreateTranslationMatrix(Vector2{ center.x - font_width * 0.5f, center.y - font_height * 0.5f });
+    const auto M = Matrix4::MakeSRT(S, R, T);
+    g_theRenderer->SetModelMatrix(M);
+    g_theRenderer->DrawTextLine(font, points_line, this->GetObjectColor());
 }
 
 void EnemyWave::Render_Active() const noexcept {
@@ -224,7 +251,7 @@ void EnemyWave::Render_Postwave() const noexcept {
 }
 
 void EnemyWave::DebugRender() const noexcept {
-    switch (m_state) {
+    switch (m_currentState) {
     case State::Inactive:
         DebugRender_Inactive();
         break;
@@ -328,6 +355,10 @@ void EnemyWave::AdvanceToNextWave() noexcept {
     ActivateWave();
 }
 
+void EnemyWave::ChangeState(State newState) noexcept {
+    m_nextState = newState;
+}
+
 bool EnemyWave::CanSpawnFlier() const noexcept {
     return IsWaveActive() && m_waveId > 0 && m_missileCount && (!m_bomber || !m_satellite) && m_flierSpawnRate.Check();
 }
@@ -406,19 +437,15 @@ int EnemyWave::GetRemainingMissiles() const noexcept {
 }
 
 bool EnemyWave::IsWaveActive() const noexcept {
-    return m_state == State::Active;
+    return m_isActive;
 }
 
 void EnemyWave::ActivateWave() noexcept {
-    SetState(State::Active);
+    m_isActive = true;
 }
 
 void EnemyWave::DeactivateWave() noexcept {
-    SetState(State::Inactive);
-}
-
-void EnemyWave::SetState(State newState) noexcept {
-    m_state = newState;
+    m_isActive = false;
 }
 
 void EnemyWave::SpawnBomber() noexcept {

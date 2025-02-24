@@ -66,7 +66,7 @@ void GameStateMain::OnEnter() noexcept {
 
     m_waves.SetMissileCount(m_waves.GetMissileCount());
     m_waves.SetMissileSpawnRate(TimeUtils::FPSeconds{ 1.0f });
-    m_waves.ActivateWave();
+    m_waves.ChangeState(EnemyWave::State::Prewave);
 
     auto desc = AudioSystem::SoundDesc{};
     desc.loopCount = 6;
@@ -205,6 +205,14 @@ const std::array<MissileManager::Target, 9> GameStateMain::GetValidTargets() con
 
 Vector2 GameStateMain::CalcCrosshairPositionFromRawMousePosition() noexcept {
     return g_theRenderer->ConvertScreenToWorldCoords(m_cameraController.GetCamera(), m_mouse_pos);
+}
+
+const CityManager& GameStateMain::GetCityManager() const noexcept {
+    return m_cityManager;
+}
+
+CityManager& GameStateMain::GetCityManager() noexcept {
+    return m_cityManager;
 }
 
 void GameStateMain::CreateExplosionAt(Vector2 position, Faction faction) noexcept {
@@ -423,6 +431,14 @@ void GameStateMain::RenderHighscoreAndWave() const noexcept {
 
 std::size_t GameStateMain::GetWaveId() const noexcept {
     return m_waves.GetWaveId();
+}
+
+const OrthographicCameraController& GameStateMain::GetCameraController() const noexcept {
+    return m_cameraController;
+}
+
+OrthographicCameraController& GameStateMain::GetCameraController() noexcept {
+    return m_cameraController;
 }
 
 void GameStateMain::HandleDebugInput(TimeUtils::FPSeconds deltaSeconds) {

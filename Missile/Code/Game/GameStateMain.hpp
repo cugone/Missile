@@ -37,8 +37,14 @@ public:
     const ExplosionManager& GetExplosionManager() const noexcept;
     ExplosionManager& GetExplosionManager() noexcept;
 
+    const CityManager& GetCityManager() const noexcept;
+    CityManager& GetCityManager() noexcept;
+
     void CreateExplosionAt(Vector2 position, Faction faction) noexcept;
     std::size_t GetWaveId() const noexcept;
+
+    const OrthographicCameraController& GetCameraController() const noexcept;
+    OrthographicCameraController& GetCameraController() noexcept;
 
 protected:
 private:

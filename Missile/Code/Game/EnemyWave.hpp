@@ -64,8 +64,7 @@ public:
     bool CanSpawnMissile() const noexcept;
     bool LaunchMissileFrom(Vector2 position) noexcept;
 
-    void SetState(State newState) noexcept;
-
+    void ChangeState(State newState) noexcept;
 protected:
 private:
 
@@ -106,7 +105,12 @@ private:
     std::unique_ptr<Satellite> m_satellite{};
     Stopwatch m_missileSpawnRate{};
     Stopwatch m_flierSpawnRate{};
+    Stopwatch m_preWaveTimer{5.0f};
+    Stopwatch m_postWaveIncrementRate{0.33f};
+    Stopwatch m_postWaveTimer{5.0f};
     std::size_t m_waveId{ 0 };
     int m_missileCount{};
-    State m_state{State::Inactive};
+    State m_currentState{State::Inactive};
+    State m_nextState{State::Inactive};
+    bool m_isActive{false};
 };
