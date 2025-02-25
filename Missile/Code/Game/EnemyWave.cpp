@@ -1,5 +1,7 @@
 #include "Game/EnemyWave.hpp"
 
+#include "Engine/Audio/AudioSystem.hpp"
+
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 
@@ -17,6 +19,9 @@ void EnemyWave::BeginFrame() noexcept {
     if(m_nextState != m_currentState) {
         m_currentState = m_nextState;
         if(m_currentState != State::Active) {
+            m_postWaveIncrementRate.Reset();
+            m_postWaveTimer.Reset();
+            m_preWaveTimer.Reset();
             DeactivateWave();
         } else {
             ActivateWave();
@@ -106,9 +111,7 @@ void EnemyWave::BeginFrame_Inactive() noexcept {
 }
 
 void EnemyWave::BeginFrame_Prewave() noexcept {
-    if(m_preWaveTimer.CheckAndReset()) {
-        ChangeState(EnemyWave::State::Active);
-    }
+    /* DO NOTHING */
 }
 
 void EnemyWave::BeginFrame_Active() noexcept {
@@ -122,7 +125,57 @@ void EnemyWave::BeginFrame_Active() noexcept {
 }
 
 void EnemyWave::BeginFrame_Postwave() noexcept {
-    /* DO NOTHING */
+    static int wave_bonus = 0;
+    const auto* g = GetGameAs<Game>();
+    auto* state = g->GetCurrentState();
+    auto* main_state = dynamic_cast<GameStateMain*>(state);
+    if(main_state->HasMissilesRemaining()) {
+        if(m_postWaveIncrementRate.CheckAndReset()) {
+            wave_bonus += GameConstants::unused_missile_value * GetScoreMultiplier();
+            main_state->DecrementTotalMissiles();
+            g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+        }
+    } else {
+        if(main_state->GetCityManager().RemainingCities()) {
+            if(m_postWaveIncrementRate.CheckAndReset()) {
+                if(main_state->GetCityManager().GetCity(0).IsDead() == false) {
+                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                    main_state->GetCityManager().GetCity(0).Kill();
+                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+                }
+                if(main_state->GetCityManager().GetCity(1).IsDead() == false) {
+                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                    main_state->GetCityManager().GetCity(1).Kill();
+                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+                }
+                if(main_state->GetCityManager().GetCity(2).IsDead() == false) {
+                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                    main_state->GetCityManager().GetCity(2).Kill();
+                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+                }
+                if(main_state->GetCityManager().GetCity(3).IsDead() == false) {
+                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                    main_state->GetCityManager().GetCity(3).Kill();
+                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+                }
+                if(main_state->GetCityManager().GetCity(4).IsDead() == false) {
+                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                    main_state->GetCityManager().GetCity(4).Kill();
+                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+                }
+                if(main_state->GetCityManager().GetCity(5).IsDead() == false) {
+                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                    main_state->GetCityManager().GetCity(5).Kill();
+                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+                }
+            }
+        }
+    }
+    if (m_postWaveTimer.CheckAndReset()) {
+        IncrementWave();
+        ChangeState(EnemyWave::State::Prewave);
+    }
+    wave_bonus = 0;
 }
 
 /************************************************************************/
@@ -300,7 +353,15 @@ void EnemyWave::EndFrame_Inactive() noexcept {
 }
 
 void EnemyWave::EndFrame_Prewave() noexcept {
-
+    if (m_preWaveTimer.CheckAndReset()) {
+        SetMissileCount(GetMissileCount());
+        m_flierSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
+        m_flierSpawnRate.Reset();
+        auto* g = GetGameAs<Game>();
+        auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+        state->ResetMissileCount();
+        ChangeState(EnemyWave::State::Active);
+    }
 }
 
 void EnemyWave::EndFrame_Active() noexcept {
@@ -342,17 +403,15 @@ void EnemyWave::EndFrame_Postwave() noexcept {
 }
 
 void EnemyWave::AdvanceToNextWave() noexcept {
-    DeactivateWave();
+    if (auto* g = GetGameAs<Game>(); g != nullptr) {
+        auto* state = g->GetCurrentState();
+        if (auto* main_state = dynamic_cast<GameStateMain*>(state); main_state != nullptr) {
+            m_postWaveCityCount = main_state->GetCityManager().RemainingCities();
+        }
+    }
     m_bomber.reset();
     m_satellite.reset();
-    IncrementWave();
-    SetMissileCount(GetMissileCount());
-    m_flierSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
-    m_flierSpawnRate.Reset();
-    auto* g = GetGameAs<Game>();
-    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
-    state->ResetMissileCount();
-    ActivateWave();
+    ChangeState(State::Postwave);
 }
 
 void EnemyWave::ChangeState(State newState) noexcept {

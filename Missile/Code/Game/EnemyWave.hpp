@@ -109,6 +109,7 @@ private:
     Stopwatch m_postWaveIncrementRate{0.33f};
     Stopwatch m_postWaveTimer{5.0f};
     std::size_t m_waveId{ 0 };
+    std::size_t m_postWaveCityCount{6};
     int m_missileCount{};
     State m_currentState{State::Inactive};
     State m_nextState{State::Inactive};
