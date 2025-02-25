@@ -53,4 +53,6 @@ namespace GameConstants {
     const std::filesystem::path game_audio_satellite_path{game_audio_folder / std::filesystem::path{"Satellite.wav"}};
     const std::filesystem::path game_audio_nomissiles_path{game_audio_folder / std::filesystem::path{"NoMissiles.wav"}};
     const std::filesystem::path game_audio_lowmissiles_path{game_audio_folder / std::filesystem::path{"LowMissiles.wav"}};
+    const std::filesystem::path game_audio_counting_path{game_audio_folder / std::filesystem::path{"Counting.wav"}};
+    const std::filesystem::path game_audio_bonuscity_path{game_audio_folder / std::filesystem::path{"BonusCity.wav"}};
 };
