@@ -245,6 +245,18 @@ void GameStateMain::ResetMissileCount() noexcept {
     m_missileBaseRight.ResetMissiles();
 }
 
+void GameStateMain::DecrementTotalMissiles() noexcept {
+    if(m_missileBaseLeft.HasMissilesRemaining()) {
+        m_missileBaseLeft.DecrementMissiles();
+    } else if(m_missileBaseCenter.HasMissilesRemaining()) {
+        m_missileBaseCenter.DecrementMissiles();
+    } else if(m_missileBaseRight.HasMissilesRemaining()) {
+        m_missileBaseRight.DecrementMissiles();
+    } else {
+        /* DO NOTHING */
+    }
+}
+
 void GameStateMain::HandleMissileExplosionCollisions(MissileManager& missileManager) noexcept {
     const auto& missiles = missileManager.GetMissilePositions();
     const auto& explosions = m_explosionManager.GetExplosionCollisionMeshes();

@@ -33,6 +33,8 @@ public:
     bool HasMissilesRemaining() const noexcept;
     void ResetMissileCount() noexcept;
 
+    void DecrementTotalMissiles() noexcept;
+
     MissileManager& GetMissileManager() noexcept;
     const ExplosionManager& GetExplosionManager() const noexcept;
     ExplosionManager& GetExplosionManager() noexcept;
