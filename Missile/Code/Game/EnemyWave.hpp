@@ -2,6 +2,10 @@
 
 #include "Engine/Core/Stopwatch.hpp"
 
+#include "Engine/UI/UICanvas.hpp"
+#include "Engine/UI/UITypes.hpp"
+#include "Engine/UI/UIWidget.hpp"
+
 #include "Game/MissileManager.hpp"
 #include "Game/Bomber.hpp"
 #include "Game/Satellite.hpp"

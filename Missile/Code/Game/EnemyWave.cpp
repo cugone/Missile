@@ -126,7 +126,7 @@ void EnemyWave::BeginFrame_Active() noexcept {
 
 void EnemyWave::BeginFrame_Postwave() noexcept {
     static int wave_bonus = 0;
-    const auto* g = GetGameAs<Game>();
+    auto* g = GetGameAs<Game>();
     auto* state = g->GetCurrentState();
     auto* main_state = dynamic_cast<GameStateMain*>(state);
     if(main_state->HasMissilesRemaining()) {
@@ -135,47 +135,47 @@ void EnemyWave::BeginFrame_Postwave() noexcept {
             main_state->DecrementTotalMissiles();
             g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
         }
-    } else {
-        if(main_state->GetCityManager().RemainingCities()) {
-            if(m_postWaveIncrementRate.CheckAndReset()) {
-                if(main_state->GetCityManager().GetCity(0).IsDead() == false) {
-                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
-                    main_state->GetCityManager().GetCity(0).Kill();
-                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
-                }
-                if(main_state->GetCityManager().GetCity(1).IsDead() == false) {
-                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
-                    main_state->GetCityManager().GetCity(1).Kill();
-                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
-                }
-                if(main_state->GetCityManager().GetCity(2).IsDead() == false) {
-                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
-                    main_state->GetCityManager().GetCity(2).Kill();
-                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
-                }
-                if(main_state->GetCityManager().GetCity(3).IsDead() == false) {
-                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
-                    main_state->GetCityManager().GetCity(3).Kill();
-                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
-                }
-                if(main_state->GetCityManager().GetCity(4).IsDead() == false) {
-                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
-                    main_state->GetCityManager().GetCity(4).Kill();
-                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
-                }
-                if(main_state->GetCityManager().GetCity(5).IsDead() == false) {
-                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
-                    main_state->GetCityManager().GetCity(5).Kill();
-                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
-                }
+    } else if(main_state->GetCityManager().RemainingCities()) {
+        if(m_postWaveIncrementRate.CheckAndReset()) {
+            if(main_state->GetCityManager().GetCity(0).IsDead() == false) {
+                wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                main_state->GetCityManager().GetCity(0).Kill();
+                g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+            }
+            if(main_state->GetCityManager().GetCity(1).IsDead() == false) {
+                wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                main_state->GetCityManager().GetCity(1).Kill();
+                g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+            }
+            if(main_state->GetCityManager().GetCity(2).IsDead() == false) {
+                wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                main_state->GetCityManager().GetCity(2).Kill();
+                g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+            }
+            if(main_state->GetCityManager().GetCity(3).IsDead() == false) {
+                wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                main_state->GetCityManager().GetCity(3).Kill();
+                g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+            }
+            if(main_state->GetCityManager().GetCity(4).IsDead() == false) {
+                wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                main_state->GetCityManager().GetCity(4).Kill();
+                g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+            }
+            if(main_state->GetCityManager().GetCity(5).IsDead() == false) {
+                wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                main_state->GetCityManager().GetCity(5).Kill();
+                g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
             }
         }
+    } else {
+        if (m_postWaveTimer.CheckAndReset()) {
+            g->GetPlayerData()->score += wave_bonus;
+            wave_bonus = 0;
+            IncrementWave();
+            ChangeState(EnemyWave::State::Prewave);
+        }
     }
-    if (m_postWaveTimer.CheckAndReset()) {
-        IncrementWave();
-        ChangeState(EnemyWave::State::Prewave);
-    }
-    wave_bonus = 0;
 }
 
 /************************************************************************/
@@ -198,7 +198,7 @@ void EnemyWave::Update_Active(TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void EnemyWave::Update_Postwave([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
-
+    /* DO NOTHING */
 }
 
 void EnemyWave::UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept {
@@ -301,6 +301,63 @@ void EnemyWave::Render_Active() const noexcept {
 
 void EnemyWave::Render_Postwave() const noexcept {
 
+    const auto* font = g_theRenderer->GetFont("System32");
+    const auto* g = GetGameAs<Game>();
+    const auto* state = g->GetCurrentState();
+    const auto* main_state = dynamic_cast<const GameStateMain*>(state);
+    const auto& camera_controller = main_state->GetCameraController();
+    const auto view_bounds = camera_controller.CalcViewBounds();
+    auto text_area = view_bounds;
+    text_area.ScalePadding(0.75f, 0.75f);
+    const auto center = text_area.CalcCenter();
+    const auto top_center = Vector2{center.x, text_area.mins.y};
+    
+    const auto S = Matrix4::I;
+    const auto R = Matrix4::I;
+    
+    const auto text_height = font->CalculateTextHeight("X");
+    auto bonus_area = AABB2::Zero_to_One;
+    const auto line_height_displacement = Vector2::Y_Axis * text_height;
+    {
+        const auto bonus_points = std::string{"BONUS POINTS"};
+        bonus_area = font->CalculateTextArea(bonus_points);
+        bonus_area.Translate(top_center + line_height_displacement * 0.0f);
+        const auto T = Matrix4::CreateTranslationMatrix(top_center - bonus_area.CalcCenter());
+        const auto M = Matrix4::MakeSRT(S, R, T);
+        g_theRenderer->SetModelMatrix();
+        g_theRenderer->DrawAABB2(bonus_area, Rgba::Green, Rgba::NoAlpha);
+        g_theRenderer->SetModelMatrix(M);
+        g_theRenderer->DrawTextLine(font, bonus_points, this->GetObjectColor());
+    }
+    const auto bonus_area_bottom_left = Vector2{bonus_area.mins.x, bonus_area.maxs.y};
+    auto missiles_area = AABB2::Zero_to_One;
+    auto missiles_area_bottom_left = Vector2::Zero;
+    {
+        const auto missiles_line = std::format("{} MISSILES: ", GameConstants::unused_missile_value * this->GetScoreMultiplier());
+        missiles_area = font->CalculateTextArea(missiles_line);
+        missiles_area.SetPosition(bonus_area_bottom_left + line_height_displacement * 1.0f);
+        const auto font_center = missiles_area.CalcCenter();
+        missiles_area_bottom_left = Vector2{ missiles_area.mins.x, missiles_area.maxs.y };
+        const auto T = Matrix4::CreateTranslationMatrix(missiles_area_bottom_left - font_center);
+        const auto M = Matrix4::MakeSRT(S, R, T);
+        g_theRenderer->SetModelMatrix();
+        g_theRenderer->DrawAABB2(missiles_area, Rgba::Green, Rgba::NoAlpha);
+        g_theRenderer->SetModelMatrix(M);
+        g_theRenderer->DrawTextLine(font, missiles_line, this->GetObjectColor());
+    }
+    {
+        const auto cities_line = std::format("{} SAVED CITIES: ", GameConstants::saved_city_value * this->GetScoreMultiplier());
+        auto cities_area = font->CalculateTextArea(cities_line);
+        cities_area.SetPosition(missiles_area_bottom_left + line_height_displacement * 30.0f);
+        const auto cities_area_bottom_left = Vector2{ cities_area.mins.x, cities_area.maxs.y };
+        const auto font_center = cities_area.CalcCenter();
+        const auto T = Matrix4::CreateTranslationMatrix(cities_area_bottom_left - font_center);
+        const auto M = Matrix4::MakeSRT(S, R, T);
+        g_theRenderer->SetModelMatrix();
+        g_theRenderer->DrawAABB2(cities_area, Rgba::Green, Rgba::NoAlpha);
+        g_theRenderer->SetModelMatrix(M);
+        g_theRenderer->DrawTextLine(font, cities_line, this->GetObjectColor());
+    }
 }
 
 void EnemyWave::DebugRender() const noexcept {
