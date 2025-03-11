@@ -7,12 +7,21 @@
 
 #include "Engine/Core/Rgba.hpp"
 
+#include "Engine/Input/InputSystem.hpp"
+
 #include "Engine/Math/MathUtils.hpp"
 
 #include "Engine/Renderer/Renderer.hpp"
 
+#include "Engine/Services/ServiceLocator.hpp"
+#include "Engine/Services/IRendererService.hpp"
+#include "Engine/Services/IInputService.hpp"
+
+#include "Engine/UI/UISystem.hpp"
+
 #include "Game/Game.hpp"
 
+#include <format>
 #include <utility>
 
 void EnemyWave::BeginFrame() noexcept {
@@ -23,6 +32,9 @@ void EnemyWave::BeginFrame() noexcept {
             m_postWaveTimer.Reset();
             m_preWaveTimer.Reset();
             DeactivateWave();
+            if(m_currentState == State::Prewave) {
+                g_theUISystem->SetClayLayoutCallback([this]() { this->ClayPrewave(); });
+            }
         } else {
             ActivateWave();
         }
@@ -270,23 +282,30 @@ void EnemyWave::Render_Inactive() const noexcept {
     /* DO NOTHING */
 }
 
-void EnemyWave::Render_Prewave() const noexcept {
+static Clay_LayoutConfig fullscreen_layout = {
+    .sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)},
+    .padding = CLAY_PADDING_ALL(16),
+    .childGap = 16
+};
 
-    const auto* font = g_theRenderer->GetFont("System32");
-    const auto* g = GetGameAs<Game>();
-    const auto* state = g->GetCurrentState();
-    const auto* main_state = dynamic_cast<const GameStateMain*>(state);
-    const auto& camera_controller = main_state->GetCameraController();
-    const auto center = camera_controller.CalcViewBounds().CalcCenter();
-    const auto points_line = std::format("{} X POINTS", this->GetScoreMultiplier());
-    const auto font_width = font->CalculateTextWidth(points_line);
-    const auto font_height = font->CalculateTextHeight(points_line);
-    const auto S = Matrix4::I;
-    const auto R = Matrix4::I;
-    const auto T = Matrix4::CreateTranslationMatrix(Vector2{ center.x - font_width * 0.5f, center.y - font_height * 0.5f });
-    const auto M = Matrix4::MakeSRT(S, R, T);
-    g_theRenderer->SetModelMatrix(M);
-    g_theRenderer->DrawTextLine(font, points_line, this->GetObjectColor());
+void EnemyWave::ClayPrewave() noexcept {
+    fullscreen_layout.childAlignment.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER;
+    fullscreen_layout.childAlignment.y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_CENTER;
+    CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
+        CLAY({ .id = CLAY_ID("ScoreMultiplier"), .layout = {.padding = CLAY_PADDING_ALL(16)}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
+            static auto points_str = std::string{};
+            points_str = std::format("{} X POINTS", this->GetScoreMultiplier());
+            Clay_TextElementConfig textConfig{};
+            textConfig.userData = g_theRenderer->GetFont("System32");
+            textConfig.textColor = Clay::RgbaToClayColor(this->GetObjectColor());
+            CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
+        }
+    }
+}
+
+
+void EnemyWave::Render_Prewave() const noexcept {
+    /* DO NOTHING */
 }
 
 void EnemyWave::Render_Active() const noexcept {

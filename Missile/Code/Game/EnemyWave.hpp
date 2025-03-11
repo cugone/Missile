@@ -68,6 +68,8 @@ public:
 protected:
 private:
 
+    void ClayPrewave() noexcept;
+
     bool CanSpawnFlier() const noexcept;
     void AdvanceToNextWave() noexcept;
 
