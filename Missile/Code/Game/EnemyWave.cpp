@@ -36,6 +36,9 @@ void EnemyWave::BeginFrame() noexcept {
                 g_theUISystem->SetClayLayoutCallback([this]() { this->ClayPrewave(); });
             }
         } else {
+            if(m_currentState == State::Active) {
+                g_theUISystem->SetClayLayoutCallback([this]() { this->ClayActive(); });
+            }
             ActivateWave();
         }
     }
@@ -298,6 +301,31 @@ void EnemyWave::ClayPrewave() noexcept {
             Clay_TextElementConfig textConfig{};
             textConfig.userData = g_theRenderer->GetFont("System32");
             textConfig.textColor = Clay::RgbaToClayColor(this->GetObjectColor());
+            CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
+        }
+    }
+}
+
+void EnemyWave::ClayActive() noexcept {
+    fullscreen_layout.childAlignment.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER;
+    fullscreen_layout.childAlignment.y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_TOP;
+    CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
+        CLAY({ .id = CLAY_ID("Score"), .layout = {.padding = CLAY_PADDING_ALL(0)}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
+            static auto points_str = std::string{};
+            points_str = [this]()->std::string {
+                const auto player_score = GetGameAs<Game>()->GetPlayerScore();
+                const auto highscore = GetGameAs<Game>()->GetHighScore();
+                const auto wave = this->GetWaveId() + 1;
+                if (player_score > highscore) {
+                    return std::format("{} <- {}\nWave: {}", player_score, highscore, wave);
+                } else {
+                    return std::format("{} -> {}\nWave: {}", player_score, highscore, wave);
+                }
+            }();
+            Clay_TextElementConfig textConfig{};
+            textConfig.userData = g_theRenderer->GetFont("System32");
+            textConfig.textColor = Clay::RgbaToClayColor(Rgba::White);
+            textConfig.wrapMode = Clay_TextElementConfigWrapMode::CLAY_TEXT_WRAP_NEWLINES;
             CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
         }
     }
