@@ -500,7 +500,12 @@ void GameStateMain::Render() const noexcept {
 
 void GameStateMain::EndFrame() noexcept {
     m_mouse_pos += m_mouse_delta;
-    g_theInputSystem->SetCursorToWindowCenter();
+    if (!g_theUISystem->IsAnyDebugWindowVisible()) {
+        g_theInputSystem->SetCursorToWindowCenter();
+        if (g_theInputSystem->IsMouseCursorVisible()) {
+            g_theInputSystem->HideMouseCursor();
+        }
+    }
     m_mouse_delta = Vector2::Zero;
     m_missileBaseLeft.EndFrame();
     m_missileBaseCenter.EndFrame();
