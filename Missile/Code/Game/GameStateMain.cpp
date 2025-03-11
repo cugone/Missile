@@ -29,7 +29,7 @@ void GameStateMain::OnEnter() noexcept {
     m_world_bounds.ScalePadding(dims.x, dims.y);
     m_world_bounds.Translate(-m_world_bounds.CalcCenter());
 
-    m_cameraController = OrthographicCameraController{};
+    m_cameraController = OrthographicCameraController{ OrthographicCameraController::Options{.lockInput = true, .lockTranslation = true, .lockZoom = true}};
     m_cameraController.SetPosition(m_world_bounds.CalcCenter());
     m_cameraController.SetZoomLevelRange(Vector2{ 8.0f, 450.0f });
     m_cameraController.SetZoomLevel(450.0f);
