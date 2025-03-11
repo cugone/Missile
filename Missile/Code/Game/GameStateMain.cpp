@@ -462,6 +462,9 @@ void GameStateMain::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::F4)) {
         g_theUISystem->ToggleImguiDemoWindow();
     }
+    if (g_theInputSystem->WasKeyJustPressed(KeyCode::F1)) {
+        g_theUISystem->ToggleClayDebugWindow();
+    }
 }
 
 void GameStateMain::HandleDebugMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
