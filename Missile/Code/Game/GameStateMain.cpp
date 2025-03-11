@@ -34,6 +34,8 @@ void GameStateMain::OnEnter() noexcept {
     m_cameraController.SetZoomLevelRange(Vector2{ 8.0f, 450.0f });
     m_cameraController.SetZoomLevel(450.0f);
 
+    m_ui_camera = m_cameraController;
+
     g_theInputSystem->SetCursorToWindowCenter();
     m_mouse_delta = Vector2::Zero;
     m_mouse_pos = g_theInputSystem->GetMouseCoords();
@@ -93,7 +95,7 @@ void GameStateMain::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) n
     HandleDebugInput(deltaSeconds);
     HandlePlayerInput(deltaSeconds);
 
-    m_ui_camera2D.Update(deltaSeconds);
+    m_ui_camera.Update(deltaSeconds);
     m_cameraController.Update(deltaSeconds);
 
     CalculateCrosshairLocation();
@@ -431,7 +433,7 @@ void GameStateMain::RenderHighscoreAndWave() const noexcept {
     }();
 
     const auto* font = g_theRenderer->GetFont("System32");
-    const auto top = m_cameraController.CalcViewBounds().mins.y;
+    const auto top = m_ui_camera.CalcViewBounds().mins.y;
     const auto font_width = font->CalculateTextWidth(highscore_line);
     const auto S = Matrix4::I;
     const auto R = Matrix4::I;
@@ -484,11 +486,12 @@ void GameStateMain::Render() const noexcept {
     //2D World / HUD View
     if(auto* g = GetGameAs<Game>(); g != nullptr) {
         const auto ui_view_height = static_cast<float>(g->GetSettings()->GetWindowHeight());
-        const auto ui_view_width = ui_view_height * m_ui_camera2D.GetAspectRatio();
+        const auto ui_view_width = ui_view_height * m_ui_camera.GetAspectRatio();
         const auto ui_view_extents = Vector2{ ui_view_width, ui_view_height };
         const auto ui_view_half_extents = ui_view_extents * 0.5f;
-        const auto ui_cam_pos = Vector2::Zero;
-        g_theRenderer->BeginHUDRender(m_ui_camera2D, ui_cam_pos, ui_view_height);
+        const auto ui_cam_pos = m_ui_camera.CalcViewBounds().CalcCenter();
+
+        g_theRenderer->BeginHUDRender(m_ui_camera.GetCamera(), ui_cam_pos, ui_view_height);
 
         RenderGround();
         RenderObjects();

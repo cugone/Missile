@@ -89,8 +89,8 @@ private:
     void RenderRadarLine() const noexcept;
     void RenderHighscoreAndWave() const noexcept;
 
-    mutable Camera2D m_ui_camera2D{};
     OrthographicCameraController m_cameraController{};
+    mutable OrthographicCameraController m_ui_camera{};
     EnemyWave m_waves{};
     MissileBase m_missileBaseLeft{};
     MissileBase m_missileBaseCenter{};
