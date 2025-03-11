@@ -206,7 +206,7 @@ const std::array<MissileManager::Target, 9> GameStateMain::GetValidTargets() con
 }
 
 Vector2 GameStateMain::CalcCrosshairPositionFromRawMousePosition() noexcept {
-    return g_theRenderer->ConvertScreenToWorldCoords(m_cameraController.GetCamera(), m_mouse_pos);
+    return m_cameraController.ConvertScreenToWorldCoords(m_mouse_pos);
 }
 
 const CityManager& GameStateMain::GetCityManager() const noexcept {
