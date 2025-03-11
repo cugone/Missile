@@ -30,9 +30,6 @@ void City::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void City::Render() const noexcept {
-    g_theRenderer->SetModelMatrix();
-    g_theRenderer->SetMaterial("__2D");
-
     auto* mat = g_theRenderer->GetMaterial("city");
     auto* tex = mat->GetTexture(Material::TextureID::Diffuse);
     const auto&& [x, y, _] = tex->GetDimensions().GetXYZ();

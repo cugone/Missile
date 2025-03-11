@@ -1,24 +1,47 @@
 #include "Game/EnemyWave.hpp"
 
+#include "Engine/Audio/AudioSystem.hpp"
+
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/ErrorWarningAssert.hpp"
 
 #include "Engine/Core/Rgba.hpp"
 
+#include "Engine/Input/InputSystem.hpp"
+
 #include "Engine/Math/MathUtils.hpp"
 
 #include "Engine/Renderer/Renderer.hpp"
 
+#include "Engine/Services/ServiceLocator.hpp"
+#include "Engine/Services/IRendererService.hpp"
+#include "Engine/Services/IInputService.hpp"
+
+#include "Engine/UI/UISystem.hpp"
+
 #include "Game/Game.hpp"
 
+#include <format>
 #include <utility>
 
 void EnemyWave::BeginFrame() noexcept {
     if(m_nextState != m_currentState) {
         m_currentState = m_nextState;
         if(m_currentState != State::Active) {
+            m_postWaveIncrementRate.Reset();
+            m_postWaveTimer.Reset();
+            m_preWaveTimer.Reset();
             DeactivateWave();
+            if(m_currentState == State::Prewave) {
+                g_theUISystem->SetClayLayoutCallback([this]() { this->ClayPrewave(); });
+            }
+            if(m_currentState == State::Postwave) {
+                g_theUISystem->SetClayLayoutCallback([this]() { this->ClayPostwave(); });
+            }
         } else {
+            if(m_currentState == State::Active) {
+                g_theUISystem->SetClayLayoutCallback([this]() { this->ClayActive(); });
+            }
             ActivateWave();
         }
     }
@@ -106,9 +129,7 @@ void EnemyWave::BeginFrame_Inactive() noexcept {
 }
 
 void EnemyWave::BeginFrame_Prewave() noexcept {
-    if(m_preWaveTimer.CheckAndReset()) {
-        ChangeState(EnemyWave::State::Active);
-    }
+    /* DO NOTHING */
 }
 
 void EnemyWave::BeginFrame_Active() noexcept {
@@ -122,7 +143,57 @@ void EnemyWave::BeginFrame_Active() noexcept {
 }
 
 void EnemyWave::BeginFrame_Postwave() noexcept {
-    /* DO NOTHING */
+    static int wave_bonus = 0;
+    const auto* g = GetGameAs<Game>();
+    auto* state = g->GetCurrentState();
+    auto* main_state = dynamic_cast<GameStateMain*>(state);
+    if(main_state->HasMissilesRemaining()) {
+        if(m_postWaveIncrementRate.CheckAndReset()) {
+            wave_bonus += GameConstants::unused_missile_value * GetScoreMultiplier();
+            main_state->DecrementTotalMissiles();
+            g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+        }
+    } else {
+        if(main_state->GetCityManager().RemainingCities()) {
+            if(m_postWaveIncrementRate.CheckAndReset()) {
+                if(main_state->GetCityManager().GetCity(0).IsDead() == false) {
+                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                    main_state->GetCityManager().GetCity(0).Kill();
+                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+                }
+                if(main_state->GetCityManager().GetCity(1).IsDead() == false) {
+                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                    main_state->GetCityManager().GetCity(1).Kill();
+                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+                }
+                if(main_state->GetCityManager().GetCity(2).IsDead() == false) {
+                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                    main_state->GetCityManager().GetCity(2).Kill();
+                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+                }
+                if(main_state->GetCityManager().GetCity(3).IsDead() == false) {
+                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                    main_state->GetCityManager().GetCity(3).Kill();
+                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+                }
+                if(main_state->GetCityManager().GetCity(4).IsDead() == false) {
+                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                    main_state->GetCityManager().GetCity(4).Kill();
+                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+                }
+                if(main_state->GetCityManager().GetCity(5).IsDead() == false) {
+                    wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                    main_state->GetCityManager().GetCity(5).Kill();
+                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
+                }
+            }
+        }
+    }
+    if (m_postWaveTimer.CheckAndReset()) {
+        IncrementWave();
+        ChangeState(EnemyWave::State::Prewave);
+    }
+    wave_bonus = 0;
 }
 
 /************************************************************************/
@@ -217,23 +288,58 @@ void EnemyWave::Render_Inactive() const noexcept {
     /* DO NOTHING */
 }
 
-void EnemyWave::Render_Prewave() const noexcept {
+static Clay_LayoutConfig fullscreen_layout = {
+    .sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)},
+    .padding = CLAY_PADDING_ALL(16),
+    .childGap = 16
+};
 
-    const auto* font = g_theRenderer->GetFont("System32");
-    const auto* g = GetGameAs<Game>();
-    const auto* state = g->GetCurrentState();
-    const auto* main_state = dynamic_cast<const GameStateMain*>(state);
-    const auto& camera_controller = main_state->GetCameraController();
-    const auto center = camera_controller.CalcViewBounds().CalcCenter();
-    const auto points_line = std::format("{} X POINTS", this->GetScoreMultiplier());
-    const auto font_width = font->CalculateTextWidth(points_line);
-    const auto font_height = font->CalculateTextHeight(points_line);
-    const auto S = Matrix4::I;
-    const auto R = Matrix4::I;
-    const auto T = Matrix4::CreateTranslationMatrix(Vector2{ center.x - font_width * 0.5f, center.y - font_height * 0.5f });
-    const auto M = Matrix4::MakeSRT(S, R, T);
-    g_theRenderer->SetModelMatrix(M);
-    g_theRenderer->DrawTextLine(font, points_line, this->GetObjectColor());
+void EnemyWave::ClayPrewave() noexcept {
+    fullscreen_layout.childAlignment.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER;
+    fullscreen_layout.childAlignment.y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_CENTER;
+    CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
+        CLAY({ .id = CLAY_ID("ScoreMultiplier"), .layout = {.padding = CLAY_PADDING_ALL(16)}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
+            static auto points_str = std::string{};
+            points_str = std::format("{} X POINTS", this->GetScoreMultiplier());
+            Clay_TextElementConfig textConfig{};
+            textConfig.userData = g_theRenderer->GetFont("System32");
+            textConfig.textColor = Clay::RgbaToClayColor(this->GetObjectColor());
+            CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
+        }
+    }
+}
+
+void EnemyWave::ClayActive() noexcept {
+    fullscreen_layout.childAlignment.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER;
+    fullscreen_layout.childAlignment.y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_TOP;
+    CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
+        CLAY({ .id = CLAY_ID("Score"), .layout = {.padding = CLAY_PADDING_ALL(0)}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
+            static auto points_str = std::string{};
+            points_str = [this]()->std::string {
+                const auto player_score = GetGameAs<Game>()->GetPlayerScore();
+                const auto highscore = GetGameAs<Game>()->GetHighScore();
+                const auto wave = this->GetWaveId() + 1;
+                if (player_score > highscore) {
+                    return std::format("{} <- {}\nWave: {}", player_score, highscore, wave);
+                } else {
+                    return std::format("{} -> {}\nWave: {}", player_score, highscore, wave);
+                }
+            }();
+            Clay_TextElementConfig textConfig{};
+            textConfig.userData = g_theRenderer->GetFont("System32");
+            textConfig.textColor = Clay::RgbaToClayColor(Rgba::White);
+            textConfig.wrapMode = Clay_TextElementConfigWrapMode::CLAY_TEXT_WRAP_NEWLINES;
+            CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
+        }
+    }
+}
+
+void EnemyWave::ClayPostwave() noexcept {
+    /* DO NOTHING */
+}
+
+void EnemyWave::Render_Prewave() const noexcept {
+    /* DO NOTHING */
 }
 
 void EnemyWave::Render_Active() const noexcept {
@@ -247,7 +353,7 @@ void EnemyWave::Render_Active() const noexcept {
 }
 
 void EnemyWave::Render_Postwave() const noexcept {
-
+    /* DO NOTHING */
 }
 
 void EnemyWave::DebugRender() const noexcept {
@@ -300,7 +406,15 @@ void EnemyWave::EndFrame_Inactive() noexcept {
 }
 
 void EnemyWave::EndFrame_Prewave() noexcept {
-
+    if (m_preWaveTimer.CheckAndReset()) {
+        SetMissileCount(GetMissileCount());
+        m_flierSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
+        m_flierSpawnRate.Reset();
+        auto* g = GetGameAs<Game>();
+        auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+        state->ResetMissileCount();
+        ChangeState(EnemyWave::State::Active);
+    }
 }
 
 void EnemyWave::EndFrame_Active() noexcept {
@@ -342,17 +456,15 @@ void EnemyWave::EndFrame_Postwave() noexcept {
 }
 
 void EnemyWave::AdvanceToNextWave() noexcept {
-    DeactivateWave();
+    if (auto* g = GetGameAs<Game>(); g != nullptr) {
+        auto* state = g->GetCurrentState();
+        if (auto* main_state = dynamic_cast<GameStateMain*>(state); main_state != nullptr) {
+            m_postWaveCityCount = main_state->GetCityManager().RemainingCities();
+        }
+    }
     m_bomber.reset();
     m_satellite.reset();
-    IncrementWave();
-    SetMissileCount(GetMissileCount());
-    m_flierSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
-    m_flierSpawnRate.Reset();
-    auto* g = GetGameAs<Game>();
-    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
-    state->ResetMissileCount();
-    ActivateWave();
+    ChangeState(State::Postwave);
 }
 
 void EnemyWave::ChangeState(State newState) noexcept {
