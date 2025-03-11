@@ -492,7 +492,6 @@ void GameStateMain::Render() const noexcept {
         RenderObjects();
         RenderCrosshairAt(m_mouse_world_pos);
         RenderRadarLine();
-        RenderHighscoreAndWave();
     }
 }
 
