@@ -409,13 +409,8 @@ void GameStateMain::RenderRadarLine() const noexcept {
         cull.maxs.y -= GameConstants::radar_line_distance;
         const auto t = g_theRenderer->GetGameTime().count();
         const auto alpha = MathUtils::SineWave(t, TimeUtils::FPSeconds{ 1.0f });
-        const auto color = [this, alpha]() {
-            if (const auto id = this->GetWaveId() % GameConstants::wave_array_size; id != GameConstants::wave_array_size - 1 && id != GameConstants::wave_array_size - 2) {
-                return Rgba{ 1.0f, 0.0f, 0.0f, alpha };
-            } else {
-                return Rgba{ 0.0f, 0.0f, 0.0f, alpha };
-            }
-            }();
+        auto color = Rgba(GameConstants::wave_player_color_lookup[this->GetWaveId() % GameConstants::wave_array_size]);
+        color.ScaleAlpha(alpha);
         g_theRenderer->DrawLine2D(Vector2{ cull.mins.x, cull.maxs.y }, Vector2{ cull.maxs.x, cull.maxs.y }, color);
     }
 }
