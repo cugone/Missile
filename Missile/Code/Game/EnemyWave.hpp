@@ -70,6 +70,7 @@ private:
 
     void ClayPrewave() noexcept;
     void ClayActive() noexcept;
+    void ClayPostwave() noexcept;
 
     bool CanSpawnFlier() const noexcept;
     void AdvanceToNextWave() noexcept;

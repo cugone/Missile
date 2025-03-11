@@ -35,6 +35,9 @@ void EnemyWave::BeginFrame() noexcept {
             if(m_currentState == State::Prewave) {
                 g_theUISystem->SetClayLayoutCallback([this]() { this->ClayPrewave(); });
             }
+            if(m_currentState == State::Postwave) {
+                g_theUISystem->SetClayLayoutCallback([this]() { this->ClayPostwave(); });
+            }
         } else {
             if(m_currentState == State::Active) {
                 g_theUISystem->SetClayLayoutCallback([this]() { this->ClayActive(); });
@@ -331,6 +334,9 @@ void EnemyWave::ClayActive() noexcept {
     }
 }
 
+void EnemyWave::ClayPostwave() noexcept {
+    /* DO NOTHING */
+}
 
 void EnemyWave::Render_Prewave() const noexcept {
     /* DO NOTHING */
@@ -347,7 +353,7 @@ void EnemyWave::Render_Active() const noexcept {
 }
 
 void EnemyWave::Render_Postwave() const noexcept {
-
+    /* DO NOTHING */
 }
 
 void EnemyWave::DebugRender() const noexcept {
