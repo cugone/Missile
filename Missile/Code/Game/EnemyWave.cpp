@@ -7,12 +7,21 @@
 
 #include "Engine/Core/Rgba.hpp"
 
+#include "Engine/Input/InputSystem.hpp"
+
 #include "Engine/Math/MathUtils.hpp"
 
 #include "Engine/Renderer/Renderer.hpp"
 
+#include "Engine/Services/ServiceLocator.hpp"
+#include "Engine/Services/IRendererService.hpp"
+#include "Engine/Services/IInputService.hpp"
+
+#include "Engine/UI/UISystem.hpp"
+
 #include "Game/Game.hpp"
 
+#include <format>
 #include <utility>
 
 void EnemyWave::BeginFrame() noexcept {
@@ -23,7 +32,16 @@ void EnemyWave::BeginFrame() noexcept {
             m_postWaveTimer.Reset();
             m_preWaveTimer.Reset();
             DeactivateWave();
+            if(m_currentState == State::Prewave) {
+                g_theUISystem->SetClayLayoutCallback([this]() { this->ClayPrewave(); });
+            }
+            if(m_currentState == State::Postwave) {
+                g_theUISystem->SetClayLayoutCallback([this]() { this->ClayPostwave(); });
+            }
         } else {
+            if(m_currentState == State::Active) {
+                g_theUISystem->SetClayLayoutCallback([this]() { this->ClayActive(); });
+            }
             ActivateWave();
         }
     }
@@ -270,23 +288,58 @@ void EnemyWave::Render_Inactive() const noexcept {
     /* DO NOTHING */
 }
 
-void EnemyWave::Render_Prewave() const noexcept {
+static Clay_LayoutConfig fullscreen_layout = {
+    .sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)},
+    .padding = CLAY_PADDING_ALL(16),
+    .childGap = 16
+};
 
-    const auto* font = g_theRenderer->GetFont("System32");
-    const auto* g = GetGameAs<Game>();
-    const auto* state = g->GetCurrentState();
-    const auto* main_state = dynamic_cast<const GameStateMain*>(state);
-    const auto& camera_controller = main_state->GetCameraController();
-    const auto center = camera_controller.CalcViewBounds().CalcCenter();
-    const auto points_line = std::format("{} X POINTS", this->GetScoreMultiplier());
-    const auto font_width = font->CalculateTextWidth(points_line);
-    const auto font_height = font->CalculateTextHeight(points_line);
-    const auto S = Matrix4::I;
-    const auto R = Matrix4::I;
-    const auto T = Matrix4::CreateTranslationMatrix(Vector2{ center.x - font_width * 0.5f, center.y - font_height * 0.5f });
-    const auto M = Matrix4::MakeSRT(S, R, T);
-    g_theRenderer->SetModelMatrix(M);
-    g_theRenderer->DrawTextLine(font, points_line, this->GetObjectColor());
+void EnemyWave::ClayPrewave() noexcept {
+    fullscreen_layout.childAlignment.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER;
+    fullscreen_layout.childAlignment.y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_CENTER;
+    CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
+        CLAY({ .id = CLAY_ID("ScoreMultiplier"), .layout = {.padding = CLAY_PADDING_ALL(16)}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
+            static auto points_str = std::string{};
+            points_str = std::format("{} X POINTS", this->GetScoreMultiplier());
+            Clay_TextElementConfig textConfig{};
+            textConfig.userData = g_theRenderer->GetFont("System32");
+            textConfig.textColor = Clay::RgbaToClayColor(this->GetObjectColor());
+            CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
+        }
+    }
+}
+
+void EnemyWave::ClayActive() noexcept {
+    fullscreen_layout.childAlignment.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER;
+    fullscreen_layout.childAlignment.y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_TOP;
+    CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
+        CLAY({ .id = CLAY_ID("Score"), .layout = {.padding = CLAY_PADDING_ALL(0)}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
+            static auto points_str = std::string{};
+            points_str = [this]()->std::string {
+                const auto player_score = GetGameAs<Game>()->GetPlayerScore();
+                const auto highscore = GetGameAs<Game>()->GetHighScore();
+                const auto wave = this->GetWaveId() + 1;
+                if (player_score > highscore) {
+                    return std::format("{} <- {}\nWave: {}", player_score, highscore, wave);
+                } else {
+                    return std::format("{} -> {}\nWave: {}", player_score, highscore, wave);
+                }
+            }();
+            Clay_TextElementConfig textConfig{};
+            textConfig.userData = g_theRenderer->GetFont("System32");
+            textConfig.textColor = Clay::RgbaToClayColor(Rgba::White);
+            textConfig.wrapMode = Clay_TextElementConfigWrapMode::CLAY_TEXT_WRAP_NEWLINES;
+            CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
+        }
+    }
+}
+
+void EnemyWave::ClayPostwave() noexcept {
+    /* DO NOTHING */
+}
+
+void EnemyWave::Render_Prewave() const noexcept {
+    /* DO NOTHING */
 }
 
 void EnemyWave::Render_Active() const noexcept {
@@ -300,64 +353,7 @@ void EnemyWave::Render_Active() const noexcept {
 }
 
 void EnemyWave::Render_Postwave() const noexcept {
-
-    const auto* font = g_theRenderer->GetFont("System32");
-    const auto* g = GetGameAs<Game>();
-    const auto* state = g->GetCurrentState();
-    const auto* main_state = dynamic_cast<const GameStateMain*>(state);
-    const auto& camera_controller = main_state->GetCameraController();
-    const auto view_bounds = camera_controller.CalcViewBounds();
-    auto text_area = view_bounds;
-    text_area.ScalePadding(0.75f, 0.75f);
-    const auto center = text_area.CalcCenter();
-    const auto top_center = Vector2{center.x, text_area.mins.y};
-    
-    const auto S = Matrix4::I;
-    const auto R = Matrix4::I;
-    
-    const auto text_height = font->CalculateTextHeight("X");
-    auto bonus_area = AABB2::Zero_to_One;
-    const auto line_height_displacement = Vector2::Y_Axis * text_height;
-    {
-        const auto bonus_points = std::string{"BONUS POINTS"};
-        bonus_area = font->CalculateTextArea(bonus_points);
-        bonus_area.Translate(top_center + line_height_displacement * 0.0f);
-        const auto T = Matrix4::CreateTranslationMatrix(top_center - bonus_area.CalcCenter());
-        const auto M = Matrix4::MakeSRT(S, R, T);
-        g_theRenderer->SetModelMatrix();
-        g_theRenderer->DrawAABB2(bonus_area, Rgba::Green, Rgba::NoAlpha);
-        g_theRenderer->SetModelMatrix(M);
-        g_theRenderer->DrawTextLine(font, bonus_points, this->GetObjectColor());
-    }
-    const auto bonus_area_bottom_left = Vector2{bonus_area.mins.x, bonus_area.maxs.y};
-    auto missiles_area = AABB2::Zero_to_One;
-    auto missiles_area_bottom_left = Vector2::Zero;
-    {
-        const auto missiles_line = std::format("{} MISSILES: ", GameConstants::unused_missile_value * this->GetScoreMultiplier());
-        missiles_area = font->CalculateTextArea(missiles_line);
-        missiles_area.SetPosition(bonus_area_bottom_left + line_height_displacement * 1.0f);
-        const auto font_center = missiles_area.CalcCenter();
-        missiles_area_bottom_left = Vector2{ missiles_area.mins.x, missiles_area.maxs.y };
-        const auto T = Matrix4::CreateTranslationMatrix(missiles_area_bottom_left - font_center);
-        const auto M = Matrix4::MakeSRT(S, R, T);
-        g_theRenderer->SetModelMatrix();
-        g_theRenderer->DrawAABB2(missiles_area, Rgba::Green, Rgba::NoAlpha);
-        g_theRenderer->SetModelMatrix(M);
-        g_theRenderer->DrawTextLine(font, missiles_line, this->GetObjectColor());
-    }
-    {
-        const auto cities_line = std::format("{} SAVED CITIES: ", GameConstants::saved_city_value * this->GetScoreMultiplier());
-        auto cities_area = font->CalculateTextArea(cities_line);
-        cities_area.SetPosition(missiles_area_bottom_left + line_height_displacement * 30.0f);
-        const auto cities_area_bottom_left = Vector2{ cities_area.mins.x, cities_area.maxs.y };
-        const auto font_center = cities_area.CalcCenter();
-        const auto T = Matrix4::CreateTranslationMatrix(cities_area_bottom_left - font_center);
-        const auto M = Matrix4::MakeSRT(S, R, T);
-        g_theRenderer->SetModelMatrix();
-        g_theRenderer->DrawAABB2(cities_area, Rgba::Green, Rgba::NoAlpha);
-        g_theRenderer->SetModelMatrix(M);
-        g_theRenderer->DrawTextLine(font, cities_line, this->GetObjectColor());
-    }
+    /* DO NOTHING */
 }
 
 void EnemyWave::DebugRender() const noexcept {
