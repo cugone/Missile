@@ -120,6 +120,10 @@ void MissileBase::ResetMissiles() noexcept {
     m_missilesRemaining = m_maxMissiles;
 }
 
+int MissileBase::GetMissilesRemaining() const noexcept {
+    return m_missilesRemaining;
+}
+
 const MissileManager& MissileBase::GetMissileManager() const noexcept {
     return m_missileManager;
 }
