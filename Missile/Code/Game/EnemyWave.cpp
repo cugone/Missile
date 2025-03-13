@@ -34,8 +34,7 @@ void EnemyWave::BeginFrame() noexcept {
             DeactivateWave();
             if(m_currentState == State::Prewave) {
                 g_theUISystem->SetClayLayoutCallback([this]() { this->ClayPrewave(); });
-            }
-            if(m_currentState == State::Postwave) {
+            } else if(m_currentState == State::Postwave) {
                 g_theUISystem->SetClayLayoutCallback([this]() { this->ClayPostwave(); });
             }
         } else {
