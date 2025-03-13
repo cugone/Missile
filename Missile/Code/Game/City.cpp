@@ -57,7 +57,7 @@ void City::EndFrame() noexcept {
 Rgba City::GetCityColor() const noexcept {
     auto* g = GetGameAs<Game>();
     auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
-    return IsDead() ? Rgba(GameConstants::wave_ground_color_lookup[state->GetWaveId() % GameConstants::wave_array_size]) : Rgba(GameConstants::wave_player_color_lookup[state->GetWaveId() % GameConstants::wave_array_size]);
+    return IsDead() ? state->GetGroundColor() : state->GetPlayerColor();
 }
 
 AABB2 City::GetCollisionMesh() const noexcept {
