@@ -45,6 +45,8 @@ public:
     void CreateExplosionAt(Vector2 position, Faction faction) noexcept;
     std::size_t GetWaveId() const noexcept;
 
+    Rgba GetGroundColor() const noexcept;
+
     const OrthographicCameraController& GetCameraController() const noexcept;
     OrthographicCameraController& GetCameraController() noexcept;
 

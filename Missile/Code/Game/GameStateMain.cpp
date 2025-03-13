@@ -419,6 +419,13 @@ std::size_t GameStateMain::GetWaveId() const noexcept {
     return m_waves.GetWaveId();
 }
 
+Rgba GameStateMain::GetGroundColor() const noexcept {
+    auto* g = GetGameAs<Game>();
+    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+    return Rgba(GameConstants::wave_ground_color_lookup[state->GetWaveId() % GameConstants::wave_array_size]);
+}
+
+
 const OrthographicCameraController& GameStateMain::GetCameraController() const noexcept {
     return m_cameraController;
 }
