@@ -425,6 +425,11 @@ Rgba GameStateMain::GetGroundColor() const noexcept {
     return Rgba(GameConstants::wave_ground_color_lookup[state->GetWaveId() % GameConstants::wave_array_size]);
 }
 
+Rgba GameStateMain::GetPlayerColor() const noexcept {
+    auto* g = GetGameAs<Game>();
+    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+    return Rgba(GameConstants::wave_player_color_lookup[state->GetWaveId() % GameConstants::wave_array_size]);
+}
 
 const OrthographicCameraController& GameStateMain::GetCameraController() const noexcept {
     return m_cameraController;

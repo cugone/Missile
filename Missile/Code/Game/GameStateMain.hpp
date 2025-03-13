@@ -46,6 +46,7 @@ public:
     std::size_t GetWaveId() const noexcept;
 
     Rgba GetGroundColor() const noexcept;
+    Rgba GetPlayerColor() const noexcept;
 
     const OrthographicCameraController& GetCameraController() const noexcept;
     OrthographicCameraController& GetCameraController() noexcept;
