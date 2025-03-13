@@ -296,47 +296,98 @@ static Clay_LayoutConfig fullscreen_layout = {
 };
 
 void EnemyWave::ClayPrewave() noexcept {
-    fullscreen_layout.childAlignment.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER;
-    fullscreen_layout.childAlignment.y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_CENTER;
-    CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
-        CLAY({ .id = CLAY_ID("ScoreMultiplier"), .layout = {.padding = CLAY_PADDING_ALL(16)}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
-            static auto points_str = std::string{};
-            points_str = std::format("{} X POINTS", this->GetScoreMultiplier());
-            Clay_TextElementConfig textConfig{};
-            textConfig.userData = g_theRenderer->GetFont("System32");
-            textConfig.textColor = Clay::RgbaToClayColor(this->GetObjectColor());
-            CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
-        }
+    CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha)}) {
+        RenderScoreElement();
+        RenderScoreMultiplierElement();
+    }
+}
+
+void EnemyWave::RenderScoreElement() const noexcept {
+    CLAY({ .id = CLAY_ID("Score"), .layout = {.sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_PERCENT(0.1f)}, .padding = CLAY_PADDING_ALL(0), .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_TOP},}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
+        static auto points_str = std::string{};
+        points_str = [this]()->std::string {
+            const auto player_score = GetGameAs<Game>()->GetPlayerScore();
+            const auto highscore = GetGameAs<Game>()->GetHighScore();
+            const auto wave = this->GetWaveId() + 1;
+            if (player_score > highscore) {
+                return std::format("{} <- {}\nWave: {}", player_score, highscore, wave);
+            } else {
+                return std::format("{} -> {}\nWave: {}", player_score, highscore, wave);
+            }
+            }();
+        Clay_TextElementConfig textConfig{};
+        textConfig.userData = g_theRenderer->GetFont("System32");
+        textConfig.textColor = Clay::RgbaToClayColor(Rgba::White);
+        textConfig.wrapMode = Clay_TextElementConfigWrapMode::CLAY_TEXT_WRAP_NEWLINES;
+        CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
+    }
+}
+
+void EnemyWave::RenderScoreMultiplierElement() const noexcept {
+    CLAY({ .id = CLAY_ID("ScoreMultiplier"), .layout = {.sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)}, .padding = CLAY_PADDING_ALL(0), .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_CENTER}}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
+        static auto points_str = std::string{};
+        points_str = std::format("{} X POINTS", this->GetScoreMultiplier());
+        Clay_TextElementConfig textConfig{};
+        textConfig.userData = g_theRenderer->GetFont("System32");
+        textConfig.textColor = Clay::RgbaToClayColor(this->GetObjectColor());
+        CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
     }
 }
 
 void EnemyWave::ClayActive() noexcept {
-    fullscreen_layout.childAlignment.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER;
-    fullscreen_layout.childAlignment.y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_TOP;
-    CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
-        CLAY({ .id = CLAY_ID("Score"), .layout = {.padding = CLAY_PADDING_ALL(0)}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
-            static auto points_str = std::string{};
-            points_str = [this]()->std::string {
-                const auto player_score = GetGameAs<Game>()->GetPlayerScore();
-                const auto highscore = GetGameAs<Game>()->GetHighScore();
-                const auto wave = this->GetWaveId() + 1;
-                if (player_score > highscore) {
-                    return std::format("{} <- {}\nWave: {}", player_score, highscore, wave);
-                } else {
-                    return std::format("{} -> {}\nWave: {}", player_score, highscore, wave);
-                }
-            }();
-            Clay_TextElementConfig textConfig{};
-            textConfig.userData = g_theRenderer->GetFont("System32");
-            textConfig.textColor = Clay::RgbaToClayColor(Rgba::White);
-            textConfig.wrapMode = Clay_TextElementConfigWrapMode::CLAY_TEXT_WRAP_NEWLINES;
-            CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
-        }
+    CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha)}) {
+        RenderScoreElement();
     }
 }
 
 void EnemyWave::ClayPostwave() noexcept {
-    /* DO NOTHING */
+    CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha)}) {
+        RenderScoreElement();
+        RenderPostWaveStatsElement();
+    }
+}
+
+void EnemyWave::RenderPostWaveStatsElement() const noexcept {
+    const Clay_TextElementConfig textConfig{ .userData = g_theRenderer->GetFont("System32"), .textColor = Clay::RgbaToClayColor(this->GetObjectColor()) };
+    CLAY({ .id = CLAY_ID("PostwaveStatsContainer"), .layout = {.sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)}, .childGap = 0, .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_TOP}, .layoutDirection = Clay_LayoutDirection::CLAY_TOP_TO_BOTTOM,}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
+        CLAY({ .id = CLAY_ID("BonusPoints"), .layout = { .sizing = { .height = CLAY_SIZING_PERCENT(0.25f)}}}) {
+            CLAY_TEXT(CLAY_STRING_CONST("BONUS POINTS"), CLAY_TEXT_CONFIG(textConfig));
+        }
+        CLAY({ .id = CLAY_ID("UnusedMissilesContainer"), .layout = {.sizing = {}, .childGap = 16, .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_CENTER}, .layoutDirection = Clay_LayoutDirection::CLAY_LEFT_TO_RIGHT} }) {
+            CLAY({ .layout = {.sizing = {.width = CLAY_SIZING_PERCENT(0.10f)}} }) {
+                CLAY_TEXT(CLAY_STRING_CONST("MISSILES"), CLAY_TEXT_CONFIG(textConfig));
+            }
+            CLAY({ .id = CLAY_ID("MissileImagesContainer"), .layout = {.sizing = {}, .childGap = 8, .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_CENTER}, .layoutDirection = Clay_LayoutDirection::CLAY_LEFT_TO_RIGHT} }) {
+                for (std::size_t i = 0; i < this->GetRemainingMissiles(); ++i) {
+                    RenderMissileImageElements();
+                }
+            }
+        }
+        CLAY({.id = CLAY_ID("SavedCitiesContainer")}) {
+            CLAY({ .layout = {.sizing = {.width = CLAY_SIZING_PERCENT(0.10f)}} }) {
+                CLAY_TEXT(CLAY_STRING_CONST("CITIES"), CLAY_TEXT_CONFIG(textConfig));
+            }
+            CLAY({ .id = CLAY_ID("CitiesImagesContainer") }) {}
+        }
+    };
+}
+
+void EnemyWave::RenderMissileImageElements() const noexcept {
+    const auto player_color = []()->Rgba {
+        if (const auto* g = GetGameAs<Game>(); g != nullptr) {
+            if (auto* mainState = dynamic_cast<GameStateMain*>(g->GetCurrentState()); mainState != nullptr) {
+                return mainState->GetPlayerColor();
+            }
+            return Rgba::Black;
+        }
+        return Rgba::Black;
+        }();
+    const auto mat = g_theRenderer->GetMaterial("missile");
+    const auto dims = Clay::Vector2ToClayDimensions(Vector2(IntVector2(mat->GetTexture(Material::TextureID::Diffuse)->GetDimensions())));
+    CLAY({ .backgroundColor = Clay::RgbaToClayColor(player_color), .image = {.imageData = mat, .sourceDimensions = dims} }) {
+        RenderScoreElement();
+        RenderPostWaveStatsElement();
+    }
 }
 
 void EnemyWave::Render_Prewave() const noexcept {

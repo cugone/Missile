@@ -108,6 +108,11 @@ private:
     void UpdateSatellite(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void UpdateBomber(TimeUtils::FPSeconds deltaSeconds) noexcept;
 
+    void RenderScoreElement() const noexcept;
+    void RenderScoreMultiplierElement() const noexcept;
+    void RenderPostWaveStatsElement() const noexcept;
+    void RenderMissileImageElements() const noexcept;
+
     MissileManager m_missiles{};
     std::unique_ptr<Bomber> m_bomber{};
     std::unique_ptr<Satellite> m_satellite{};
