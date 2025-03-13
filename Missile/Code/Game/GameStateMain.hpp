@@ -34,6 +34,7 @@ public:
     void ResetMissileCount() noexcept;
 
     void DecrementTotalMissiles() noexcept;
+    int GetTotalMissiles() const noexcept;
 
     MissileManager& GetMissileManager() noexcept;
     const ExplosionManager& GetExplosionManager() const noexcept;

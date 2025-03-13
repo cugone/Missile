@@ -259,6 +259,10 @@ void GameStateMain::DecrementTotalMissiles() noexcept {
     }
 }
 
+int GameStateMain::GetTotalMissiles() const noexcept {
+    return m_missileBaseLeft.GetMissilesRemaining() + m_missileBaseCenter.GetMissilesRemaining() + m_missileBaseRight.GetMissilesRemaining();
+}
+
 void GameStateMain::HandleMissileExplosionCollisions(MissileManager& missileManager) noexcept {
     const auto& missiles = missileManager.GetMissilePositions();
     const auto& explosions = m_explosionManager.GetExplosionCollisionMeshes();
