@@ -87,7 +87,6 @@ private:
     void RenderCrosshairAt(Vector2 pos) const noexcept;
     void RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept;
     void RenderRadarLine() const noexcept;
-    void RenderHighscoreAndWave() const noexcept;
 
     OrthographicCameraController m_cameraController{};
     mutable OrthographicCameraController m_ui_camera{};
