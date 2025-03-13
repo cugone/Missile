@@ -289,8 +289,10 @@ void EnemyWave::Render_Inactive() const noexcept {
 
 static Clay_LayoutConfig fullscreen_layout = {
     .sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)},
-    .padding = CLAY_PADDING_ALL(16),
-    .childGap = 16
+    .padding = CLAY_PADDING_ALL(0),
+    .childGap = 0,
+    .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_TOP},
+    .layoutDirection = Clay_LayoutDirection::CLAY_TOP_TO_BOTTOM,
 };
 
 void EnemyWave::ClayPrewave() noexcept {
