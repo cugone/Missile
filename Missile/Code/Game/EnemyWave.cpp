@@ -157,28 +157,23 @@ void EnemyWave::BeginFrame_Postwave() noexcept {
                 g->AdjustPlayerScore(GameConstants::saved_city_value * GetScoreMultiplier());
                 main_state->GetCityManager().GetCity(0).Kill();
                 g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
-            }
-            if(main_state->GetCityManager().GetCity(1).IsDead() == false) {
+            } else if (main_state->GetCityManager().GetCity(1).IsDead() == false) {
                 g->AdjustPlayerScore(GameConstants::saved_city_value * GetScoreMultiplier());
                 main_state->GetCityManager().GetCity(1).Kill();
                 g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
-            }
-            if(main_state->GetCityManager().GetCity(2).IsDead() == false) {
+            } else if (main_state->GetCityManager().GetCity(2).IsDead() == false) {
                 g->AdjustPlayerScore(GameConstants::saved_city_value * GetScoreMultiplier());
                 main_state->GetCityManager().GetCity(2).Kill();
                 g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
-            }
-            if(main_state->GetCityManager().GetCity(3).IsDead() == false) {
+            } else if (main_state->GetCityManager().GetCity(3).IsDead() == false) {
                 g->AdjustPlayerScore(GameConstants::saved_city_value * GetScoreMultiplier());
                 main_state->GetCityManager().GetCity(3).Kill();
                 g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
-            }
-            if(main_state->GetCityManager().GetCity(4).IsDead() == false) {
+            } else if (main_state->GetCityManager().GetCity(4).IsDead() == false) {
                 g->AdjustPlayerScore(GameConstants::saved_city_value * GetScoreMultiplier());
                 main_state->GetCityManager().GetCity(4).Kill();
                 g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
-            }
-            if(main_state->GetCityManager().GetCity(5).IsDead() == false) {
+            } else if(main_state->GetCityManager().GetCity(5).IsDead() == false) {
                 g->AdjustPlayerScore(GameConstants::saved_city_value * GetScoreMultiplier());
                 main_state->GetCityManager().GetCity(5).Kill();
                 g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
