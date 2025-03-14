@@ -71,3 +71,7 @@ bool City::IsDead() const noexcept {
 void City::Kill() noexcept {
     m_health = 0;
 }
+
+void City::Resurrect() noexcept {
+    m_health = 1;
+}
