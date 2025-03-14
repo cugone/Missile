@@ -142,53 +142,50 @@ void EnemyWave::BeginFrame_Active() noexcept {
 }
 
 void EnemyWave::BeginFrame_Postwave() noexcept {
-    static int wave_bonus = 0;
     auto* g = GetGameAs<Game>();
     auto* state = g->GetCurrentState();
     auto* main_state = dynamic_cast<GameStateMain*>(state);
     if(main_state->HasMissilesRemaining()) {
         if(m_postWaveIncrementRate.CheckAndReset()) {
-            wave_bonus += GameConstants::unused_missile_value * GetScoreMultiplier();
+            g->AdjustPlayerScore(GameConstants::unused_missile_value * GetScoreMultiplier());
             main_state->DecrementTotalMissiles();
             g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
         }
     } else if(main_state->GetCityManager().RemainingCities()) {
         if(m_postWaveIncrementRate.CheckAndReset()) {
             if(main_state->GetCityManager().GetCity(0).IsDead() == false) {
-                wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                g->AdjustPlayerScore(GameConstants::saved_city_value * GetScoreMultiplier());
                 main_state->GetCityManager().GetCity(0).Kill();
                 g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
             }
             if(main_state->GetCityManager().GetCity(1).IsDead() == false) {
-                wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                g->AdjustPlayerScore(GameConstants::saved_city_value * GetScoreMultiplier());
                 main_state->GetCityManager().GetCity(1).Kill();
                 g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
             }
             if(main_state->GetCityManager().GetCity(2).IsDead() == false) {
-                wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                g->AdjustPlayerScore(GameConstants::saved_city_value * GetScoreMultiplier());
                 main_state->GetCityManager().GetCity(2).Kill();
                 g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
             }
             if(main_state->GetCityManager().GetCity(3).IsDead() == false) {
-                wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                g->AdjustPlayerScore(GameConstants::saved_city_value * GetScoreMultiplier());
                 main_state->GetCityManager().GetCity(3).Kill();
                 g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
             }
             if(main_state->GetCityManager().GetCity(4).IsDead() == false) {
-                wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                g->AdjustPlayerScore(GameConstants::saved_city_value * GetScoreMultiplier());
                 main_state->GetCityManager().GetCity(4).Kill();
                 g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
             }
             if(main_state->GetCityManager().GetCity(5).IsDead() == false) {
-                wave_bonus += GameConstants::saved_city_value * GetScoreMultiplier();
+                g->AdjustPlayerScore(GameConstants::saved_city_value * GetScoreMultiplier());
                 main_state->GetCityManager().GetCity(5).Kill();
                 g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
             }
         }
     } else {
         if (m_postWaveTimer.CheckAndReset()) {
-            g->GetPlayerData()->score += wave_bonus;
-            wave_bonus = 0;
             IncrementWave();
             ChangeState(EnemyWave::State::Prewave);
         }
