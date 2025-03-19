@@ -44,8 +44,16 @@ void CityManager::RedeemBonusCIty() noexcept {
     m_bonusCities -= 1;
 }
 
-std::size_t CityManager::RemainingCities() const noexcept {
+std::size_t CityManager::RemainingCitiesCount() const noexcept {
     return std::count_if(std::cbegin(m_cities), std::cend(m_cities), [](const City& city) { return !city.IsDead(); });
+}
+
+std::bitset<6> CityManager::RemainingCities() const noexcept {
+    auto result = std::bitset<6>{0x3FULL};
+    for(std::size_t i = 0; i < m_cities.size(); ++i) {
+         result[i] = m_cities[i].IsAlive();
+    }
+    return result;
 }
 
 const City& CityManager::GetCity(std::size_t index) const noexcept {

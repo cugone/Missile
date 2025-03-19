@@ -68,6 +68,10 @@ bool City::IsDead() const noexcept {
     return m_health < 1;
 }
 
+bool City::IsAlive() const noexcept {
+    return !IsDead();
+}
+
 void City::Kill() noexcept {
     m_health = 0;
 }

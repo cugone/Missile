@@ -29,6 +29,8 @@ public:
 
     bool IsDead() const noexcept;
     void Kill() noexcept;
+
+    bool IsAlive() const noexcept;
     void Resurrect() noexcept;
 
 protected:

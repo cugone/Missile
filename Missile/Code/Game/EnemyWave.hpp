@@ -107,6 +107,7 @@ private:
     void RenderScoreElement() const noexcept;
     void RenderScoreMultiplierElement() const noexcept;
     void RenderPostWaveStatsElement() const noexcept;
+    void RenderCityImageElements() const noexcept;
     void RenderMissileImageElements() const noexcept;
 
     MissileManager m_missiles{};
@@ -115,12 +116,15 @@ private:
     Stopwatch m_missileSpawnRate{};
     Stopwatch m_flierSpawnRate{};
     Stopwatch m_preWaveTimer{5.0f};
-    Stopwatch m_postWaveIncrementRate{0.33f};
+    mutable Stopwatch m_postWaveIncrementRate{0.33f};
     Stopwatch m_postWaveTimer{5.0f};
     std::size_t m_waveId{ 0 };
-    std::size_t m_postWaveCityCount{6};
     int m_missileCount{};
+    int m_missilesRemainingPostWave{};
+    std::size_t m_citiesRemainingPostWave{};
     State m_currentState{State::Inactive};
     State m_nextState{State::Inactive};
     bool m_isActive{false};
+    bool m_grantedCityThisWave{false};
+    bool m_showBonusCityText{false};
 };
