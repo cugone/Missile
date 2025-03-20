@@ -623,7 +623,7 @@ TimeUtils::FPSeconds EnemyWave::GetMissileImpactTime() const noexcept {
 }
 
 int EnemyWave::GetMissileCount() const noexcept {
-    return m_waveId < GameConstants::wave_missile_count_lookup.size() ? GameConstants::wave_missile_count_lookup[m_waveId] : GameConstants::max_missile_count;
+    return m_waveId < GameConstants::wave_missile_count_lookup.size() ? GameConstants::wave_missile_count_lookup[m_waveId] : GameConstants::max_enemy_missile_count;
 }
 
 void EnemyWave::SetMissileSpawnRate(TimeUtils::FPSeconds secondsBetween) noexcept {
