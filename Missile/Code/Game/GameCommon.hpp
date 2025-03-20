@@ -19,6 +19,7 @@ namespace GameConstants {
     constexpr const int max_explosion_sounds{5};
     constexpr const int max_score_multiplier{6};
     constexpr const int max_missile_count{20};
+    constexpr const int max_player_missile_count{30};
     constexpr const int max_smartbomb_count{7};
     constexpr const int max_missles_on_screen{4};
     constexpr const int max_cities{6};

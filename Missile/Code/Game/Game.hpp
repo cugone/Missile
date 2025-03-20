@@ -43,6 +43,7 @@ protected:
 
 struct Player {
     int score{ 0ull };
+    int scoreRemainingForBonusCity{10000};
 };
 
 class Game : public GameBase {

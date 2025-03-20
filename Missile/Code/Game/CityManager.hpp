@@ -5,6 +5,7 @@
 #include "Game/City.hpp"
 
 #include <array>
+#include <bitset>
 
 class CityManager {
 public:
@@ -19,7 +20,8 @@ public:
     void GrantBonusCIty() noexcept;
     void RedeemBonusCIty() noexcept;
 
-    std::size_t RemainingCities() const noexcept;
+    std::size_t RemainingCitiesCount() const noexcept;
+    std::bitset<6> RemainingCities() const noexcept;
 
     const City& GetCity(std::size_t index) const noexcept;
     City& GetCity(std::size_t index) noexcept;

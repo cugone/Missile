@@ -259,6 +259,10 @@ void GameStateMain::DecrementTotalMissiles() noexcept {
     }
 }
 
+int GameStateMain::GetTotalMissiles() const noexcept {
+    return m_missileBaseLeft.GetMissilesRemaining() + m_missileBaseCenter.GetMissilesRemaining() + m_missileBaseRight.GetMissilesRemaining();
+}
+
 void GameStateMain::HandleMissileExplosionCollisions(MissileManager& missileManager) noexcept {
     const auto& missiles = missileManager.GetMissilePositions();
     const auto& explosions = m_explosionManager.GetExplosionCollisionMeshes();
@@ -415,31 +419,20 @@ void GameStateMain::RenderRadarLine() const noexcept {
     }
 }
 
-void GameStateMain::RenderHighscoreAndWave() const noexcept {
-    const auto highscore_line = [this]()-> std::string {
-        if(auto* g = GetGameAs<Game>(); g != nullptr) {
-            if (g->GetPlayerScore() < g->GetHighScore()) {
-                return std::format("{} -> {}\nWave: {}", g->GetPlayerScore(), g->GetHighScore(), std::size_t{ 1u } + this->GetWaveId());
-            } else {
-                return std::format("{} <- {}\nWave: {}", g->GetPlayerScore(), g->GetHighScore(), std::size_t{1u} + this->GetWaveId());
-            }
-        }
-        return std::string{"ERROR RENDERING HIGHSCORE"};
-    }();
-
-    const auto* font = g_theRenderer->GetFont("System32");
-    const auto top = m_ui_camera.CalcViewBounds().mins.y;
-    const auto font_width = font->CalculateTextWidth(highscore_line);
-    const auto S = Matrix4::I;
-    const auto R = Matrix4::I;
-    const auto T = Matrix4::CreateTranslationMatrix(Vector2{ font_width * -0.5f, top });
-    const auto M = Matrix4::MakeSRT(S, R, T);
-    g_theRenderer->SetModelMatrix(M);
-    g_theRenderer->DrawMultilineText(font, highscore_line);
-}
-
 std::size_t GameStateMain::GetWaveId() const noexcept {
     return m_waves.GetWaveId();
+}
+
+Rgba GameStateMain::GetGroundColor() const noexcept {
+    auto* g = GetGameAs<Game>();
+    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+    return Rgba(GameConstants::wave_ground_color_lookup[state->GetWaveId() % GameConstants::wave_array_size]);
+}
+
+Rgba GameStateMain::GetPlayerColor() const noexcept {
+    auto* g = GetGameAs<Game>();
+    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+    return Rgba(GameConstants::wave_player_color_lookup[state->GetWaveId() % GameConstants::wave_array_size]);
 }
 
 const OrthographicCameraController& GameStateMain::GetCameraController() const noexcept {

@@ -34,6 +34,7 @@ public:
     void ResetMissileCount() noexcept;
 
     void DecrementTotalMissiles() noexcept;
+    int GetTotalMissiles() const noexcept;
 
     MissileManager& GetMissileManager() noexcept;
     const ExplosionManager& GetExplosionManager() const noexcept;
@@ -44,6 +45,9 @@ public:
 
     void CreateExplosionAt(Vector2 position, Faction faction) noexcept;
     std::size_t GetWaveId() const noexcept;
+
+    Rgba GetGroundColor() const noexcept;
+    Rgba GetPlayerColor() const noexcept;
 
     const OrthographicCameraController& GetCameraController() const noexcept;
     OrthographicCameraController& GetCameraController() noexcept;
@@ -87,7 +91,6 @@ private:
     void RenderCrosshairAt(Vector2 pos) const noexcept;
     void RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept;
     void RenderRadarLine() const noexcept;
-    void RenderHighscoreAndWave() const noexcept;
 
     OrthographicCameraController m_cameraController{};
     mutable OrthographicCameraController m_ui_camera{};
