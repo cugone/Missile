@@ -120,6 +120,10 @@ void MissileBase::ResetMissiles() noexcept {
     m_missilesRemaining = m_maxMissiles;
 }
 
+int MissileBase::GetMissilesRemaining() const noexcept {
+    return m_missilesRemaining;
+}
+
 const MissileManager& MissileBase::GetMissileManager() const noexcept {
     return m_missileManager;
 }
@@ -154,9 +158,7 @@ void MissileBase::RenderRemainingMissiles() const noexcept {
     g_theRenderer->SetMaterial(mat);
     const auto s = missilePositions.size();
     const auto idx = s - m_missilesRemaining;
-    auto* g = GetGameAs<Game>();
-    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
-    const auto color = Rgba(GameConstants::wave_player_color_lookup[state->GetWaveId() % GameConstants::wave_array_size]);
+    const auto color = GetMissileColor();
     for (std::size_t i = idx; i < s; ++i) {
         const auto T = Matrix4::CreateTranslationMatrix(missilePositions[i]);
         const auto M = Matrix4::MakeSRT(S, R, T);

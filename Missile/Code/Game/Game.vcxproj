@@ -200,6 +200,8 @@
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\..\Run_x64\Data\Audio\Bomber.wav" />
+    <Media Include="..\..\Run_x64\Data\Audio\BonusCity.wav" />
+    <Media Include="..\..\Run_x64\Data\Audio\Counting.wav" />
     <Media Include="..\..\Run_x64\Data\Audio\Explosion0.wav" />
     <Media Include="..\..\Run_x64\Data\Audio\Explosion1.wav" />
     <Media Include="..\..\Run_x64\Data\Audio\Explosion2.wav" />

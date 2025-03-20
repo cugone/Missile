@@ -64,10 +64,13 @@ public:
     bool CanSpawnMissile() const noexcept;
     bool LaunchMissileFrom(Vector2 position) noexcept;
 
-    void SetState(State newState) noexcept;
-
+    void ChangeState(State newState) noexcept;
 protected:
 private:
+
+    void ClayPrewave() noexcept;
+    void ClayActive() noexcept;
+    void ClayPostwave() noexcept;
 
     bool CanSpawnFlier() const noexcept;
     void AdvanceToNextWave() noexcept;
@@ -101,12 +104,27 @@ private:
     void UpdateSatellite(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void UpdateBomber(TimeUtils::FPSeconds deltaSeconds) noexcept;
 
+    void RenderScoreElement() const noexcept;
+    void RenderScoreMultiplierElement() const noexcept;
+    void RenderPostWaveStatsElement() const noexcept;
+    void RenderCityImageElements() const noexcept;
+    void RenderMissileImageElements() const noexcept;
+
     MissileManager m_missiles{};
     std::unique_ptr<Bomber> m_bomber{};
     std::unique_ptr<Satellite> m_satellite{};
     Stopwatch m_missileSpawnRate{};
     Stopwatch m_flierSpawnRate{};
+    Stopwatch m_preWaveTimer{5.0f};
+    mutable Stopwatch m_postWaveIncrementRate{0.33f};
+    Stopwatch m_postWaveTimer{5.0f};
     std::size_t m_waveId{ 0 };
     int m_missileCount{};
-    State m_state{State::Inactive};
+    int m_missilesRemainingPostWave{};
+    std::size_t m_citiesRemainingPostWave{};
+    State m_currentState{State::Inactive};
+    State m_nextState{State::Inactive};
+    bool m_isActive{false};
+    bool m_grantedCityThisWave{false};
+    bool m_showBonusCityText{false};
 };

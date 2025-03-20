@@ -33,6 +33,7 @@ public:
     void DecrementMissiles() noexcept;
     void IncrementMissiles() noexcept;
     void ResetMissiles() noexcept;
+    int GetMissilesRemaining() const noexcept;
 
     const MissileManager& GetMissileManager() const noexcept;
     MissileManager& GetMissileManager() noexcept;

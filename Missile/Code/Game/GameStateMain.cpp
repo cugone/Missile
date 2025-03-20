@@ -29,10 +29,12 @@ void GameStateMain::OnEnter() noexcept {
     m_world_bounds.ScalePadding(dims.x, dims.y);
     m_world_bounds.Translate(-m_world_bounds.CalcCenter());
 
-    m_cameraController = OrthographicCameraController{};
+    m_cameraController = OrthographicCameraController{ OrthographicCameraController::Options{.lockInput = true, .lockTranslation = true, .lockZoom = true}};
     m_cameraController.SetPosition(m_world_bounds.CalcCenter());
     m_cameraController.SetZoomLevelRange(Vector2{ 8.0f, 450.0f });
     m_cameraController.SetZoomLevel(450.0f);
+
+    m_ui_camera = m_cameraController;
 
     g_theInputSystem->SetCursorToWindowCenter();
     m_mouse_delta = Vector2::Zero;
@@ -66,7 +68,7 @@ void GameStateMain::OnEnter() noexcept {
 
     m_waves.SetMissileCount(m_waves.GetMissileCount());
     m_waves.SetMissileSpawnRate(TimeUtils::FPSeconds{ 1.0f });
-    m_waves.ActivateWave();
+    m_waves.ChangeState(EnemyWave::State::Prewave);
 
     auto desc = AudioSystem::SoundDesc{};
     desc.loopCount = 6;
@@ -93,7 +95,7 @@ void GameStateMain::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) n
     HandleDebugInput(deltaSeconds);
     HandlePlayerInput(deltaSeconds);
 
-    m_ui_camera2D.Update(deltaSeconds);
+    m_ui_camera.Update(deltaSeconds);
     m_cameraController.Update(deltaSeconds);
 
     CalculateCrosshairLocation();
@@ -204,7 +206,15 @@ const std::array<MissileManager::Target, 9> GameStateMain::GetValidTargets() con
 }
 
 Vector2 GameStateMain::CalcCrosshairPositionFromRawMousePosition() noexcept {
-    return g_theRenderer->ConvertScreenToWorldCoords(m_cameraController.GetCamera(), m_mouse_pos);
+    return m_cameraController.ConvertScreenToWorldCoords(m_mouse_pos);
+}
+
+const CityManager& GameStateMain::GetCityManager() const noexcept {
+    return m_cityManager;
+}
+
+CityManager& GameStateMain::GetCityManager() noexcept {
+    return m_cityManager;
 }
 
 void GameStateMain::CreateExplosionAt(Vector2 position, Faction faction) noexcept {
@@ -235,6 +245,22 @@ void GameStateMain::ResetMissileCount() noexcept {
     m_missileBaseLeft.ResetMissiles();
     m_missileBaseCenter.ResetMissiles();
     m_missileBaseRight.ResetMissiles();
+}
+
+void GameStateMain::DecrementTotalMissiles() noexcept {
+    if(m_missileBaseLeft.HasMissilesRemaining()) {
+        m_missileBaseLeft.DecrementMissiles();
+    } else if(m_missileBaseCenter.HasMissilesRemaining()) {
+        m_missileBaseCenter.DecrementMissiles();
+    } else if(m_missileBaseRight.HasMissilesRemaining()) {
+        m_missileBaseRight.DecrementMissiles();
+    } else {
+        /* DO NOTHING */
+    }
+}
+
+int GameStateMain::GetTotalMissiles() const noexcept {
+    return m_missileBaseLeft.GetMissilesRemaining() + m_missileBaseCenter.GetMissilesRemaining() + m_missileBaseRight.GetMissilesRemaining();
 }
 
 void GameStateMain::HandleMissileExplosionCollisions(MissileManager& missileManager) noexcept {
@@ -387,42 +413,34 @@ void GameStateMain::RenderRadarLine() const noexcept {
         cull.maxs.y -= GameConstants::radar_line_distance;
         const auto t = g_theRenderer->GetGameTime().count();
         const auto alpha = MathUtils::SineWave(t, TimeUtils::FPSeconds{ 1.0f });
-        const auto color = [this, alpha]() {
-            if (const auto id = this->GetWaveId() % GameConstants::wave_array_size; id != GameConstants::wave_array_size - 1 && id != GameConstants::wave_array_size - 2) {
-                return Rgba{ 1.0f, 0.0f, 0.0f, alpha };
-            } else {
-                return Rgba{ 0.0f, 0.0f, 0.0f, alpha };
-            }
-            }();
+        auto color = Rgba(GameConstants::wave_player_color_lookup[this->GetWaveId() % GameConstants::wave_array_size]);
+        color.ScaleAlpha(alpha);
         g_theRenderer->DrawLine2D(Vector2{ cull.mins.x, cull.maxs.y }, Vector2{ cull.maxs.x, cull.maxs.y }, color);
     }
 }
 
-void GameStateMain::RenderHighscoreAndWave() const noexcept {
-    const auto highscore_line = [this]()-> std::string {
-        if(auto* g = GetGameAs<Game>(); g != nullptr) {
-            if (g->GetPlayerScore() < g->GetHighScore()) {
-                return std::format("{} -> {}\nWave: {}", g->GetPlayerScore(), g->GetHighScore(), std::size_t{ 1u } + this->GetWaveId());
-            } else {
-                return std::format("{} <- {}\nWave: {}", g->GetPlayerScore(), g->GetHighScore(), std::size_t{1u} + this->GetWaveId());
-            }
-        }
-        return std::string{"ERROR RENDERING HIGHSCORE"};
-    }();
-
-    const auto* font = g_theRenderer->GetFont("System32");
-    const auto top = m_cameraController.CalcViewBounds().mins.y;
-    const auto font_width = font->CalculateTextWidth(highscore_line);
-    const auto S = Matrix4::I;
-    const auto R = Matrix4::I;
-    const auto T = Matrix4::CreateTranslationMatrix(Vector2{ font_width * -0.5f, top });
-    const auto M = Matrix4::MakeSRT(S, R, T);
-    g_theRenderer->SetModelMatrix(M);
-    g_theRenderer->DrawMultilineText(font, highscore_line);
-}
-
 std::size_t GameStateMain::GetWaveId() const noexcept {
     return m_waves.GetWaveId();
+}
+
+Rgba GameStateMain::GetGroundColor() const noexcept {
+    auto* g = GetGameAs<Game>();
+    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+    return Rgba(GameConstants::wave_ground_color_lookup[state->GetWaveId() % GameConstants::wave_array_size]);
+}
+
+Rgba GameStateMain::GetPlayerColor() const noexcept {
+    auto* g = GetGameAs<Game>();
+    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+    return Rgba(GameConstants::wave_player_color_lookup[state->GetWaveId() % GameConstants::wave_array_size]);
+}
+
+const OrthographicCameraController& GameStateMain::GetCameraController() const noexcept {
+    return m_cameraController;
+}
+
+OrthographicCameraController& GameStateMain::GetCameraController() noexcept {
+    return m_cameraController;
 }
 
 void GameStateMain::HandleDebugInput(TimeUtils::FPSeconds deltaSeconds) {
@@ -436,6 +454,9 @@ void GameStateMain::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds
     }
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::F4)) {
         g_theUISystem->ToggleImguiDemoWindow();
+    }
+    if (g_theInputSystem->WasKeyJustPressed(KeyCode::F1)) {
+        g_theUISystem->ToggleClayDebugWindow();
     }
 }
 
@@ -456,23 +477,28 @@ void GameStateMain::Render() const noexcept {
     //2D World / HUD View
     if(auto* g = GetGameAs<Game>(); g != nullptr) {
         const auto ui_view_height = static_cast<float>(g->GetSettings()->GetWindowHeight());
-        const auto ui_view_width = ui_view_height * m_ui_camera2D.GetAspectRatio();
+        const auto ui_view_width = ui_view_height * m_ui_camera.GetAspectRatio();
         const auto ui_view_extents = Vector2{ ui_view_width, ui_view_height };
         const auto ui_view_half_extents = ui_view_extents * 0.5f;
-        const auto ui_cam_pos = Vector2::Zero;
-        g_theRenderer->BeginHUDRender(m_ui_camera2D, ui_cam_pos, ui_view_height);
+        const auto ui_cam_pos = m_ui_camera.CalcViewBounds().CalcCenter();
+
+        g_theRenderer->BeginHUDRender(m_ui_camera.GetCamera(), ui_cam_pos, ui_view_height);
 
         RenderGround();
         RenderObjects();
         RenderCrosshairAt(m_mouse_world_pos);
         RenderRadarLine();
-        RenderHighscoreAndWave();
     }
 }
 
 void GameStateMain::EndFrame() noexcept {
     m_mouse_pos += m_mouse_delta;
-    g_theInputSystem->SetCursorToWindowCenter();
+    if (!g_theUISystem->IsAnyDebugWindowVisible()) {
+        g_theInputSystem->SetCursorToWindowCenter();
+        if (g_theInputSystem->IsMouseCursorVisible()) {
+            g_theInputSystem->HideMouseCursor();
+        }
+    }
     m_mouse_delta = Vector2::Zero;
     m_missileBaseLeft.EndFrame();
     m_missileBaseCenter.EndFrame();

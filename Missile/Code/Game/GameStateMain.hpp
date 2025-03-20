@@ -33,12 +33,24 @@ public:
     bool HasMissilesRemaining() const noexcept;
     void ResetMissileCount() noexcept;
 
+    void DecrementTotalMissiles() noexcept;
+    int GetTotalMissiles() const noexcept;
+
     MissileManager& GetMissileManager() noexcept;
     const ExplosionManager& GetExplosionManager() const noexcept;
     ExplosionManager& GetExplosionManager() noexcept;
 
+    const CityManager& GetCityManager() const noexcept;
+    CityManager& GetCityManager() noexcept;
+
     void CreateExplosionAt(Vector2 position, Faction faction) noexcept;
     std::size_t GetWaveId() const noexcept;
+
+    Rgba GetGroundColor() const noexcept;
+    Rgba GetPlayerColor() const noexcept;
+
+    const OrthographicCameraController& GetCameraController() const noexcept;
+    OrthographicCameraController& GetCameraController() noexcept;
 
 protected:
 private:
@@ -79,10 +91,9 @@ private:
     void RenderCrosshairAt(Vector2 pos) const noexcept;
     void RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept;
     void RenderRadarLine() const noexcept;
-    void RenderHighscoreAndWave() const noexcept;
 
-    mutable Camera2D m_ui_camera2D{};
     OrthographicCameraController m_cameraController{};
+    mutable OrthographicCameraController m_ui_camera{};
     EnemyWave m_waves{};
     MissileBase m_missileBaseLeft{};
     MissileBase m_missileBaseCenter{};

@@ -19,6 +19,7 @@ namespace GameConstants {
     constexpr const int max_explosion_sounds{5};
     constexpr const int max_score_multiplier{6};
     constexpr const int max_missile_count{20};
+    constexpr const int max_player_missile_count{30};
     constexpr const int max_smartbomb_count{7};
     constexpr const int max_missles_on_screen{4};
     constexpr const int max_cities{6};
@@ -53,4 +54,6 @@ namespace GameConstants {
     const std::filesystem::path game_audio_satellite_path{game_audio_folder / std::filesystem::path{"Satellite.wav"}};
     const std::filesystem::path game_audio_nomissiles_path{game_audio_folder / std::filesystem::path{"NoMissiles.wav"}};
     const std::filesystem::path game_audio_lowmissiles_path{game_audio_folder / std::filesystem::path{"LowMissiles.wav"}};
+    const std::filesystem::path game_audio_counting_path{game_audio_folder / std::filesystem::path{"Counting.wav"}};
+    const std::filesystem::path game_audio_bonuscity_path{game_audio_folder / std::filesystem::path{"BonusCity.wav"}};
 };

@@ -43,6 +43,7 @@ protected:
 
 struct Player {
     int score{ 0ull };
+    int scoreRemainingForBonusCity{10000};
 };
 
 class Game : public GameBase {
@@ -80,8 +81,6 @@ private:
 
     void LoadOrCreateConfigFile() noexcept;
 
-    mutable Camera2D m_ui_camera2D{};
-    OrthographicCameraController m_cameraController{};
     int m_currentHighScore{ GameConstants::default_highscore };
     MySettings m_mySettings{};
     std::unique_ptr<GameState> m_currentState{std::make_unique<GameStateTitle>()};

@@ -117,6 +117,13 @@ int Game::GetPlayerScore() const noexcept {
 
 void Game::AdjustPlayerScore(int scoreToAdd) noexcept {
     m_playerData.score += scoreToAdd;
+    m_playerData.scoreRemainingForBonusCity -= scoreToAdd;
+    if(m_playerData.scoreRemainingForBonusCity <= 0) {
+        if (auto* main_state = dynamic_cast<GameStateMain*>(this->GetCurrentState()); main_state != nullptr) {
+            m_playerData.scoreRemainingForBonusCity = MathUtils::Wrap(m_playerData.scoreRemainingForBonusCity, 0, 10000);
+            main_state->GetCityManager().GrantBonusCIty();
+        }
+    }
 }
 
 int Game::GetHighScore() const noexcept {

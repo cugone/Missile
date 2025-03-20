@@ -30,9 +30,6 @@ void City::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
 }
 
 void City::Render() const noexcept {
-    g_theRenderer->SetModelMatrix();
-    g_theRenderer->SetMaterial("__2D");
-
     auto* mat = g_theRenderer->GetMaterial("city");
     auto* tex = mat->GetTexture(Material::TextureID::Diffuse);
     const auto&& [x, y, _] = tex->GetDimensions().GetXYZ();
@@ -60,7 +57,7 @@ void City::EndFrame() noexcept {
 Rgba City::GetCityColor() const noexcept {
     auto* g = GetGameAs<Game>();
     auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
-    return IsDead() ? Rgba(GameConstants::wave_ground_color_lookup[state->GetWaveId() % GameConstants::wave_array_size]) : Rgba(GameConstants::wave_player_color_lookup[state->GetWaveId() % GameConstants::wave_array_size]);
+    return IsDead() ? state->GetGroundColor() : state->GetPlayerColor();
 }
 
 AABB2 City::GetCollisionMesh() const noexcept {
@@ -71,6 +68,14 @@ bool City::IsDead() const noexcept {
     return m_health < 1;
 }
 
+bool City::IsAlive() const noexcept {
+    return !IsDead();
+}
+
 void City::Kill() noexcept {
     m_health = 0;
+}
+
+void City::Resurrect() noexcept {
+    m_health = 1;
 }
