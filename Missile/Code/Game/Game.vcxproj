@@ -152,6 +152,9 @@
     <ClCompile Include="CityManager.cpp" />
     <ClCompile Include="EnemyWave.cpp" />
     <ClCompile Include="EnemyWaveState.cpp" />
+    <ClCompile Include="EnemyWaveStateActive.cpp" />
+    <ClCompile Include="EnemyWaveStatePostwave.cpp" />
+    <ClCompile Include="EnemyWaveStatePrewave.cpp" />
     <ClCompile Include="Explosion.cpp" />
     <ClCompile Include="ExplosionManager.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -173,6 +176,9 @@
     <ClInclude Include="CityManager.hpp" />
     <ClInclude Include="EnemyWave.hpp" />
     <ClInclude Include="EnemyWaveState.hpp" />
+    <ClInclude Include="EnemyWaveStateActive.hpp" />
+    <ClInclude Include="EnemyWaveStatePostwave.hpp" />
+    <ClInclude Include="EnemyWaveStatePrewave.hpp" />
     <ClInclude Include="Explosion.hpp" />
     <ClInclude Include="ExplosionManager.hpp" />
     <ClInclude Include="Game.hpp" />
