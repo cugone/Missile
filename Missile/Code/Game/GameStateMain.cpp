@@ -68,12 +68,12 @@ void GameStateMain::OnEnter() noexcept {
 
     m_waves.SetMissileCount(m_waves.GetMissileCount());
     m_waves.SetMissileSpawnRate(TimeUtils::FPSeconds{ 1.0f });
-    m_waves.ChangeState(EnemyWave::State::Postwave);
+    m_waves.ChangeState(EnemyWave::State::Prewave);
 
     auto desc = AudioSystem::SoundDesc{};
     desc.loopCount = 6;
     desc.stopWhenFinishedLooping = true;
-    //g_theAudioSystem->Play(GameConstants::game_audio_klaxon_path, desc);
+    g_theAudioSystem->Play(GameConstants::game_audio_klaxon_path, desc);
 }
 
 void GameStateMain::OnExit() noexcept {
