@@ -85,6 +85,9 @@
     <ClCompile Include="GameState.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="EnemyWaveState.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameCommon.hpp">
@@ -139,6 +142,9 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="GameStateTitle.hpp">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyWaveState.hpp">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

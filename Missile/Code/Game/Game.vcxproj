@@ -151,6 +151,7 @@
     <ClCompile Include="City.cpp" />
     <ClCompile Include="CityManager.cpp" />
     <ClCompile Include="EnemyWave.cpp" />
+    <ClCompile Include="EnemyWaveState.cpp" />
     <ClCompile Include="Explosion.cpp" />
     <ClCompile Include="ExplosionManager.cpp" />
     <ClCompile Include="Game.cpp" />
@@ -171,6 +172,7 @@
     <ClInclude Include="City.hpp" />
     <ClInclude Include="CityManager.hpp" />
     <ClInclude Include="EnemyWave.hpp" />
+    <ClInclude Include="EnemyWaveState.hpp" />
     <ClInclude Include="Explosion.hpp" />
     <ClInclude Include="ExplosionManager.hpp" />
     <ClInclude Include="Game.hpp" />
