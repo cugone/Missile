@@ -67,9 +67,9 @@ void GameStateMain::OnEnter() noexcept {
 
     auto right_center_displacement = m_missileBaseCenter.GetMissileLauncherPosition() - m_missileBaseRight.GetMissileLauncherPosition();
     const auto right_len = right_center_displacement.Normalize();
-    m_cityManager.GetCity(3).SetPosition(m_missileBaseRight.GetMissileLauncherPosition() + right_center_displacement * right_len * 0.25f);
+    m_cityManager.GetCity(3).SetPosition(m_missileBaseRight.GetMissileLauncherPosition() + right_center_displacement * right_len * 0.75f);
     m_cityManager.GetCity(4).SetPosition(m_missileBaseRight.GetMissileLauncherPosition() + right_center_displacement * right_len * 0.50f);
-    m_cityManager.GetCity(5).SetPosition(m_missileBaseRight.GetMissileLauncherPosition() + right_center_displacement * right_len * 0.75f);
+    m_cityManager.GetCity(5).SetPosition(m_missileBaseRight.GetMissileLauncherPosition() + right_center_displacement * right_len * 0.25f);
 
     m_waves.SetMissileCount(m_waves.GetMissileCountForWave());
     m_waves.SetMissileSpawnRate(TimeUtils::FPSeconds{ 1.0f });

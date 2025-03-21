@@ -57,7 +57,7 @@ void EnemyWaveStatePostwave::OnExit() noexcept {
     auto* state = g->GetCurrentState();
     auto* main_state = dynamic_cast<GameStateMain*>(state);
     if (m_grantedCityThisWave) {
-        main_state->GetCityManager().RedeemBonusCIty();
+        main_state->GetCityManager().RedeemBonusCity();
         if (std::any_of(std::begin(m_alive_cities), std::end(m_alive_cities), [](bool a) { return a == false; })) {
             auto i = MathUtils::GetRandomLessThan(m_alive_cities.size());
             do {
