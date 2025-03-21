@@ -21,6 +21,11 @@
 #include "Game/GameState.hpp"
 #include "Game/GameStateTitle.hpp"
 
+#include "Game/EnemyWaveState.hpp"
+#include "Game/EnemyWaveStatePrewave.hpp"
+#include "Game/EnemyWaveStateActive.hpp"
+#include "Game/EnemyWaveStatePostwave.hpp"
+
 #include <format>
 
 void GameStateMain::OnEnter() noexcept {
@@ -66,9 +71,9 @@ void GameStateMain::OnEnter() noexcept {
     m_cityManager.GetCity(4).SetPosition(m_missileBaseRight.GetMissileLauncherPosition() + right_center_displacement * right_len * 0.50f);
     m_cityManager.GetCity(5).SetPosition(m_missileBaseRight.GetMissileLauncherPosition() + right_center_displacement * right_len * 0.75f);
 
-    m_waves.SetMissileCount(m_waves.GetMissileCount());
+    m_waves.SetMissileCount(m_waves.GetMissileCountForWave());
     m_waves.SetMissileSpawnRate(TimeUtils::FPSeconds{ 1.0f });
-    m_waves.ChangeState(EnemyWave::State::Prewave);
+    m_waves.ChangeState(std::make_unique<EnemyWaveStatePrewave>(&m_waves));
 
     auto desc = AudioSystem::SoundDesc{};
     desc.loopCount = 6;
@@ -221,7 +226,11 @@ void GameStateMain::CreateExplosionAt(Vector2 position, Faction faction) noexcep
     m_explosionManager.CreateExplosionAt(ExplosionManager::ExplosionData{ Vector4{position, GameConstants::max_explosion_size, 3.0f}, faction });
 }
 
-MissileManager& GameStateMain::GetMissileManager() noexcept {
+const MissileManager* GameStateMain::GetMissileManager() const noexcept {
+    return m_waves.GetMissileManager();
+}
+
+MissileManager* GameStateMain::GetMissileManager() noexcept {
     return m_waves.GetMissileManager();
 }
 
@@ -263,14 +272,17 @@ int GameStateMain::GetTotalMissiles() const noexcept {
     return m_missileBaseLeft.GetMissilesRemaining() + m_missileBaseCenter.GetMissilesRemaining() + m_missileBaseRight.GetMissilesRemaining();
 }
 
-void GameStateMain::HandleMissileExplosionCollisions(MissileManager& missileManager) noexcept {
-    const auto& missiles = missileManager.GetMissilePositions();
+void GameStateMain::HandleMissileExplosionCollisions(MissileManager* missileManager) noexcept {
+    if (missileManager == nullptr) {
+        return;
+    }
+    const auto& missiles = missileManager->GetMissilePositions();
     const auto& explosions = m_explosionManager.GetExplosionCollisionMeshes();
     for (const auto& e : explosions) {
         for (auto idx = std::size_t{}; idx < missiles.size(); ++idx) {
             const auto& m = missiles[idx];
             if (MathUtils::IsPointInside(e, m)) {
-                missileManager.KillMissile(idx);
+                missileManager->KillMissile(idx);
                 if (auto* g = GetGameAs<Game>(); g != nullptr) {
                     g->AdjustPlayerScore(GameConstants::enemy_missile_value * m_waves.GetScoreMultiplier());
                 }
@@ -311,13 +323,16 @@ void GameStateMain::HandleSatelliteExplosionCollision() noexcept {
     }
 }
 
-void GameStateMain::HandleMissileGroundCollisions(MissileManager& missileManager) noexcept {
-    const auto& missiles = missileManager.GetMissilePositions();
+void GameStateMain::HandleMissileGroundCollisions(MissileManager* missileManager) noexcept {
+    if (missileManager == nullptr) {
+        return;
+    }
+    const auto& missiles = missileManager->GetMissilePositions();
     const auto s = missiles.size();
     for (auto idx = std::size_t{}; idx < s; ++idx) {
         const auto& m = missiles[idx];
         if (MathUtils::IsPointInside(m_ground, m)) {
-            missileManager.KillMissile(idx);
+            missileManager->KillMissile(idx);
         }
     }
 }

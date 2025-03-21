@@ -20,582 +20,90 @@
 #include "Engine/UI/UISystem.hpp"
 
 #include "Game/Game.hpp"
+#include "Game/EnemyWaveStatePrewave.hpp"
+#include "Game/EnemyWaveStateActive.hpp"
 
 #include <algorithm>
 #include <format>
 #include <utility>
 
+EnemyWave::EnemyWave() noexcept {
+    m_currentState = std::move(std::make_unique<EnemyWaveStatePrewave>(this));
+}
+
 void EnemyWave::BeginFrame() noexcept {
-    if(m_nextState != m_currentState) {
-        m_currentState = m_nextState;
-        if(m_currentState != State::Active) {
-            m_postWaveIncrementRate.Reset();
-            m_postWaveTimer.Reset();
-            m_preWaveTimer.Reset();
-            m_missilesRemainingPostWave = 0;
-            m_citiesRemainingPostWave = 0;
-            DeactivateWave();
-            if(m_currentState == State::Prewave) {
-                g_theUISystem->SetClayLayoutCallback([this]() { this->ClayPrewave(); });
-            } else if(m_currentState == State::Postwave) {
-                g_theUISystem->SetClayLayoutCallback([this]() { this->ClayPostwave(); });
-            }
-        } else {
-            if(m_currentState == State::Active) {
-                g_theUISystem->SetClayLayoutCallback([this]() { this->ClayActive(); });
-            }
-            ActivateWave();
-        }
+    if (m_nextState) {
+        m_currentState->OnExit();
+        m_currentState = std::move(m_nextState);
+        m_currentState->OnEnter();
+        m_nextState.reset(nullptr);
     }
-    switch (m_currentState) {
-    case State::Inactive:
-        BeginFrame_Inactive();
-        break;
-    case State::Prewave:
-        BeginFrame_Prewave();
-        break;
-    case State::Active:
-        BeginFrame_Active();
-        break;
-    case State::Postwave:
-        BeginFrame_Postwave();
-        break;
-    default:
-        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
-    }
+    m_currentState->BeginFrame();
 }
 
 void EnemyWave::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    switch (m_currentState) {
-    case State::Inactive:
-        Update_Inactive(deltaSeconds);
-        break;
-    case State::Prewave:
-        Update_Prewave(deltaSeconds);
-        break;
-    case State::Active:
-        Update_Active(deltaSeconds);
-        break;
-    case State::Postwave:
-        Update_Postwave(deltaSeconds);
-        break;
-    default:
-        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
-    }
+    m_currentState->Update(deltaSeconds);
 }
 
 void EnemyWave::Render() const noexcept {
-    switch (m_currentState) {
-    case State::Inactive:
-        Render_Inactive();
-        break;
-    case State::Prewave:
-        Render_Prewave();
-        break;
-    case State::Active:
-        Render_Active();
-        break;
-    case State::Postwave:
-        Render_Postwave();
-        break;
-    default:
-        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
-    }
-}
-
-void EnemyWave::EndFrame() noexcept {
-    switch (m_currentState) {
-    case State::Inactive:
-        EndFrame_Inactive();
-        break;
-    case State::Prewave:
-        EndFrame_Prewave();
-        break;
-    case State::Active:
-        EndFrame_Active();
-        break;
-    case State::Postwave:
-        EndFrame_Postwave();
-        break;
-    default:
-        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
-    }
-}
-
-/************************************************************************/
-/*                         BEGIN FRAME                                  */
-/************************************************************************/
-
-void EnemyWave::BeginFrame_Inactive() noexcept {
-    /* DO NOTHING */
-}
-
-void EnemyWave::BeginFrame_Prewave() noexcept {
-    /* DO NOTHING */
-}
-
-void EnemyWave::BeginFrame_Active() noexcept {
-    m_missiles.BeginFrame();
-    if (m_bomber) {
-        m_bomber->BeginFrame();
-    }
-    if (m_satellite) {
-        m_satellite->BeginFrame();
-    }
-}
-
-void EnemyWave::BeginFrame_Postwave() noexcept {
-    auto* g = GetGameAs<Game>();
-    auto* state = g->GetCurrentState();
-    auto* main_state = dynamic_cast<GameStateMain*>(state);
-    static std::array<bool, GameConstants::max_cities> alive_cities{ false, false, false, false, false, false};
-    static std::size_t city_idx = 0u;
-    static auto remaining_cities = main_state->GetCityManager().RemainingCitiesCount();
-    if(main_state->GetCityManager().IsBonusCityAvailable()) {
-        m_grantedCityThisWave = true;
-    }
-    if(main_state->HasMissilesRemaining()) {
-        if(m_postWaveIncrementRate.CheckAndReset()) {
-            g->AdjustPlayerScore(GameConstants::unused_missile_value * GetScoreMultiplier());
-            main_state->DecrementTotalMissiles();
-            ++m_missilesRemainingPostWave;
-            g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
-        }
-    } else if(main_state->GetCityManager().RemainingCitiesCount()) {
-        if(m_postWaveIncrementRate.CheckAndReset()) {
-            if(city_idx < GameConstants::max_cities) {
-                if (main_state->GetCityManager().GetCity(city_idx).IsAlive()) {
-                    alive_cities[city_idx] = true;
-                    g->AdjustPlayerScore(GameConstants::saved_city_value * GetScoreMultiplier());
-                    main_state->GetCityManager().GetCity(city_idx).Kill();
-                    ++m_citiesRemainingPostWave;
-                    g_theAudioSystem->Play(GameConstants::game_audio_counting_path, AudioSystem::SoundDesc{});
-                }
-            }
-            ++city_idx;
-        }
-    } else if (main_state->GetCityManager().IsBonusCityAvailable() && m_grantedCityThisWave) {
-        m_showBonusCityText = true;
-        if (m_postWaveIncrementRate.CheckAndReset()) {
-            main_state->GetCityManager().RedeemBonusCIty();
-            if (std::any_of(std::begin(alive_cities), std::end(alive_cities), [](bool a) { return a == false; })) {
-                auto i = MathUtils::GetRandomLessThan(alive_cities.size());
-                do {
-                    i = MathUtils::GetRandomLessThan(alive_cities.size());
-                } while (alive_cities[i] == true);
-                for (std::size_t idx = 0; idx < alive_cities.size(); ++idx) {
-                    if (alive_cities[idx]) {
-                        main_state->GetCityManager().GetCity(i).Resurrect();
-                        break;
-                    }
-                }
-                m_grantedCityThisWave = false;
-            }
-            m_postWaveTimer.Reset();
-            g_theAudioSystem->Play(GameConstants::game_audio_bonuscity_path, AudioSystem::SoundDesc{});
-        }
-    } else {
-        if (m_postWaveTimer.CheckAndReset()) {
-            for (std::size_t i = 0; i < alive_cities.size(); ++i) {
-                if (alive_cities[i]) {
-                    main_state->GetCityManager().GetCity(i).Resurrect();
-                }
-            }
-            std::fill(std::begin(alive_cities), std::end(alive_cities), false);
-            remaining_cities = main_state->GetCityManager().RemainingCitiesCount();
-            city_idx = 0;
-            m_showBonusCityText = false;
-            IncrementWave();
-            ChangeState(EnemyWave::State::Prewave);
-        }
-    }
-}
-
-/************************************************************************/
-/*                         UPDATE                                       */
-/************************************************************************/
-
-
-void EnemyWave::Update_Inactive([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
-    /* DO NOTHING */
-}
-
-void EnemyWave::Update_Prewave([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
-    /* DO NOTHING */
-}
-
-void EnemyWave::Update_Active(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    UpdateMissiles(deltaSeconds);
-    UpdateBomber(deltaSeconds);
-    UpdateSatellite(deltaSeconds);
-}
-
-void EnemyWave::Update_Postwave([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
-    /* DO NOTHING */
-}
-
-void EnemyWave::UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    if(IsWaveActive() && CanSpawnMissile()) {
-        if(m_missileSpawnRate.CheckAndReset()) {
-            SpawnMissile();
-        }
-    }
-    m_missiles.Update(deltaSeconds);
-}
-
-bool EnemyWave::CanSpawnMissile() const noexcept {
-    return m_missileCount != 0 && m_missiles.ActiveMissileCount() < GameConstants::max_missles_on_screen;
-}
-
-void EnemyWave::UpdateSatellite(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    if(!m_satellite) {
-        return;
-    }
-    m_satellite->Update(deltaSeconds);
-    Disc2 satellite_visible{ m_satellite->GetPosition(), 50.0f };
-    const auto satellite_right = satellite_visible.center.x + satellite_visible.radius;
-    auto* g = GetGameAs<Game>();
-    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
-    AABB2 bounds = state->GetWorldBounds();
-    const auto bounds_left = bounds.mins.x;
-    if (satellite_right < bounds_left) {
-        m_satellite.reset();
-        m_flierSpawnRate.Reset();
-    }
-}
-
-void EnemyWave::UpdateBomber(TimeUtils::FPSeconds deltaSeconds) noexcept {
-    if(!m_bomber) {
-        return;
-    }
-    m_bomber->Update(deltaSeconds);
-    Disc2 bomber_visible{ m_bomber->GetPosition(), 50.0f };
-    const auto bomber_left = bomber_visible.center.x - bomber_visible.radius;
-    auto* g = GetGameAs<Game>();
-    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
-    AABB2 bounds = state->GetWorldBounds();
-    const auto bounds_right = bounds.maxs.x;
-    if(bounds_right < bomber_left) {
-        m_bomber.reset();
-        m_flierSpawnRate.Reset();
-    }
-}
-
-bool EnemyWave::LaunchMissileFrom(Vector2 position) noexcept {
-    if(CanSpawnMissile()) {
-        if (const auto* g = GetGameAs<Game>(); g != nullptr) {
-            if (const auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState()); state != nullptr) {
-                const auto& targets = state->GetValidTargets();
-                const auto& target = targets[MathUtils::GetRandomLessThan(targets.size())];
-                m_missileCount = (std::max)(0, m_missileCount - 1);
-                return m_missiles.LaunchMissile(position, target, GetMissileImpactTime(), Faction::Enemy, GetObjectColor());
-            }
-        }
-    }
-    return false;
-}
-
-/************************************************************************/
-/*                         RENDER                                       */
-/************************************************************************/
-
-void EnemyWave::Render_Inactive() const noexcept {
-    /* DO NOTHING */
-}
-
-static Clay_LayoutConfig fullscreen_layout = {
-    .sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)},
-    .padding = CLAY_PADDING_ALL(0),
-    .childGap = 0,
-    .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_TOP},
-    .layoutDirection = Clay_LayoutDirection::CLAY_TOP_TO_BOTTOM,
-};
-
-void EnemyWave::ClayPrewave() noexcept {
-    CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha)}) {
-        RenderScoreElement();
-        RenderScoreMultiplierElement();
-    }
-}
-
-void EnemyWave::RenderScoreElement() const noexcept {
-    CLAY({ .id = CLAY_ID("Score"), .layout = {.sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_PERCENT(0.1f)}, .padding = CLAY_PADDING_ALL(0), .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_TOP},}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
-        static auto points_str = std::string{};
-        points_str = [this]()->std::string {
-            const auto player_score = GetGameAs<Game>()->GetPlayerScore();
-            const auto highscore = GetGameAs<Game>()->GetHighScore();
-            const auto wave = this->GetWaveId() + 1;
-            if (player_score > highscore) {
-                return std::format("{} <- {}\nWave: {}", player_score, highscore, wave);
-            } else {
-                return std::format("{} -> {}\nWave: {}", player_score, highscore, wave);
-            }
-            }();
-        Clay_TextElementConfig textConfig{};
-        textConfig.userData = g_theRenderer->GetFont("System32");
-        textConfig.textColor = Clay::RgbaToClayColor(Rgba::White);
-        textConfig.wrapMode = Clay_TextElementConfigWrapMode::CLAY_TEXT_WRAP_NEWLINES;
-        CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
-    }
-}
-
-void EnemyWave::RenderScoreMultiplierElement() const noexcept {
-    CLAY({ .id = CLAY_ID("ScoreMultiplier"), .layout = {.sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)}, .padding = CLAY_PADDING_ALL(0), .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_CENTER}}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
-        static auto points_str = std::string{};
-        points_str = std::format("{} X POINTS", this->GetScoreMultiplier());
-        Clay_TextElementConfig textConfig{};
-        textConfig.userData = g_theRenderer->GetFont("System32");
-        textConfig.textColor = Clay::RgbaToClayColor(this->GetObjectColor());
-        CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
-    }
-}
-
-void EnemyWave::ClayActive() noexcept {
-    CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha)}) {
-        RenderScoreElement();
-    }
-}
-
-void EnemyWave::ClayPostwave() noexcept {
-    CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha)}) {
-        RenderScoreElement();
-        RenderPostWaveStatsElement();
-    }
-}
-
-void EnemyWave::RenderPostWaveStatsElement() const noexcept {
-    const Clay_TextElementConfig textConfig{ .userData = g_theRenderer->GetFont("System32"), .textColor = Clay::RgbaToClayColor(this->GetObjectColor()) };
-
-    CLAY({ .id = CLAY_ID("PostwaveStatsContainer"), .layout = {.sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)}, .childGap = 16, .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_TOP}, .layoutDirection = Clay_LayoutDirection::CLAY_TOP_TO_BOTTOM,}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha)}) {
-        CLAY_TEXT(CLAY_STRING_CONST("BONUS POINTS"), CLAY_TEXT_CONFIG(textConfig));
-        CLAY_TEXT(CLAY_STRING_CONST("MISSILES"), CLAY_TEXT_CONFIG(textConfig));
-        {
-            const auto dims = Clay::Vector2ToClayDimensions(Vector2(IntVector2(g_theRenderer->GetMaterial("missile")->GetTexture(Material::TextureID::Diffuse)->GetDimensions())));
-            CLAY({ .id = CLAY_ID("MissileImagesContainer"), .layout = {.sizing = {.width = CLAY_SIZING_FIXED(dims.width * GameConstants::max_player_missile_count), .height = CLAY_SIZING_FIXED(dims.height)}, .childGap = 8, .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_LEFT, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_CENTER}, .layoutDirection = Clay_LayoutDirection::CLAY_LEFT_TO_RIGHT} }) {
-                RenderMissileImageElements();
-            }
-        }
-        CLAY_TEXT(CLAY_STRING_CONST("CITIES"), CLAY_TEXT_CONFIG(textConfig));
-        {
-            const auto dims = Clay::Vector2ToClayDimensions(Vector2(IntVector2(g_theRenderer->GetMaterial("city")->GetTexture(Material::TextureID::Diffuse)->GetDimensions())));
-            CLAY({ .id = CLAY_ID("CityImagesContainer"), .layout = {.sizing = {.width = CLAY_SIZING_FIXED(dims.width * GameConstants::max_cities), .height = CLAY_SIZING_FIXED(dims.height)}, .childGap = static_cast<uint8_t>(dims.width + 8), .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_LEFT, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_CENTER}, .layoutDirection = Clay_LayoutDirection::CLAY_LEFT_TO_RIGHT} }) {
-                RenderCityImageElements();
-            }
-        }
-        if (m_showBonusCityText) {
-            CLAY({ .layout = {.sizing = {}, .childGap = 16, .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_LEFT, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_CENTER}, .layoutDirection = Clay_LayoutDirection::CLAY_LEFT_TO_RIGHT} }) {
-                CLAY_TEXT(CLAY_STRING_CONST("BONUS CITY"), CLAY_TEXT_CONFIG(textConfig));
-                const auto player_color = []()->Rgba {
-                    if (const auto* g = GetGameAs<Game>(); g != nullptr) {
-                        if (auto* mainState = dynamic_cast<GameStateMain*>(g->GetCurrentState()); mainState != nullptr) {
-                            return mainState->GetPlayerColor();
-                        }
-                        return Rgba::Black;
-                    }
-                    return Rgba::Black;
-                    }();
-                const auto mat = g_theRenderer->GetMaterial("city");
-                const auto dims = Clay::Vector2ToClayDimensions(Vector2(IntVector2(mat->GetTexture(Material::TextureID::Diffuse)->GetDimensions())));
-                CLAY({ .layout = {.sizing = {.width = CLAY_SIZING_FIXED(dims.width), .height = CLAY_SIZING_FIXED(dims.height)}},  .backgroundColor = Clay::RgbaToClayColor(player_color), .image = {.imageData = mat, .sourceDimensions = dims}}) {}
-            }
-        }
-    }
-}
-
-void EnemyWave::RenderCityImageElements() const noexcept {
-    const auto player_color = []()->Rgba {
-        if (const auto* g = GetGameAs<Game>(); g != nullptr) {
-            if (auto* mainState = dynamic_cast<GameStateMain*>(g->GetCurrentState()); mainState != nullptr) {
-                return mainState->GetPlayerColor();
-            }
-            return Rgba::Black;
-        }
-        return Rgba::Black;
-        }();
-    const auto mat = g_theRenderer->GetMaterial("city");
-    const auto dims = Clay::Vector2ToClayDimensions(Vector2(IntVector2(mat->GetTexture(Material::TextureID::Diffuse)->GetDimensions())));
-    std::size_t j = 1u;
-    for (std::size_t i = m_citiesRemainingPostWave - (m_citiesRemainingPostWave - j); j <= m_citiesRemainingPostWave; ++i, ++j) {
-        CLAY({ .backgroundColor = Clay::RgbaToClayColor(player_color), .image = {.imageData = mat, .sourceDimensions = dims} }) {}
-    }
-}
-
-void EnemyWave::RenderMissileImageElements() const noexcept {
-    const auto player_color = []()->Rgba {
-        if (const auto* g = GetGameAs<Game>(); g != nullptr) {
-            if (auto* mainState = dynamic_cast<GameStateMain*>(g->GetCurrentState()); mainState != nullptr) {
-                return mainState->GetPlayerColor();
-            }
-            return Rgba::Black;
-        }
-        return Rgba::Black;
-        }();
-    const auto mat = g_theRenderer->GetMaterial("missile");
-    const auto dims = Clay::Vector2ToClayDimensions(Vector2(IntVector2(mat->GetTexture(Material::TextureID::Diffuse)->GetDimensions())));
-    int j = 1;
-    for (int i = m_missilesRemainingPostWave - (m_missilesRemainingPostWave - j); j <= m_missilesRemainingPostWave; ++i, ++j) {
-        CLAY({ .backgroundColor = Clay::RgbaToClayColor(player_color), .image = {.imageData = mat, .sourceDimensions = dims} }) {}
-    }
-}
-
-void EnemyWave::Render_Prewave() const noexcept {
-    /* DO NOTHING */
-}
-
-void EnemyWave::Render_Active() const noexcept {
-    m_missiles.Render();
-    if (m_bomber) {
-        m_bomber->Render();
-    }
-    if (m_satellite) {
-        m_satellite->Render();
-    }
-}
-
-void EnemyWave::Render_Postwave() const noexcept {
-    /* DO NOTHING */
+    m_currentState->Render();
 }
 
 void EnemyWave::DebugRender() const noexcept {
-    switch (m_currentState) {
-    case State::Inactive:
-        DebugRender_Inactive();
-        break;
-    case State::Prewave:
-        DebugRender_Prewave();
-        break;
-    case State::Active:
-        DebugRender_Active();
-        break;
-    case State::Postwave:
-        DebugRender_Postwave();
-        break;
-    default:
-        ERROR_AND_DIE("EnemyWave State scoped enum has changed");
-    }
+    m_currentState->DebugRender();
 }
 
-void EnemyWave::DebugRender_Inactive() const noexcept {
-
+void EnemyWave::EndFrame() noexcept {
+    m_currentState->EndFrame();
 }
 
-void EnemyWave::DebugRender_Prewave() const noexcept {
-
+const EnemyWaveState* EnemyWave::GetCurrentState() const noexcept {
+    return m_currentState.get();
 }
 
-void EnemyWave::DebugRender_Active() const noexcept {
-    m_missiles.DebugRender();
-    if (m_bomber) {
-        m_bomber->DebugRender();
-    }
-    if (m_satellite) {
-        m_satellite->DebugRender();
-    }
+EnemyWaveState* EnemyWave::GetCurrentState() noexcept {
+    return m_currentState.get();
 }
 
-void EnemyWave::DebugRender_Postwave() const noexcept {
-
-}
-
-/************************************************************************/
-/*                         END FRAME                                    */
-/************************************************************************/
-
-void EnemyWave::EndFrame_Inactive() noexcept {
-
-}
-
-void EnemyWave::EndFrame_Prewave() noexcept {
-    if (m_preWaveTimer.CheckAndReset()) {
-        SetMissileCount(GetMissileCount());
-        m_flierSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
-        m_flierSpawnRate.Reset();
-        auto* g = GetGameAs<Game>();
-        auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
-        state->ResetMissileCount();
-        ChangeState(EnemyWave::State::Active);
-    }
-}
-
-void EnemyWave::EndFrame_Active() noexcept {
-    m_missiles.EndFrame();
-    if (m_bomber) {
-        m_bomber->EndFrame();
-        if (m_bomber->IsDead()) {
-            m_bomber.reset();
-        }
-    }
-    if (m_satellite) {
-        m_satellite->EndFrame();
-        if (m_satellite->IsDead()) {
-            m_satellite.reset();
-        }
-    }
-    if (CanSpawnFlier()) {
-        if (const auto is_bomber = MathUtils::GetRandomBool(); is_bomber) {
-            if (!m_bomber) {
-                SpawnBomber();
-                m_flierSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
-                m_flierSpawnRate.Reset();
-            }
-        } else {
-            if (!m_satellite) {
-                SpawnSatellite();
-                m_flierSpawnRate.SetSeconds(TimeUtils::FPFrames{ GetFlierCooldown() });
-                m_flierSpawnRate.Reset();
-            }
-        }
-    }
-    if (IsWaveOver()) {
-        AdvanceToNextWave();
-    }
-}
-
-void EnemyWave::EndFrame_Postwave() noexcept {
-
-}
-
-void EnemyWave::AdvanceToNextWave() noexcept {
-    m_bomber.reset();
-    m_satellite.reset();
-    ChangeState(State::Postwave);
-}
-
-void EnemyWave::ChangeState(State newState) noexcept {
-    m_nextState = newState;
-}
-
-bool EnemyWave::CanSpawnFlier() const noexcept {
-    return IsWaveActive() && m_waveId > 0 && m_missileCount && (!m_bomber || !m_satellite) && m_flierSpawnRate.Check();
-}
-
-bool EnemyWave::IsWaveOver() const noexcept {
-    if (auto* g = GetGameAs<Game>(); g != nullptr) {
-        if (auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState()); state != nullptr) {
-            const auto all_explosions_finished = state->GetExplosionManager().ActiveExplosionCount() == 0;
-            const auto no_missiles_in_flight = state->GetMissileManager().ActiveMissileCount() == 0;
-            const auto player_has_no_missiles_remaining = !state->HasMissilesRemaining();
-            const auto wave_has_no_missiles_remaining = m_missileCount == 0;
-            const auto cant_score_points = player_has_no_missiles_remaining && no_missiles_in_flight && all_explosions_finished;
-            const auto everything_dead = wave_has_no_missiles_remaining && !m_bomber && !m_satellite && all_explosions_finished;
-            if (cant_score_points || everything_dead) {
-                return true;
-            }
-        }
-    }
-    return false;
+void EnemyWave::ChangeState(std::unique_ptr<EnemyWaveState> newState) noexcept {
+    m_nextState = std::move(newState);
 }
 
 float EnemyWave::GetFlierCooldown() const noexcept {
     return m_waveId < GameConstants::wave_flier_cooldown_lookup.size() ? GameConstants::wave_flier_cooldown_lookup[m_waveId] : GameConstants::min_bomber_cooldown;
 }
 
-const MissileManager& EnemyWave::GetMissileManager() const noexcept {
-    return m_missiles;
+bool EnemyWave::CanSpawnMissile() const noexcept {
+    auto* state = GetCurrentState();
+    if (auto* active_state = dynamic_cast<const EnemyWaveStateActive*>(state); active_state != nullptr) {
+        return active_state->CanSpawnMissile();
+    }
+    return false;
 }
 
-MissileManager& EnemyWave::GetMissileManager() noexcept {
-    return m_missiles;
+bool EnemyWave::LaunchMissileFrom(Vector2 position) noexcept {
+    auto* state = GetCurrentState();
+    if (auto* active_state = dynamic_cast<EnemyWaveStateActive*>(state); active_state != nullptr) {
+        return active_state->LaunchMissileFrom(position);
+    }
+    return false;
+}
+
+const MissileManager* EnemyWave::GetMissileManager() const noexcept {
+    const auto* state = GetCurrentState();
+    if (const auto* main_state = dynamic_cast<const EnemyWaveStateActive*>(state); main_state != nullptr) {
+        return main_state->GetMissileManager();
+    }
+    return nullptr;
+}
+
+MissileManager* EnemyWave::GetMissileManager() noexcept {
+    auto* state = GetCurrentState();
+    if (auto* main_state = dynamic_cast<EnemyWaveStateActive*>(state); main_state != nullptr) {
+        return main_state->GetMissileManager();
+    }
+    return nullptr;
+
 }
 
 std::size_t EnemyWave::GetWaveId() const noexcept {
@@ -622,7 +130,27 @@ TimeUtils::FPSeconds EnemyWave::GetMissileImpactTime() const noexcept {
     return TimeUtils::FPSeconds{m_waveId < GameConstants::wave_missile_impact_time.size() ? GameConstants::wave_missile_impact_time[m_waveId] : GameConstants::min_missile_impact_time};
 }
 
-int EnemyWave::GetMissileCount() const noexcept {
+Bomber* const EnemyWave::GetBomber() const noexcept {
+    const auto* state = GetCurrentState();
+    if (const auto* active_state = dynamic_cast<const EnemyWaveStateActive*>(state); active_state != nullptr) {
+        return active_state->GetBomber();
+    }
+    return nullptr;
+}
+
+Satellite* const EnemyWave::GetSatellite() const noexcept {
+    const auto* state = GetCurrentState();
+    if (const auto* active_state = dynamic_cast<const EnemyWaveStateActive*>(state); active_state != nullptr) {
+        return active_state->GetSatellite();
+    }
+    return nullptr;
+}
+
+void EnemyWave::DecrementMissileCount() noexcept {
+    m_missileCount = (std::max)(0, m_missileCount - 1);
+}
+
+int EnemyWave::GetMissileCountForWave() const noexcept {
     return m_waveId < GameConstants::wave_missile_count_lookup.size() ? GameConstants::wave_missile_count_lookup[m_waveId] : GameConstants::max_enemy_missile_count;
 }
 
@@ -652,50 +180,4 @@ void EnemyWave::ActivateWave() noexcept {
 
 void EnemyWave::DeactivateWave() noexcept {
     m_isActive = false;
-}
-
-void EnemyWave::SpawnBomber() noexcept {
-    if(m_bomber) {
-        return;
-    }
-    auto* g = GetGameAs<Game>();
-    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
-    AABB2 bomber_spawn_area = state->GetWorldBounds();
-    bomber_spawn_area.Translate(Vector2::X_Axis * -100.0f);
-    bomber_spawn_area.AddPaddingToSides(0.0f, -GameConstants::radar_line_distance);
-    bomber_spawn_area.maxs.x = state->GetWorldBounds().mins.x;
-    m_bomber = std::make_unique<Bomber>(this, MathUtils::GetRandomPointInside(bomber_spawn_area));
-}
-
-void EnemyWave::SpawnSatellite() noexcept {
-    if (m_satellite) {
-        return;
-    }
-    auto* g = GetGameAs<Game>();
-    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
-    AABB2 satellite_spawn_area = state->GetWorldBounds();
-    satellite_spawn_area.Translate(Vector2::X_Axis * 100.0f);
-    satellite_spawn_area.AddPaddingToSides(0.0f, -100.0f);
-    satellite_spawn_area.mins.x = state->GetWorldBounds().maxs.x;
-    m_satellite = std::make_unique<Satellite>(this, MathUtils::GetRandomPointInside(satellite_spawn_area));
-}
-
-void EnemyWave::SpawnMissile() noexcept {
-    auto* g = GetGameAs<Game>();
-    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
-    AABB2 missile_spawn_area = state->GetWorldBounds();
-    missile_spawn_area.Translate(Vector2::Y_Axis * -100.0f);
-    missile_spawn_area.AddPaddingToSides(-100.0f, 0.0f);
-    missile_spawn_area.maxs.y = state->GetWorldBounds().mins.y;
-    Vector2 pos = MathUtils::GetRandomPointInside(missile_spawn_area);
-
-    LaunchMissileFrom(pos);
-}
-
-Bomber* const EnemyWave::GetBomber() const noexcept {
-    return m_bomber.get();
-}
-
-Satellite* const EnemyWave::GetSatellite() const noexcept {
-    return m_satellite.get();
 }
