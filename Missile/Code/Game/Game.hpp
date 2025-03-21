@@ -43,7 +43,7 @@ protected:
 
 struct Player {
     int score{ 0ull };
-    int scoreRemainingForBonusCity{10000};
+    int scoreRemainingForBonusCity{GameConstants::default_bonus_city_score};
 };
 
 class Game : public GameBase {
