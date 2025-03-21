@@ -36,7 +36,9 @@ public:
     void DecrementTotalMissiles() noexcept;
     int GetTotalMissiles() const noexcept;
 
-    MissileManager& GetMissileManager() noexcept;
+    const MissileManager* GetMissileManager() const noexcept;
+    MissileManager* GetMissileManager() noexcept;
+
     const ExplosionManager& GetExplosionManager() const noexcept;
     ExplosionManager& GetExplosionManager() noexcept;
 
@@ -76,10 +78,10 @@ private:
     Vector2 BaseLocationRight() const noexcept;
     Vector2 CityLocation(std::size_t index) const noexcept;
 
-    void HandleMissileExplosionCollisions(MissileManager& missileManager) noexcept;
+    void HandleMissileExplosionCollisions(MissileManager* missileManager) noexcept;
     void HandleBomberExplosionCollision() noexcept;
     void HandleSatelliteExplosionCollision() noexcept;
-    void HandleMissileGroundCollisions(MissileManager& missileManager) noexcept;
+    void HandleMissileGroundCollisions(MissileManager* missileManager) noexcept;
     void HandleCityExplosionCollisions() noexcept;
     void HandleBaseExplosionCollisions() noexcept;
 

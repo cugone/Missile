@@ -18,7 +18,7 @@ namespace GameConstants {
     constexpr const int max_launch_sounds{2};
     constexpr const int max_explosion_sounds{5};
     constexpr const int max_score_multiplier{6};
-    constexpr const int max_missile_count{20};
+    constexpr const int max_enemy_missile_count{20};
     constexpr const int max_player_missile_count{30};
     constexpr const int max_smartbomb_count{7};
     constexpr const int max_missles_on_screen{4};
@@ -35,6 +35,7 @@ namespace GameConstants {
     constexpr const int unused_missile_value{5};
     constexpr const int saved_city_value{100};
     constexpr const int default_highscore{17000};
+    constexpr const int default_bonus_city_score{10000};
     constexpr const std::size_t wave_array_size{20u};
     constexpr std::array<int, wave_array_size> wave_score_multiplier_lookup{ 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 };
     constexpr std::array<int, wave_array_size> wave_missile_count_lookup{ 12, 15, 18, 12, 16, 14, 17, 10, 13, 16, 19, 12, 14, 16, 18, 14, 16, 18, 20, 20 };
