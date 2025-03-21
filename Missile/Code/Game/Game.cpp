@@ -121,7 +121,7 @@ void Game::AdjustPlayerScore(int scoreToAdd) noexcept {
     if(m_playerData.scoreRemainingForBonusCity <= 0) {
         if (auto* main_state = dynamic_cast<GameStateMain*>(this->GetCurrentState()); main_state != nullptr) {
             m_playerData.scoreRemainingForBonusCity = MathUtils::Wrap(m_playerData.scoreRemainingForBonusCity, 0, 10000);
-            main_state->GetCityManager().GrantBonusCIty();
+            main_state->GetCityManager().GrantBonusCity();
         }
     }
 }

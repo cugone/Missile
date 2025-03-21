@@ -17,8 +17,8 @@ public:
     void EndFrame() noexcept;
 
     bool IsBonusCityAvailable() const noexcept;
-    void GrantBonusCIty() noexcept;
-    void RedeemBonusCIty() noexcept;
+    void GrantBonusCity() noexcept;
+    void RedeemBonusCity() noexcept;
 
     std::size_t RemainingCitiesCount() const noexcept;
     std::bitset<6> RemainingCities() const noexcept;
