@@ -98,6 +98,7 @@ void EnemyWaveStatePrewave::RenderScoreMultiplierElement() const noexcept {
         Clay_TextElementConfig textConfig{};
         textConfig.userData = g_theRenderer->GetFont("System32");
         textConfig.textColor = Clay::RgbaToClayColor(m_context->GetObjectColor());
+        textConfig.fontSize = 32;
         CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
     }
 }
