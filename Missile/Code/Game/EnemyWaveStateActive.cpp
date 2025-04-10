@@ -272,7 +272,9 @@ void EnemyWaveStateActive::RenderScoreElement() const noexcept {
             }
             }();
         Clay_TextElementConfig textConfig{};
-        textConfig.userData = g_theRenderer->GetFont("System32");
+        auto* font = g_theRenderer->GetFont("System32");
+        textConfig.fontId = static_cast<uint16_t>(g_theRenderer->GetFontId("System32"));
+        textConfig.fontSize = static_cast<uint16_t>(font->GetInfoDef().em_size);
         textConfig.textColor = Clay::RgbaToClayColor(Rgba::White);
         textConfig.wrapMode = Clay_TextElementConfigWrapMode::CLAY_TEXT_WRAP_NEWLINES;
         CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
