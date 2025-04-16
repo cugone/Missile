@@ -169,6 +169,7 @@
     <ClCompile Include="MissileBase.cpp" />
     <ClCompile Include="MissileManager.cpp" />
     <ClCompile Include="Satellite.cpp" />
+    <ClCompile Include="SmartBomb.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bomber.hpp" />
@@ -193,6 +194,7 @@
     <ClInclude Include="MissileBase.hpp" />
     <ClInclude Include="MissileManager.hpp" />
     <ClInclude Include="Satellite.hpp" />
+    <ClInclude Include="SmartBomb.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\Abrams2022\Engine\Code\Engine\Engine.vcxproj">
