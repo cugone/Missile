@@ -89,6 +89,34 @@ bool EnemyWave::LaunchMissileFrom(Vector2 position) noexcept {
     return false;
 }
 
+int EnemyWave::GetSmartBombCountForWave() const noexcept {
+    return m_waveId < GameConstants::wave_smartbomb_count_lookup.size() ? GameConstants::wave_smartbomb_count_lookup[m_waveId] : GameConstants::max_smartbomb_count;
+}
+
+void EnemyWave::DecrementSmartBombCount() noexcept {
+    m_smartBombCount = (std::max)(0, m_smartBombCount - 1);
+}
+
+int EnemyWave::GetRemainingSmartBombs() const noexcept {
+    return m_smartBombCount;
+}
+
+bool EnemyWave::CanSpawnSmartBomb() const noexcept {
+    auto* state = GetCurrentState();
+    if (auto* active_state = dynamic_cast<const EnemyWaveStateActive*>(state); active_state != nullptr) {
+        return active_state->CanSpawnSmartBomb();
+    }
+    return false;
+}
+
+bool EnemyWave::LaunchSmartBombFrom(Vector2 position) noexcept {
+    auto* state = GetCurrentState();
+    if(auto* active_state = dynamic_cast<EnemyWaveStateActive*>(state); active_state != nullptr) {
+        return active_state->LaunchSmartBombFrom(position);
+    }
+    return false;
+}
+
 const MissileManager* EnemyWave::GetMissileManager() const noexcept {
     const auto* state = GetCurrentState();
     if (const auto* main_state = dynamic_cast<const EnemyWaveStateActive*>(state); main_state != nullptr) {
@@ -164,6 +192,10 @@ void EnemyWave::SetBomberSpawnRate(TimeUtils::FPSeconds secondsBetween) noexcept
 
 void EnemyWave::SetMissileCount(int newMissileCount) noexcept {
     m_missileCount = newMissileCount;
+}
+
+void EnemyWave::SetSmartBombCount(int newSmartBombCount) noexcept {
+    m_smartBombCount = newSmartBombCount;
 }
 
 int EnemyWave::GetRemainingMissiles() const noexcept {

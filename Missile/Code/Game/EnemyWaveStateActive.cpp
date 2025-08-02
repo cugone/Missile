@@ -48,12 +48,16 @@ void EnemyWaveStateActive::BeginFrame() noexcept {
     if (m_satellite) {
         m_satellite->BeginFrame();
     }
+    if (m_smartBomb) {
+        m_smartBomb->BeginFrame();
+    }
 }
 
 void EnemyWaveStateActive::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
     UpdateMissiles(deltaSeconds);
     UpdateBomber(deltaSeconds);
     UpdateSatellite(deltaSeconds);
+    UpdateSmartBomb(deltaSeconds);
 }
 
 void EnemyWaveStateActive::Render() const noexcept {
@@ -64,6 +68,9 @@ void EnemyWaveStateActive::Render() const noexcept {
     if (m_satellite) {
         m_satellite->Render();
     }
+    if (m_smartBomb) {
+        m_smartBomb->Render();
+    }
 }
 
 void EnemyWaveStateActive::DebugRender() const noexcept {
@@ -73,6 +80,9 @@ void EnemyWaveStateActive::DebugRender() const noexcept {
     }
     if (m_satellite) {
         m_satellite->DebugRender();
+    }
+    if (m_smartBomb) {
+        m_smartBomb->DebugRender();
     }
 }
 
@@ -88,6 +98,12 @@ void EnemyWaveStateActive::EndFrame() noexcept {
         m_satellite->EndFrame();
         if (m_satellite->IsDead()) {
             m_satellite.reset();
+        }
+    }
+    if (m_smartBomb) {
+        m_smartBomb->EndFrame();
+        if (m_smartBomb->IsDead()) {
+            m_smartBomb.reset();
         }
     }
     if (CanSpawnFlier()) {
@@ -124,6 +140,10 @@ Bomber* const EnemyWaveStateActive::GetBomber() const noexcept {
 
 Satellite* const EnemyWaveStateActive::GetSatellite() const noexcept {
     return m_satellite.get();
+}
+
+SmartBomb* const EnemyWaveStateActive::GetSmartBomb() const noexcept {
+    return m_smartBomb.get();
 }
 
 bool EnemyWaveStateActive::CanSpawnFlier() const noexcept {
@@ -185,6 +205,18 @@ void EnemyWaveStateActive::SpawnMissile() noexcept {
     LaunchMissileFrom(pos);
 }
 
+void EnemyWaveStateActive::SpawnSmartBomb() noexcept {
+    auto* g = GetGameAs<Game>();
+    auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
+    AABB2 missile_spawn_area = state->GetWorldBounds();
+    missile_spawn_area.Translate(Vector2::Y_Axis * -100.0f);
+    missile_spawn_area.AddPaddingToSides(-100.0f, 0.0f);
+    missile_spawn_area.maxs.y = state->GetWorldBounds().mins.y;
+    Vector2 pos = MathUtils::GetRandomPointInside(missile_spawn_area);
+
+    LaunchMissileFrom(pos);
+}
+
 void EnemyWaveStateActive::UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept {
     if (m_context->IsWaveActive() && CanSpawnMissile()) {
         if (m_missileSpawnRate.CheckAndReset()) {
@@ -232,9 +264,17 @@ void EnemyWaveStateActive::UpdateBomber(TimeUtils::FPSeconds deltaSeconds) noexc
     }
 }
 
+void EnemyWaveStateActive::UpdateSmartBomb(TimeUtils::FPSeconds deltaSeconds) noexcept {
+    if(!m_smartBomb) {
+        return;
+    }
+    m_smartBomb->Update(deltaSeconds);
+}
+
 void EnemyWaveStateActive::AdvanceToNextWave() noexcept {
     m_bomber.reset();
     m_satellite.reset();
+    m_smartBomb.reset();
     m_context->ChangeState(std::make_unique<EnemyWaveStatePostwave>(m_context));
 }
 
@@ -249,6 +289,25 @@ bool EnemyWaveStateActive::LaunchMissileFrom(Vector2 position) noexcept {
             }
         }
     }
+    return false;
+}
+
+bool EnemyWaveStateActive::CanSpawnSmartBomb() const noexcept {
+    return m_context->GetRemainingSmartBombs() > 0 && m_missiles.ActiveMissileCount() < GameConstants::max_missles_on_screen;
+}
+
+bool EnemyWaveStateActive::LaunchSmartBombFrom(Vector2 position) noexcept {
+    //if(CanSpawnSmartBomb()) {
+        if (const auto* g = GetGameAs<Game>(); g != nullptr) {
+            if (auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState()); state != nullptr) {
+                const auto& targets = state->GetValidTargets();
+                const auto& target = targets[MathUtils::GetRandomLessThan(targets.size())].value;
+                m_context->DecrementSmartBombCount();
+                m_smartBomb = std::make_unique<SmartBomb>(&state->GetExplosionManager(), position, target);
+                return true;
+            }
+        }
+    //}
     return false;
 }
 

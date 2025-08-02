@@ -8,6 +8,7 @@
 #include "Game/Bomber.hpp"
 #include "Game/MissileManager.hpp"
 #include "Game/Satellite.hpp"
+#include "Game/SmartBomb.hpp"
 
 #include <memory>
 
@@ -37,8 +38,13 @@ public:
 
     Satellite* const GetSatellite() const noexcept;
 
+    SmartBomb* const GetSmartBomb() const noexcept;
+
     bool CanSpawnMissile() const noexcept;
     bool LaunchMissileFrom(Vector2 position) noexcept;
+
+    bool CanSpawnSmartBomb() const noexcept;
+    bool LaunchSmartBombFrom(Vector2 position) noexcept;
 protected:
 private:
 
@@ -53,9 +59,12 @@ private:
 
     void SpawnMissile() noexcept;
 
+    void SpawnSmartBomb() noexcept;
+
     void UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void UpdateSatellite(TimeUtils::FPSeconds deltaSeconds) noexcept;
     void UpdateBomber(TimeUtils::FPSeconds deltaSeconds) noexcept;
+    void UpdateSmartBomb(TimeUtils::FPSeconds deltaSeconds) noexcept;
 
     void AdvanceToNextWave() noexcept;
 
@@ -67,6 +76,7 @@ private:
     MissileManager m_missiles{};
     std::unique_ptr<Bomber> m_bomber{};
     std::unique_ptr<Satellite> m_satellite{};
+    std::unique_ptr<SmartBomb> m_smartBomb{};
     Stopwatch m_missileSpawnRate{};
     Stopwatch m_flierSpawnRate{};
 

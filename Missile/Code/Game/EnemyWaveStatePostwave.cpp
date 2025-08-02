@@ -215,7 +215,7 @@ void EnemyWaveStatePostwave::RenderPostWaveStatsElement() const noexcept {
                     }();
                 const auto mat = g_theRenderer->GetMaterial("city");
                 const auto dims = Clay::Vector2ToClayDimensions(Vector2(IntVector2(mat->GetTexture(Material::TextureID::Diffuse)->GetDimensions())));
-                CLAY({ .layout = {.sizing = {.width = CLAY_SIZING_FIXED(dims.width), .height = CLAY_SIZING_FIXED(dims.height)}},  .backgroundColor = Clay::RgbaToClayColor(player_color), .image = {.imageData = mat, .sourceDimensions = dims} }) {}
+                CLAY({ .layout = {.sizing = {.width = CLAY_SIZING_FIXED(dims.width), .height = CLAY_SIZING_FIXED(dims.height)}},  .backgroundColor = Clay::RgbaToClayColor(player_color), .aspectRatio = { dims.width / dims.height }, .image = {.imageData = mat} }) {}
             }
         }
     }
@@ -236,7 +236,7 @@ void EnemyWaveStatePostwave::RenderCityImageElements() const noexcept {
     const auto dims = Clay::Vector2ToClayDimensions(Vector2(IntVector2(mat->GetTexture(Material::TextureID::Diffuse)->GetDimensions())));
     std::size_t j = 1u;
     for (std::size_t i = m_citiesRemainingPostWave - (m_citiesRemainingPostWave - j); j <= m_citiesRemainingPostWave; ++i, ++j) {
-        CLAY({ .backgroundColor = Clay::RgbaToClayColor(player_color), .image = {.imageData = mat, .sourceDimensions = dims} }) {}
+        CLAY({ .backgroundColor = Clay::RgbaToClayColor(player_color), .aspectRatio = { dims.width / dims.height }, .image = {.imageData = mat} }) {}
     }
 }
 
@@ -254,6 +254,6 @@ void EnemyWaveStatePostwave::RenderMissileImageElements() const noexcept {
     const auto dims = Clay::Vector2ToClayDimensions(Vector2(IntVector2(mat->GetTexture(Material::TextureID::Diffuse)->GetDimensions())));
     int j = 1;
     for (int i = m_missilesRemainingPostWave - (m_missilesRemainingPostWave - j); j <= m_missilesRemainingPostWave; ++i, ++j) {
-        CLAY({ .backgroundColor = Clay::RgbaToClayColor(player_color), .image = {.imageData = mat, .sourceDimensions = dims} }) {}
+        CLAY({ .backgroundColor = Clay::RgbaToClayColor(player_color), .aspectRatio = { dims.width / dims.height }, .image = {.imageData = mat} }) {}
     }
 }

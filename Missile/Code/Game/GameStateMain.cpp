@@ -72,6 +72,7 @@ void GameStateMain::OnEnter() noexcept {
     m_cityManager.GetCity(5).SetPosition(m_missileBaseRight.GetMissileLauncherPosition() + right_center_displacement * right_len * 0.25f);
 
     m_waves.SetMissileCount(m_waves.GetMissileCountForWave());
+    m_waves.SetSmartBombCount(m_waves.GetSmartBombCountForWave());
     m_waves.SetMissileSpawnRate(TimeUtils::FPSeconds{ 1.0f });
     m_waves.ChangeState(std::make_unique<EnemyWaveStatePrewave>(&m_waves));
 
@@ -472,6 +473,11 @@ void GameStateMain::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds
     }
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::F1)) {
         g_theUISystem->ToggleClayDebugWindow();
+    }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::S)) {
+        if(auto* active_state = dynamic_cast<EnemyWaveStateActive*>(m_waves.GetCurrentState()); active_state != nullptr) {
+            active_state->LaunchSmartBombFrom(m_mouse_world_pos);
+        }
     }
 }
 
