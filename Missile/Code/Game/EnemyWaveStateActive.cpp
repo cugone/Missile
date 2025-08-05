@@ -1,5 +1,6 @@
 #include "Game/EnemyWaveStateActive.hpp"
 
+#include "Engine/Core/BuildConfig.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 
 #include "Engine/Renderer/Renderer.hpp"
@@ -11,6 +12,10 @@
 #include "Game/EnemyWave.hpp"
 
 #include "Game/EnemyWaveStatePostwave.hpp"
+
+#ifdef PROFILE_BUILD
+#include <Thirdparty/Tracy/tracy/Tracy.hpp>
+#endif
 
 #include <format>
 
@@ -25,10 +30,16 @@ static Clay_LayoutConfig fullscreen_layout = {
 EnemyWaveStateActive::EnemyWaveStateActive(EnemyWave* context) noexcept
     : m_context(context)
 {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     /* DO NOTHING */
 }
 
 void EnemyWaveStateActive::OnEnter() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     g_theUISystem->SetClayLayoutCallback([this]() { this->ClayActive(); });
     m_context->SetMissileCount(m_context->GetMissileCountForWave());
     m_flierSpawnRate.SetSeconds(TimeUtils::FPFrames{ m_context->GetFlierCooldown() });
@@ -37,10 +48,16 @@ void EnemyWaveStateActive::OnEnter() noexcept {
 }
 
 void EnemyWaveStateActive::OnExit() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     /* DO NOTHING */
 }
 
 void EnemyWaveStateActive::BeginFrame() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_missiles.BeginFrame();
     if (m_bomber) {
         m_bomber->BeginFrame();
@@ -54,6 +71,9 @@ void EnemyWaveStateActive::BeginFrame() noexcept {
 }
 
 void EnemyWaveStateActive::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     UpdateMissiles(deltaSeconds);
     UpdateBomber(deltaSeconds);
     UpdateSatellite(deltaSeconds);
@@ -61,6 +81,9 @@ void EnemyWaveStateActive::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSec
 }
 
 void EnemyWaveStateActive::Render() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_missiles.Render();
     if (m_bomber) {
         m_bomber->Render();
@@ -74,6 +97,9 @@ void EnemyWaveStateActive::Render() const noexcept {
 }
 
 void EnemyWaveStateActive::DebugRender() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_missiles.DebugRender();
     if (m_bomber) {
         m_bomber->DebugRender();
@@ -87,6 +113,9 @@ void EnemyWaveStateActive::DebugRender() const noexcept {
 }
 
 void EnemyWaveStateActive::EndFrame() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_missiles.EndFrame();
     if (m_bomber) {
         m_bomber->EndFrame();
@@ -127,30 +156,51 @@ void EnemyWaveStateActive::EndFrame() noexcept {
 }
 
 const MissileManager* EnemyWaveStateActive::GetMissileManager() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return &m_missiles;
 }
 
 MissileManager* EnemyWaveStateActive::GetMissileManager() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return &m_missiles;
 }
 
 Bomber* const EnemyWaveStateActive::GetBomber() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_bomber.get();
 }
 
 Satellite* const EnemyWaveStateActive::GetSatellite() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_satellite.get();
 }
 
 SmartBomb* const EnemyWaveStateActive::GetSmartBomb() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_smartBomb.get();
 }
 
 bool EnemyWaveStateActive::CanSpawnFlier() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_context->IsWaveActive() && m_context->GetWaveId() > 0 && m_context->GetRemainingMissiles() > 0 && (!m_bomber || !m_satellite) && m_flierSpawnRate.Check();
 }
 
 bool EnemyWaveStateActive::IsWaveOver() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (auto* g = GetGameAs<Game>(); g != nullptr) {
         if (auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState()); state != nullptr) {
             const auto all_explosions_finished = state->GetExplosionManager().ActiveExplosionCount() == 0;
@@ -168,6 +218,9 @@ bool EnemyWaveStateActive::IsWaveOver() const noexcept {
 }
 
 void EnemyWaveStateActive::SpawnBomber() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (m_bomber) {
         return;
     }
@@ -181,6 +234,9 @@ void EnemyWaveStateActive::SpawnBomber() noexcept {
 }
 
 void EnemyWaveStateActive::SpawnSatellite() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (m_satellite) {
         return;
     }
@@ -194,6 +250,9 @@ void EnemyWaveStateActive::SpawnSatellite() noexcept {
 }
 
 void EnemyWaveStateActive::SpawnMissile() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     auto* g = GetGameAs<Game>();
     auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
     AABB2 missile_spawn_area = state->GetWorldBounds();
@@ -206,6 +265,9 @@ void EnemyWaveStateActive::SpawnMissile() noexcept {
 }
 
 void EnemyWaveStateActive::SpawnSmartBomb() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     auto* g = GetGameAs<Game>();
     auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
     AABB2 missile_spawn_area = state->GetWorldBounds();
@@ -218,6 +280,9 @@ void EnemyWaveStateActive::SpawnSmartBomb() noexcept {
 }
 
 void EnemyWaveStateActive::UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (m_context->IsWaveActive() && CanSpawnMissile()) {
         if (m_missileSpawnRate.CheckAndReset()) {
             SpawnMissile();
@@ -227,10 +292,16 @@ void EnemyWaveStateActive::UpdateMissiles(TimeUtils::FPSeconds deltaSeconds) noe
 }
 
 bool EnemyWaveStateActive::CanSpawnMissile() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_context->GetRemainingMissiles() > 0 && m_missiles.ActiveMissileCount() < GameConstants::max_missles_on_screen;
 }
 
 void EnemyWaveStateActive::UpdateSatellite(TimeUtils::FPSeconds deltaSeconds) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (!m_satellite) {
         return;
     }
@@ -248,6 +319,9 @@ void EnemyWaveStateActive::UpdateSatellite(TimeUtils::FPSeconds deltaSeconds) no
 }
 
 void EnemyWaveStateActive::UpdateBomber(TimeUtils::FPSeconds deltaSeconds) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (!m_bomber) {
         return;
     }
@@ -265,6 +339,9 @@ void EnemyWaveStateActive::UpdateBomber(TimeUtils::FPSeconds deltaSeconds) noexc
 }
 
 void EnemyWaveStateActive::UpdateSmartBomb(TimeUtils::FPSeconds deltaSeconds) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if(!m_smartBomb) {
         return;
     }
@@ -272,6 +349,9 @@ void EnemyWaveStateActive::UpdateSmartBomb(TimeUtils::FPSeconds deltaSeconds) no
 }
 
 void EnemyWaveStateActive::AdvanceToNextWave() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_bomber.reset();
     m_satellite.reset();
     m_smartBomb.reset();
@@ -279,6 +359,9 @@ void EnemyWaveStateActive::AdvanceToNextWave() noexcept {
 }
 
 bool EnemyWaveStateActive::LaunchMissileFrom(Vector2 position) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (CanSpawnMissile()) {
         if (const auto* g = GetGameAs<Game>(); g != nullptr) {
             if (const auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState()); state != nullptr) {
@@ -293,10 +376,16 @@ bool EnemyWaveStateActive::LaunchMissileFrom(Vector2 position) noexcept {
 }
 
 bool EnemyWaveStateActive::CanSpawnSmartBomb() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_context->GetRemainingSmartBombs() > 0 && m_missiles.ActiveMissileCount() < GameConstants::max_missles_on_screen;
 }
 
 bool EnemyWaveStateActive::LaunchSmartBombFrom(Vector2 position) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     //if(CanSpawnSmartBomb()) {
         if (const auto* g = GetGameAs<Game>(); g != nullptr) {
             if (auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState()); state != nullptr) {
@@ -312,12 +401,18 @@ bool EnemyWaveStateActive::LaunchSmartBombFrom(Vector2 position) noexcept {
 }
 
 void EnemyWaveStateActive::ClayActive() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
         RenderScoreElement();
     }
 }
 
 void EnemyWaveStateActive::RenderScoreElement() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     CLAY({ .id = CLAY_ID("Score"), .layout = {.sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_PERCENT(0.1f)}, .padding = CLAY_PADDING_ALL(0), .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_TOP},}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
         static auto points_str = std::string{};
         points_str = [this]()->std::string {
@@ -341,6 +436,9 @@ void EnemyWaveStateActive::RenderScoreElement() const noexcept {
 }
 
 void EnemyWaveStateActive::RenderScoreMultiplierElement() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     CLAY({ .id = CLAY_ID("ScoreMultiplier"), .layout = {.sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)}, .padding = CLAY_PADDING_ALL(0), .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_CENTER}}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
         static auto points_str = std::string{};
         points_str = std::format("{} X POINTS", m_context->GetScoreMultiplier());

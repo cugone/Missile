@@ -1,5 +1,6 @@
 #include "Game/Game.hpp"
 
+#include "Engine/Core/BuildConfig.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 #include "Engine/Core/FileUtils.hpp"
 #include "Engine/Core/KerningFont.hpp"
@@ -25,33 +26,55 @@
 
 #include "Game/GameConfig.hpp"
 
+#ifdef PROFILE_BUILD
+#include <Thirdparty/Tracy/tracy/Tracy.hpp>
+#endif
+
 #include <algorithm>
 #include <format>
 #include <utility>
 
 void MySettings::SaveToConfig(Config& config) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     GameSettings::SaveToConfig(config);
     config.SetValue("uiScale", m_UiScale);
 }
 
 void MySettings::SetToDefault() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     GameSettings::SetToDefault();
     m_UiScale = m_defaultUiScale;
 }
 
 float MySettings::GetUiScale() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_UiScale;
 }
 
 void MySettings::SetUiScale(float newScale) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_UiScale = newScale;
 }
 
 float MySettings::DefaultUiScale() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_defaultUiScale;
 }
 
 void Game::LoadOrCreateConfigFile() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (!g_theConfig->AppendFromFile(GameConstants::game_config_path)) {
         if (g_theConfig->HasKey("uiScale")) {
             float value = m_mySettings.GetUiScale();
@@ -67,10 +90,16 @@ void Game::LoadOrCreateConfigFile() noexcept {
 }
 
 void Game::ChangeState(std::unique_ptr<GameState> newState) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_nextState = std::move(newState);
 }
 
 void Game::Initialize() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     LoadOrCreateConfigFile();
     g_theRenderer->SetVSync(true);
     g_theRenderer->RegisterMaterialsFromFolder(FileUtils::GetKnownFolderPath(FileUtils::KnownPathID::GameMaterials));
@@ -81,6 +110,9 @@ void Game::Initialize() noexcept {
 }
 
 void Game::BeginFrame() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if(m_nextState) {
         m_currentState->OnExit();
         m_currentState = std::move(m_nextState);
@@ -91,31 +123,52 @@ void Game::BeginFrame() noexcept {
 }
 
 void Game::Update(TimeUtils::FPSeconds deltaSeconds) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     g_theRenderer->UpdateGameTime(deltaSeconds);
     m_currentState->Update(deltaSeconds);
 }
 
 void Game::Render() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_currentState->Render();
 }
 
 void Game::EndFrame() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_currentState->EndFrame();
 }
 
 const Player* Game::GetPlayerData() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return &m_playerData;
 }
 
 Player* Game::GetPlayerData() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return &m_playerData;
 }
 
 int Game::GetPlayerScore() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return GetPlayerData()->score;
 }
 
 void Game::AdjustPlayerScore(int scoreToAdd) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_playerData.score += scoreToAdd;
     m_playerData.scoreRemainingForBonusCity -= scoreToAdd;
     if(m_playerData.scoreRemainingForBonusCity <= 0) {
@@ -127,21 +180,36 @@ void Game::AdjustPlayerScore(int scoreToAdd) noexcept {
 }
 
 int Game::GetHighScore() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_currentHighScore;
 }
 
 void Game::UpdateHighScore() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_currentHighScore = (std::max)(GetPlayerScore(), GetHighScore());
 }
 
 GameState* const Game::GetCurrentState() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_currentState.get();
 }
 
 const GameSettings* Game::GetSettings() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return &m_mySettings;
 }
 
 GameSettings* Game::GetSettings() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return &m_mySettings;
 }

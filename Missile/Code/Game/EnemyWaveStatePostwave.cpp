@@ -2,6 +2,7 @@
 
 #include "Engine/Audio/AudioSystem.hpp"
 
+#include "Engine/Core/BuildConfig.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 
 #include "Engine/Renderer/Renderer.hpp"
@@ -11,6 +12,10 @@
 #include "Game/Game.hpp"
 #include "Game/EnemyWave.hpp"
 #include "Game/EnemyWaveStatePrewave.hpp"
+
+#ifdef PROFILE_BUILD
+#include <Thirdparty/Tracy/tracy/Tracy.hpp>
+#endif
 
 #include <format>
 
@@ -27,10 +32,16 @@ static Clay_LayoutConfig fullscreen_layout = {
 EnemyWaveStatePostwave::EnemyWaveStatePostwave(EnemyWave* context) noexcept
     : m_context(context)
 {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     /* DO NOTHING */
 }
 
 void EnemyWaveStatePostwave::OnEnter() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     auto* g = GetGameAs<Game>();
     auto* state = g->GetCurrentState();
     auto* main_state = dynamic_cast<GameStateMain*>(state);
@@ -53,6 +64,9 @@ void EnemyWaveStatePostwave::OnEnter() noexcept {
 }
 
 void EnemyWaveStatePostwave::OnExit() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     auto* g = GetGameAs<Game>();
     auto* state = g->GetCurrentState();
     auto* main_state = dynamic_cast<GameStateMain*>(state);
@@ -85,6 +99,9 @@ void EnemyWaveStatePostwave::OnExit() noexcept {
 }
 
 void EnemyWaveStatePostwave::BeginFrame() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     auto* g = GetGameAs<Game>();
     auto* state = g->GetCurrentState();
     auto* main_state = dynamic_cast<GameStateMain*>(state);
@@ -123,18 +140,30 @@ void EnemyWaveStatePostwave::BeginFrame() noexcept {
 }
 
 void EnemyWaveStatePostwave::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     /* DO NOTHING */
 }
 
 void EnemyWaveStatePostwave::Render() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     /* DO NOTHING */
 }
 
 void EnemyWaveStatePostwave::DebugRender() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     /* DO NOTHING */
 }
 
 void EnemyWaveStatePostwave::EndFrame() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (m_postWaveTimer.CheckAndReset()) {
         if (m_canTransision) {
             m_canTransision = false;
@@ -144,6 +173,9 @@ void EnemyWaveStatePostwave::EndFrame() noexcept {
 }
 
 void EnemyWaveStatePostwave::ClayPostwave() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     CLAY({ .id = CLAY_ID("OuterContainer"), .layout = fullscreen_layout, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
         RenderScoreElement();
         RenderPostWaveStatsElement();
@@ -151,6 +183,9 @@ void EnemyWaveStatePostwave::ClayPostwave() noexcept {
 }
 
 void EnemyWaveStatePostwave::RenderScoreElement() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     CLAY({ .id = CLAY_ID("Score"), .layout = {.sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_PERCENT(0.1f)}, .padding = CLAY_PADDING_ALL(0), .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_TOP},}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
         static auto points_str = std::string{};
         points_str = [this]()->std::string {
@@ -172,6 +207,9 @@ void EnemyWaveStatePostwave::RenderScoreElement() const noexcept {
 }
 
 void EnemyWaveStatePostwave::RenderScoreMultiplierElement() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     CLAY({ .id = CLAY_ID("ScoreMultiplier"), .layout = {.sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)}, .padding = CLAY_PADDING_ALL(0), .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_CENTER}}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
         static auto points_str = std::string{};
         points_str = std::format("{} X POINTS", m_context->GetScoreMultiplier());
@@ -183,6 +221,9 @@ void EnemyWaveStatePostwave::RenderScoreMultiplierElement() const noexcept {
 }
 
 void EnemyWaveStatePostwave::RenderPostWaveStatsElement() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     const Clay_TextElementConfig textConfig{ .userData = g_theRenderer->GetFont("System32"), .textColor = Clay::RgbaToClayColor(m_context->GetObjectColor()) };
 
     CLAY({ .id = CLAY_ID("PostwaveStatsContainer"), .layout = {.sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)}, .childGap = 16, .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_TOP}, .layoutDirection = Clay_LayoutDirection::CLAY_TOP_TO_BOTTOM,}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
@@ -223,6 +264,9 @@ void EnemyWaveStatePostwave::RenderPostWaveStatsElement() const noexcept {
 
 
 void EnemyWaveStatePostwave::RenderCityImageElements() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     const auto player_color = []()->Rgba {
         if (const auto* g = GetGameAs<Game>(); g != nullptr) {
             if (auto* mainState = dynamic_cast<GameStateMain*>(g->GetCurrentState()); mainState != nullptr) {
@@ -241,6 +285,9 @@ void EnemyWaveStatePostwave::RenderCityImageElements() const noexcept {
 }
 
 void EnemyWaveStatePostwave::RenderMissileImageElements() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     const auto player_color = []()->Rgba {
         if (const auto* g = GetGameAs<Game>(); g != nullptr) {
             if (auto* mainState = dynamic_cast<GameStateMain*>(g->GetCurrentState()); mainState != nullptr) {
