@@ -674,14 +674,19 @@ void GameStateMain::EndFrame() noexcept {
 #ifdef PROFILE_BUILD
     ZoneScoped;
 #endif
-    m_mouse_pos += m_mouse_delta;
-    if(!g_theUISystem->IsAnyDebugWindowVisible()) {
-        g_theInputSystem->SetCursorToWindowCenter();
-        if (g_theInputSystem->IsMouseCursorVisible()) {
-            g_theInputSystem->HideMouseCursor();
-        }
+    const auto has_focus = ServiceLocator::get<IAppService>()->HasFocus();
+    const auto debug_visible = g_theUISystem->IsAnyDebugWindowVisible();
+    const auto should_show_mouse = !has_focus || debug_visible;
+    g_theInputSystem->HideMouseCursor();
+    if(should_show_mouse) {
+        g_theInputSystem->ShowMouseCursor();
     }
-    m_mouse_delta = Vector2::Zero;
+    const auto should_reset_cursor_position = has_focus && !debug_visible;
+    if(should_reset_cursor_position) {
+        m_mouse_pos += m_mouse_delta;
+        g_theInputSystem->SetCursorToWindowCenter();
+        m_mouse_delta = Vector2::Zero;
+    }
     m_missileBaseLeft.EndFrame();
     m_missileBaseCenter.EndFrame();
     m_missileBaseRight.EndFrame();
