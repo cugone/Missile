@@ -56,6 +56,14 @@ public:
     bool CanSpawnMissile() const noexcept;
     bool LaunchMissileFrom(Vector2 position) noexcept;
 
+    void DecrementSmartBombCount() noexcept;
+    void SetSmartBombCount(int newSmartBombCount) noexcept;
+    int GetSmartBombCountForWave() const noexcept;
+    int GetRemainingSmartBombs() const noexcept;
+
+    bool CanSpawnSmartBomb() const noexcept;
+    bool LaunchSmartBombFrom(Vector2 position) noexcept;
+
     const EnemyWaveState* GetCurrentState() const noexcept;
     EnemyWaveState* GetCurrentState() noexcept;
 
@@ -68,5 +76,6 @@ private:
     Stopwatch m_missileSpawnRate{};
     Stopwatch m_flierSpawnRate{};
     int m_missileCount{0};
+    int m_smartBombCount{0};
     bool m_isActive{false};
 };

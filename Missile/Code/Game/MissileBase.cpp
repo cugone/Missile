@@ -57,14 +57,14 @@ void MissileBase::Render() const noexcept {
     }
 
     if (OutOfMissiles()) {
-        const auto* font = g_theRenderer->GetFont("System32");
+        const auto* font = g_theRenderer->GetDefaultFont();
         const auto S = Matrix4::I;
         const auto R = Matrix4::I;
         const auto T = Matrix4::CreateTranslationMatrix(m_position + Vector2{-0.5f * font->CalculateTextWidth("OUT"), 24.0f});
         const auto M = Matrix4::MakeSRT(S, R, T);
         g_theRenderer->DrawTextLine(M, font, "OUT", GetMissileColor());
     } else if(LowOnMissiles()) {
-        const auto* font = g_theRenderer->GetFont("System32");
+        const auto* font = g_theRenderer->GetDefaultFont();
         const auto S = Matrix4::I;
         const auto R = Matrix4::I;
         const auto T = Matrix4::CreateTranslationMatrix(m_position + Vector2{-0.5f * font->CalculateTextWidth("LOW"), 24.0f});

@@ -2,6 +2,8 @@
 
 #include "Engine/Audio/AudioSystem.hpp"
 
+#include "Engine/Core/App.hpp"
+#include "Engine/Core/BuildConfig.hpp"
 #include "Engine/Core/EngineCommon.hpp"
 
 #include "Engine/Input/InputSystem.hpp"
@@ -26,10 +28,16 @@
 #include "Game/EnemyWaveStateActive.hpp"
 #include "Game/EnemyWaveStatePostwave.hpp"
 
+#ifdef PROFILE_BUILD
+#include <Thirdparty/Tracy/tracy/Tracy.hpp>
+#endif
+
 #include <format>
 
 void GameStateMain::OnEnter() noexcept {
-
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     auto dims = Vector2{ g_theRenderer->GetOutput()->GetDimensions() };
     m_world_bounds.ScalePadding(dims.x, dims.y);
     m_world_bounds.Translate(-m_world_bounds.CalcCenter());
@@ -72,6 +80,7 @@ void GameStateMain::OnEnter() noexcept {
     m_cityManager.GetCity(5).SetPosition(m_missileBaseRight.GetMissileLauncherPosition() + right_center_displacement * right_len * 0.25f);
 
     m_waves.SetMissileCount(m_waves.GetMissileCountForWave());
+    m_waves.SetSmartBombCount(m_waves.GetSmartBombCountForWave());
     m_waves.SetMissileSpawnRate(TimeUtils::FPSeconds{ 1.0f });
     m_waves.ChangeState(std::make_unique<EnemyWaveStatePrewave>(&m_waves));
 
@@ -82,10 +91,15 @@ void GameStateMain::OnEnter() noexcept {
 }
 
 void GameStateMain::OnExit() noexcept {
-
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
 }
 
 void GameStateMain::BeginFrame() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_waves.BeginFrame();
     m_missileBaseLeft.BeginFrame();
     m_missileBaseCenter.BeginFrame();
@@ -95,7 +109,9 @@ void GameStateMain::BeginFrame() noexcept {
 }
 
 void GameStateMain::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) noexcept {
-
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     g_theRenderer->UpdateGameTime(deltaSeconds);
     HandleDebugInput(deltaSeconds);
     HandlePlayerInput(deltaSeconds);
@@ -120,12 +136,18 @@ void GameStateMain::Update([[maybe_unused]] TimeUtils::FPSeconds deltaSeconds) n
 }
 
 void GameStateMain::HandlePlayerInput(TimeUtils::FPSeconds deltaSeconds) {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     HandleKeyboardInput(deltaSeconds);
     HandleControllerInput(deltaSeconds);
     HandleMouseInput(deltaSeconds);
 }
 
 void GameStateMain::HandleKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::Esc)) {
         if (auto* g = GetGameAs<Game>(); g != nullptr) {
             //g->ChangeState(std::make_unique<GameStateTitle>());
@@ -147,10 +169,15 @@ void GameStateMain::HandleKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
 }
 
 void GameStateMain::HandleControllerInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
-
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
 }
 
 void GameStateMain::HandleMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (g_theInputSystem->WasMouseMoved()) {
         m_mouse_delta = g_theInputSystem->GetMouseDeltaFromWindowCenter();
     }
@@ -166,11 +193,17 @@ void GameStateMain::HandleMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
 }
 
 void GameStateMain::CalculateCrosshairLocation() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_mouse_world_pos = CalcCrosshairPositionFromRawMousePosition();
     ClampCrosshairToRadar();
 }
 
 void GameStateMain::ClampCrosshairToRadar() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     AABB2 cull = m_cameraController.CalcCullBounds();
     cull.maxs.y -= GameConstants::radar_line_distance;
     m_mouse_world_pos = MathUtils::CalcClosestPoint(m_mouse_world_pos, cull);
@@ -178,6 +211,9 @@ void GameStateMain::ClampCrosshairToRadar() noexcept {
 }
 
 const bool GameStateMain::IsCrosshairClampedToRadar() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     const auto cull = [this]() {
         auto bounds = m_cameraController.CalcCullBounds();
         bounds.maxs.y -= GameConstants::radar_line_distance;
@@ -187,76 +223,130 @@ const bool GameStateMain::IsCrosshairClampedToRadar() const noexcept {
 }
 
 Vector2 GameStateMain::CalculatePlayerMissileTarget() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return CalcCrosshairPositionFromRawMousePosition();
 }
 
 Vector2 GameStateMain::BaseLocationLeft() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_missileBaseLeft.GetMissileLauncherPosition();
 }
 
 Vector2 GameStateMain::BaseLocationCenter() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_missileBaseCenter.GetMissileLauncherPosition();
 }
 
 Vector2 GameStateMain::BaseLocationRight() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_missileBaseRight.GetMissileLauncherPosition();
 }
 
 Vector2 GameStateMain::CityLocation(std::size_t index) const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_cityManager.GetCity(index).GetCollisionMesh().CalcCenter();
 }
 
 const std::array<MissileManager::Target, 9> GameStateMain::GetValidTargets() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return std::array<MissileManager::Target, 9>{ BaseLocationLeft(), BaseLocationCenter(), BaseLocationRight(), CityLocation(0), CityLocation(1), CityLocation(2), CityLocation(3), CityLocation(4), CityLocation(5) };
 }
 
 Vector2 GameStateMain::CalcCrosshairPositionFromRawMousePosition() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_cameraController.ConvertScreenToWorldCoords(m_mouse_pos);
 }
 
 const CityManager& GameStateMain::GetCityManager() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_cityManager;
 }
 
 CityManager& GameStateMain::GetCityManager() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_cityManager;
 }
 
 void GameStateMain::CreateExplosionAt(Vector2 position, Faction faction) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_explosionManager.CreateExplosionAt(ExplosionManager::ExplosionData{ Vector4{position, GameConstants::max_explosion_size, 3.0f}, faction });
 }
 
 const MissileManager* GameStateMain::GetMissileManager() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_waves.GetMissileManager();
 }
 
 MissileManager* GameStateMain::GetMissileManager() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_waves.GetMissileManager();
 }
 
 const ExplosionManager& GameStateMain::GetExplosionManager() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_explosionManager;
 }
 
 ExplosionManager& GameStateMain::GetExplosionManager() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_explosionManager;
 }
 
 AABB2 GameStateMain::GetWorldBounds() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_world_bounds;
 }
 
 bool GameStateMain::HasMissilesRemaining() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_missileBaseLeft.HasMissilesRemaining() || m_missileBaseCenter.HasMissilesRemaining() || m_missileBaseRight.HasMissilesRemaining();
 }
 
 void GameStateMain::ResetMissileCount() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_missileBaseLeft.ResetMissiles();
     m_missileBaseCenter.ResetMissiles();
     m_missileBaseRight.ResetMissiles();
 }
 
 void GameStateMain::DecrementTotalMissiles() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if(m_missileBaseLeft.HasMissilesRemaining()) {
         m_missileBaseLeft.DecrementMissiles();
     } else if(m_missileBaseCenter.HasMissilesRemaining()) {
@@ -269,10 +359,16 @@ void GameStateMain::DecrementTotalMissiles() noexcept {
 }
 
 int GameStateMain::GetTotalMissiles() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_missileBaseLeft.GetMissilesRemaining() + m_missileBaseCenter.GetMissilesRemaining() + m_missileBaseRight.GetMissilesRemaining();
 }
 
 void GameStateMain::HandleMissileExplosionCollisions(MissileManager* missileManager) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (missileManager == nullptr) {
         return;
     }
@@ -292,6 +388,9 @@ void GameStateMain::HandleMissileExplosionCollisions(MissileManager* missileMana
 }
 
 void GameStateMain::HandleBomberExplosionCollision() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (auto* bomber = m_waves.GetBomber(); bomber == nullptr) {
         return;
     } else {
@@ -308,6 +407,9 @@ void GameStateMain::HandleBomberExplosionCollision() noexcept {
 }
 
 void GameStateMain::HandleSatelliteExplosionCollision() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (auto* sat = m_waves.GetSatellite(); sat == nullptr) {
         return;
     } else {
@@ -324,6 +426,9 @@ void GameStateMain::HandleSatelliteExplosionCollision() noexcept {
 }
 
 void GameStateMain::HandleMissileGroundCollisions(MissileManager* missileManager) noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (missileManager == nullptr) {
         return;
     }
@@ -338,6 +443,9 @@ void GameStateMain::HandleMissileGroundCollisions(MissileManager* missileManager
 }
 
 void GameStateMain::HandleCityExplosionCollisions() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     const auto& explosions = m_explosionManager.GetExplosionCollisionMeshes();
     for (int i = 0; i < GameConstants::max_cities; ++i) {
         auto& city = m_cityManager.GetCity(i);
@@ -350,6 +458,9 @@ void GameStateMain::HandleCityExplosionCollisions() noexcept {
 }
 
 void GameStateMain::HandleBaseExplosionCollisions() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     for (const auto& explosion : m_explosionManager.GetExplosionCollisionMeshes()) {
         if (MathUtils::Contains(explosion, m_missileBaseLeft.GetCollisionMesh())) {
             m_missileBaseLeft.Kill();
@@ -364,12 +475,18 @@ void GameStateMain::HandleBaseExplosionCollisions() noexcept {
 }
 
 void GameStateMain::UpdateHighScore() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (auto* g = GetGameAs<Game>(); g != nullptr) {
         g->UpdateHighScore();
     }
 }
 
 void GameStateMain::RenderGround() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     g_theRenderer->SetMaterial(g_theRenderer->GetMaterial("__2D"));
     const auto S = Matrix4::CreateScaleMatrix(Vector2::One * Vector2{ 1600.0f, 40.0f });
     const auto R = Matrix4::I;
@@ -380,6 +497,9 @@ void GameStateMain::RenderGround() const noexcept {
 }
 
 void GameStateMain::RenderObjects() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     m_waves.Render();
     m_missileBaseLeft.Render();
     m_missileBaseCenter.Render();
@@ -389,14 +509,23 @@ void GameStateMain::RenderObjects() const noexcept {
 }
 
 void GameStateMain::RenderCrosshair() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     RenderCrosshairAt(m_mouse_pos);
 }
 
 void GameStateMain::RenderCrosshairAt(Vector2 pos) const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     RenderCrosshairAt(pos, Rgba::White);
 }
 
 void GameStateMain::RenderCrosshairAt(Vector2 pos, const Rgba& color) const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     auto* mat = g_theRenderer->GetMaterial("crosshair");
     g_theRenderer->SetMaterial(mat);
     const auto&& [x, y, _] = mat->GetTexture(Material::TextureID::Diffuse)->GetDimensions().GetXYZ();
@@ -421,6 +550,9 @@ void GameStateMain::RenderCrosshairAt(Vector2 pos, const Rgba& color) const noex
 }
 
 void GameStateMain::RenderRadarLine() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (IsCrosshairClampedToRadar()) {
         g_theRenderer->SetModelMatrix();
         g_theRenderer->SetMaterial("__2D");
@@ -435,35 +567,56 @@ void GameStateMain::RenderRadarLine() const noexcept {
 }
 
 std::size_t GameStateMain::GetWaveId() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_waves.GetWaveId();
 }
 
 Rgba GameStateMain::GetGroundColor() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     auto* g = GetGameAs<Game>();
     auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
     return Rgba(GameConstants::wave_ground_color_lookup[state->GetWaveId() % GameConstants::wave_array_size]);
 }
 
 Rgba GameStateMain::GetPlayerColor() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     auto* g = GetGameAs<Game>();
     auto* state = dynamic_cast<GameStateMain*>(g->GetCurrentState());
     return Rgba(GameConstants::wave_player_color_lookup[state->GetWaveId() % GameConstants::wave_array_size]);
 }
 
 const OrthographicCameraController& GameStateMain::GetCameraController() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_cameraController;
 }
 
 OrthographicCameraController& GameStateMain::GetCameraController() noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     return m_cameraController;
 }
 
 void GameStateMain::HandleDebugInput(TimeUtils::FPSeconds deltaSeconds) {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     HandleDebugKeyboardInput(deltaSeconds);
     HandleDebugMouseInput(deltaSeconds);
 }
 
 void GameStateMain::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (g_theUISystem->WantsInputKeyboardCapture()) {
         return;
     }
@@ -473,15 +626,26 @@ void GameStateMain::HandleDebugKeyboardInput(TimeUtils::FPSeconds /*deltaSeconds
     if (g_theInputSystem->WasKeyJustPressed(KeyCode::F1)) {
         g_theUISystem->ToggleClayDebugWindow();
     }
+    if(g_theInputSystem->WasKeyJustPressed(KeyCode::S)) {
+        if(auto* active_state = dynamic_cast<EnemyWaveStateActive*>(m_waves.GetCurrentState()); active_state != nullptr) {
+            active_state->LaunchSmartBombFrom(m_mouse_world_pos);
+        }
+    }
 }
 
 void GameStateMain::HandleDebugMouseInput(TimeUtils::FPSeconds /*deltaSeconds*/) {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
     if (g_theUISystem->WantsInputMouseCapture()) {
         return;
     }
 }
 
 void GameStateMain::Render() const noexcept {
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
 
     g_theRenderer->BeginRenderToBackbuffer(m_waves.GetBackgroundColor());
 
@@ -507,14 +671,22 @@ void GameStateMain::Render() const noexcept {
 }
 
 void GameStateMain::EndFrame() noexcept {
-    m_mouse_pos += m_mouse_delta;
-    if (!g_theUISystem->IsAnyDebugWindowVisible()) {
-        g_theInputSystem->SetCursorToWindowCenter();
-        if (g_theInputSystem->IsMouseCursorVisible()) {
-            g_theInputSystem->HideMouseCursor();
-        }
+#ifdef PROFILE_BUILD
+    ZoneScoped;
+#endif
+    const auto has_focus = ServiceLocator::get<IAppService>()->HasFocus();
+    const auto debug_visible = g_theUISystem->IsAnyDebugWindowVisible();
+    const auto should_show_mouse = !has_focus || debug_visible;
+    g_theInputSystem->HideMouseCursor();
+    if(should_show_mouse) {
+        g_theInputSystem->ShowMouseCursor();
     }
-    m_mouse_delta = Vector2::Zero;
+    const auto should_reset_cursor_position = has_focus && !debug_visible;
+    if(should_reset_cursor_position) {
+        m_mouse_pos += m_mouse_delta;
+        g_theInputSystem->SetCursorToWindowCenter();
+        m_mouse_delta = Vector2::Zero;
+    }
     m_missileBaseLeft.EndFrame();
     m_missileBaseCenter.EndFrame();
     m_missileBaseRight.EndFrame();
