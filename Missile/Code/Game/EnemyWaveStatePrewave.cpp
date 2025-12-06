@@ -119,7 +119,7 @@ void EnemyWaveStatePrewave::RenderScoreElement() const noexcept {
             }
             }();
         Clay_TextElementConfig textConfig{};
-        textConfig.userData = g_theRenderer->GetFont("System32");
+        textConfig.userData = g_theRenderer->GetDefaultFont();
         textConfig.textColor = Clay::RgbaToClayColor(Rgba::White);
         textConfig.wrapMode = Clay_TextElementConfigWrapMode::CLAY_TEXT_WRAP_NEWLINES;
         CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
@@ -134,7 +134,7 @@ void EnemyWaveStatePrewave::RenderScoreMultiplierElement() const noexcept {
         static auto points_str = std::string{};
         points_str = std::format("{} X POINTS", m_context->GetScoreMultiplier());
         Clay_TextElementConfig textConfig{};
-        textConfig.userData = g_theRenderer->GetFont("System32");
+        textConfig.userData = g_theRenderer->GetDefaultFont();
         textConfig.textColor = Clay::RgbaToClayColor(m_context->GetObjectColor());
         textConfig.fontSize = 32;
         CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));

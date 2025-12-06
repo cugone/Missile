@@ -426,9 +426,9 @@ void EnemyWaveStateActive::RenderScoreElement() const noexcept {
             }
             }();
         Clay_TextElementConfig textConfig{};
-        auto* font = g_theRenderer->GetFont("System32");
-        textConfig.fontId = static_cast<uint16_t>(g_theRenderer->GetFontId("System32"));
-        textConfig.fontSize = static_cast<uint16_t>(font->GetInfoDef().em_size);
+        auto* font = g_theRenderer->GetDefaultFont();
+        textConfig.fontId = static_cast<uint16_t>(g_theRenderer->GetFontId(font->GetName()));
+        textConfig.fontSize = static_cast<uint16_t>(font->GetEmSize());
         textConfig.textColor = Clay::RgbaToClayColor(Rgba::White);
         textConfig.wrapMode = Clay_TextElementConfigWrapMode::CLAY_TEXT_WRAP_NEWLINES;
         CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
@@ -443,7 +443,7 @@ void EnemyWaveStateActive::RenderScoreMultiplierElement() const noexcept {
         static auto points_str = std::string{};
         points_str = std::format("{} X POINTS", m_context->GetScoreMultiplier());
         Clay_TextElementConfig textConfig{};
-        textConfig.userData = g_theRenderer->GetFont("System32");
+        textConfig.userData = g_theRenderer->GetDefaultFont();
         textConfig.textColor = Clay::RgbaToClayColor(m_context->GetObjectColor());
         CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
     }

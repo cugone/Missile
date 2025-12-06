@@ -199,7 +199,7 @@ void EnemyWaveStatePostwave::RenderScoreElement() const noexcept {
             }
             }();
         Clay_TextElementConfig textConfig{};
-        textConfig.userData = g_theRenderer->GetFont("System32");
+        textConfig.userData = g_theRenderer->GetDefaultFont();
         textConfig.textColor = Clay::RgbaToClayColor(Rgba::White);
         textConfig.wrapMode = Clay_TextElementConfigWrapMode::CLAY_TEXT_WRAP_NEWLINES;
         CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
@@ -214,7 +214,7 @@ void EnemyWaveStatePostwave::RenderScoreMultiplierElement() const noexcept {
         static auto points_str = std::string{};
         points_str = std::format("{} X POINTS", m_context->GetScoreMultiplier());
         Clay_TextElementConfig textConfig{};
-        textConfig.userData = g_theRenderer->GetFont("System32");
+        textConfig.userData = g_theRenderer->GetDefaultFont();
         textConfig.textColor = Clay::RgbaToClayColor(m_context->GetObjectColor());
         CLAY_TEXT(Clay::StrToClayString(points_str), CLAY_TEXT_CONFIG(textConfig));
     }
@@ -224,7 +224,7 @@ void EnemyWaveStatePostwave::RenderPostWaveStatsElement() const noexcept {
 #ifdef PROFILE_BUILD
     ZoneScoped;
 #endif
-    const Clay_TextElementConfig textConfig{ .userData = g_theRenderer->GetFont("System32"), .textColor = Clay::RgbaToClayColor(m_context->GetObjectColor()) };
+    const Clay_TextElementConfig textConfig{ .userData = g_theRenderer->GetDefaultFont(), .textColor = Clay::RgbaToClayColor(m_context->GetObjectColor())};
 
     CLAY({ .id = CLAY_ID("PostwaveStatsContainer"), .layout = {.sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)}, .childGap = 16, .childAlignment = {.x = Clay_LayoutAlignmentX::CLAY_ALIGN_X_CENTER, .y = Clay_LayoutAlignmentY::CLAY_ALIGN_Y_TOP}, .layoutDirection = Clay_LayoutDirection::CLAY_TOP_TO_BOTTOM,}, .backgroundColor = Clay::RgbaToClayColor(Rgba::NoAlpha) }) {
         CLAY_TEXT(CLAY_STRING_CONST("BONUS POINTS"), CLAY_TEXT_CONFIG(textConfig));
